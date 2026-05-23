@@ -17,10 +17,24 @@ services:
       --lower_case_table_names=1
       --max_allowed_packet=128M
       --default-authentication-plugin=caching_sha2_password
+      # ----------------------------------------------------------------
+      # [开发环境 I/O 优化] 针对 Windows/WSL2 Bind Mount 场景，
+      # 以下三项参数可大幅加速 SQL 初始化导入（牺牲极端断电下的数据一致性）。
+      #
+      # 生产环境请删除或替换为以下安全值：
+      #   --innodb_flush_log_at_trx_commit=1  # 每次事务提交强制刷盘（默认值）
+      #   --innodb_doublewrite=ON             # 启用双写缓冲（默认值）
+      #   --sync_binlog=1                     # binlog 每次提交同步（默认值）
+      # ----------------------------------------------------------------
+      --innodb_flush_log_at_trx_commit=0
+      --innodb_doublewrite=0
+      --sync_binlog=0
     ports:
       - 13306:3306
     networks:
       - jeecg-boot
+    volumes:
+      - ./data/mysql:/var/lib/mysql
 
   jeecg-boot-redis:
     image: registry.cn-hangzhou.aliyuncs.com/jeecgdocker/redis:5.0
@@ -31,6 +45,8 @@ services:
     container_name: jeecg-boot-redis
     networks:
       - jeecg-boot
+    volumes:
+      - ./data/redis:/data
 
   jeecg-boot-system:
     build:
@@ -46,6 +62,11 @@ services:
       - 8080:8080
     networks:
       - jeecg-boot
+    volumes:
+      - ./jeecg-boot/jeecg-module-system/jeecg-system-start:/jeecg-boot/app
+    command: >
+      sh -c "sleep 60 && exec java -Djava.security.egd=file:/dev/./urandom -jar /jeecg-boot/app/target/jeecg-system-start-3.9.2.jar"
+  
   jeecg-vue:
     build:
       context: ./jeecgboot-vue3
@@ -70,6 +91,8 @@ services:
     restart: always
     networks:
       - jeecg-boot
+    volumes:
+      - ./data/pgvector:/var/lib/postgresql/data
 
 networks:
   jeecg-boot:

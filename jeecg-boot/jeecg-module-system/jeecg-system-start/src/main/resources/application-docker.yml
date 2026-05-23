@@ -106,6 +106,7 @@ spring:
     exclude:
       - com.alibaba.druid.spring.boot3.autoconfigure.DruidDataSourceAutoConfigure
       - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+  
   datasource:
     druid:
       stat-view-servlet:
@@ -178,6 +179,7 @@ mybatis-plus:
     #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     # 返回类型为Map,显示null对应的字段
     call-setters-on-nulls: true
+
 #jeecg专用配置
 minidao:
   base-package: org.jeecg.modules.jmreport.*,org.jeecg.modules.drag.*
