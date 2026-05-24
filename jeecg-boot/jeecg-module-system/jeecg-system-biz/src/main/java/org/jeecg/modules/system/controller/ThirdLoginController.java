@@ -62,7 +62,7 @@ public class ThirdLoginController {
 	private BaseCommonService baseCommonService;
 	@Autowired
     private RedisUtil redisUtil;
-	@Autowired
+	@Autowired(required = false)
 	private AuthRequestFactory factory;
 	@Autowired
 	private ISysDepartService sysDepartService;
@@ -81,6 +81,13 @@ public class ThirdLoginController {
 	@RequestMapping("/render/{source}")
     public void render(@PathVariable("source") String source, HttpServletResponse response) throws IOException {
         log.info("第三方登录进入render：" + source);
+        if (factory == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("text/html;charset=utf-8");
+            response.getWriter().write("第三方登录功能已禁用 (JustAuth is disabled)");
+            return;
+        }
         AuthRequest authRequest = factory.get(source);
         String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
         log.info("第三方登录认证地址：" + authorizeUrl);
@@ -90,6 +97,10 @@ public class ThirdLoginController {
 	@RequestMapping("/{source}/callback")
     public String loginThird(@PathVariable("source") String source, AuthCallback callback,ModelMap modelMap) {
 		log.info("第三方登录进入callback：" + source + " params：" + JSONObject.toJSONString(callback));
+        if (factory == null) {
+            modelMap.addAttribute("token", "第三方登录功能未启用");
+            return "thirdLogin";
+        }
         AuthRequest authRequest = factory.get(source);
         AuthResponse response = authRequest.login(callback);
         log.info(JSONObject.toJSONString(response));
