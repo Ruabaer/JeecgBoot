@@ -197,7 +197,17 @@ public class AiragModelController extends JeecgController<AiragModel, IAiragMode
             //update-end---author:wangshuai---date:2026-01-07---for:【QQYUN-12145】【AI】AI 绘画创作---
         }catch (Exception e){
             log.error("测试模型连接失败", e);
-            return Result.error(e.getMessage());
+            Throwable rootCause = e;
+            while (rootCause.getCause() != null) {
+                rootCause = rootCause.getCause();
+            }
+            String errMsg = e.getMessage();
+            if (rootCause instanceof ArrayIndexOutOfBoundsException && "ZHIPU".equalsIgnoreCase(airagModel.getProvider())) {
+                errMsg = "智谱 AI 的 API Key 格式不正确，标准格式必须是带有点号(.)分隔符的 'ID.Secret' (例如: xxxx.yyyy)";
+            } else if (rootCause instanceof IllegalArgumentException && rootCause.getMessage() != null && rootCause.getMessage().contains("Unexpected char 0x")) {
+                errMsg = "API Key 中包含了非法字符（如中文字符），请确保 API Key 为纯英文/数字及合法字符";
+            }
+            return Result.error(oConvertUtils.isEmpty(errMsg) ? "测试模型连接失败" : errMsg);
         }
         // 测试成功激活数据
         airagModel.setActivateFlag(1);

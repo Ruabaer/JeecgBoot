@@ -32,6 +32,8 @@ public class JeecgSystemApplication extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) throws UnknownHostException {
+        // 解决 langchain4j 在类路径中同时发现 OkHttp 和 JdkHttpClient 导致的 SPI 冲突问题
+        System.setProperty("langchain4j.http.clientBuilderFactory", "dev.langchain4j.http.client.okhttp.OkHttpClientBuilderFactory");
         SpringApplication app = new SpringApplication(JeecgSystemApplication.class);
         Map<String, Object> defaultProperties = new HashMap<>();
         defaultProperties.put("management.health.elasticsearch.enabled", false);

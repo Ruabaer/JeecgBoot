@@ -246,6 +246,8 @@ public class ShiroConfig {
     public DefaultWebSecurityManager securityManager(ShiroRealm myRealm) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(myRealm);
+        // 禁用 RememberMeManager 以防止反序列化漏洞及解密失败警告
+        securityManager.setRememberMeManager(null);
 
         /*
          * 关闭shiro自带的session，详情见文档
