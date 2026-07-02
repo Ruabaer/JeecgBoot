@@ -64,8 +64,8 @@
 		<commons.version>2.6</commons.version>
 		<aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
 		<aliyun.oss.version>3.11.2</aliyun.oss.version>
-		<!-- shiro -->
-		<shiro.version>1.12.0</shiro.version>
+		<!-- shiro (升级至1.13.0以修复CVE-2023-46749绕过漏洞和CVE-2023-46750重定向漏洞) -->
+		<shiro.version>1.13.0</shiro.version>
 		<java-jwt.version>3.11.0</java-jwt.version>
 		<shiro-redis.version>3.2.2</shiro-redis.version>
 		<codegenerate.version>1.4.82</codegenerate.version>
