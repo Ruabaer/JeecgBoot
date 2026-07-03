@@ -1,3 +1,29 @@
+diff --git a/FieldExtendJsonModal-cc7fce26.mjs b/FieldExtendJsonModal-cc7fce26.mjs
+index f54f4d7d2d1d27c427a9502940c83c92aed87db7..2b5861b8f020755d7f599015fcabc3a7a7308e90 100644
+--- a/FieldExtendJsonModal-cc7fce26.mjs
++++ b/FieldExtendJsonModal-cc7fce26.mjs
+@@ -221,7 +221,9 @@ const Z = C({
+     }));
+     function E() {
+       return R(this, null, function* () {
+-        let e = yield b(), s = l.value, o = {};
++        //update-begin--Author:lipen -- Date:20260703 ----for：【修复】在字段扩展配置提交时保留并合并原有的自定义扩展参数（如 defaultHidden），防止保存时被覆盖抹除-----
++        let e = yield b(), s = l.value, o = Object.assign({}, D(i));
++        //update-end--Author:lipen -- Date:20260703 ----for：【修复】在字段扩展配置提交时保留并合并原有的自定义扩展参数（如 defaultHidden），防止保存时被覆盖抹除-----
+         if (s === "file" || s === "image" ? e.uploadnum && e.uploadnum > 0 && (o.uploadnum = e.uploadnum) : s === "textarea" || s === "text" ? e.showLength && e.showLength > 0 && (o.showLength = e.showLength) : s === "sel_user" || s === "sel_depart" ? o = z(e, "store", "text", "multiSelect") : (s === "popup" || s === "popup_dict") && (o.popupMulti = e.popupMulti), e.orderRule && (o.orderRule = e.orderRule), e.validateError && (o.validateError = e.validateError), e.labelLength && (o.labelLength = e.labelLength), e.isFixed && (o.isFixed = e.isFixed), e.isOneRow && (o.isOneRow = e.isOneRow), e.picker && (o.picker = e.picker), e.switchOptions) {
+           const u = e.switchOptions.split(",");
+           let g = Number(u[0]), S = Number(u[1]);
+@@ -229,7 +231,9 @@ const Z = C({
+         }
+         for (let u in o)
+           o[u] === "" && delete o[u];
+-        a("success", o, e.rowKey), k();
++        //update-begin--Author:lipen -- Date:20260703 ----for：【修复】将保存时传回的行ID由不可靠的 e.rowKey 改为绝对可靠的 d.value，解决 JVxeTable 找不到 undefined 行导致保存失败的 Bug-----
++        a("success", o, d.value), k();
++        //update-end--Author:lipen -- Date:20260703 ----for：【修复】将保存时传回的行ID由不可靠的 e.rowKey 改为绝对可靠的 d.value，解决 JVxeTable 找不到 undefined 行导致保存失败的 Bug-----
+       });
+     }
+     return _({
 diff --git a/useExtendComponent-bb7cca20.mjs b/useExtendComponent-bb7cca20.mjs
 index b13253b35299c5bf108c52b2d5ec80ccd4bd5111..4b593fb21aa72be3857bde234993ab766ed810cb 100644
 --- a/useExtendComponent-bb7cca20.mjs

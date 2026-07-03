@@ -1,4 +1,4 @@
-import { computed, nextTick, unref, watchEffect } from 'vue';
+import { computed, nextTick, unref, watchEffect, watch } from 'vue';
 import { router } from '/@/router';
 import { useRoute } from 'vue-router';
 import { createLocalStorage } from '/@/utils/cache';
@@ -26,6 +26,13 @@ export function useColumnsCache(opt, setColumns, handleColumnFixed) {
     }
     return 'columnCache:' + key;
   });
+
+  watch(
+    () => cacheKey.value,
+    () => {
+      isInit = false;
+    }
+  );
 
   watchEffect(() => {
     const columns = table.getColumns();

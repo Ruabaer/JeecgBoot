@@ -35,7 +35,7 @@
         <ScrollContainer>
           <CheckboxGroup v-model:value="checkedList" @change="onChange" ref="columnListRef">
             <template v-for="item in plainOptions" :key="item.value">
-              <div :class="`${prefixCls}__check-item`" v-if="!('ifShow' in item && !item.ifShow)">
+              <div :class="`${prefixCls}__check-item`" :data-value="item.value" v-if="!('ifShow' in item && !item.ifShow)">
                 <DragOutlined class="table-column-drag-icon" />
                 <Checkbox :value="item.value">
                   {{ item.label }}
@@ -215,6 +215,7 @@
             .filter((item) => !item.flag)
             .map((item) => (item.dataIndex || item.title) as string);
           
+
           if (!isEqual(plainKeys, newKeys)) {
             plainOptions.value = [];
             plainSortOptions.value = [];
@@ -307,43 +308,50 @@
         checkedList.sort((prev, next) => {
           return sortList.indexOf(prev) - sortList.indexOf(next);
         });
-        setColumns(checkedList);
+        const fullCols = unref(plainSortOptions).map(col => {
+          col.defaultHidden = !checkedList.includes(col.value);
+          return col;
+        });
+        setColumns(fullCols);
+      }
+
+      function getOriginalSchemaColumns() {
+        const ret: Options[] = [];
+        table.getCacheColumns().forEach((item) => {
+          if (item.flag) return;
+          const val = item.dataIndex || (typeof item.title === 'string' ? item.title : '') || item.key || item.customTitle;
+          ret.push({
+            label: (item.title as string) || (item.customTitle as string),
+            value: (val || '') as string,
+            ...item,
+          });
+        });
+        return ret;
       }
 
       // reset columns
       function reset() {
-        //update-begin--Author:lipen -- Date:20260703 ----for：【修复】通过 setTimeout 延迟机制，解决重置按钮需要点击两次才生效的问题(同步上游 TV360X-105 修复逻辑)-----
+        //update-begin--Author:lipen -- Date:20260703 ----for：【修复】重置时直接使用缓存的原始 schema 列进行重排与勾选过滤，解决“更新时间”等列位置重置后不同步的问题-----
         setColumns(table.getCacheColumns());
         setTimeout(() => {
-          // update-begin--author:liaozhiyang---date:20231103---for：【issues/825】tabel的列设置隐藏列保存后切换路由问题[重置没勾选]
           state.checkedList = table
-            .getColumns({ ignoreAction: true })
+            .getCacheColumns()
             .map((item) => {
-              //update-begin--Author:lipen -- Date:20260703 ----for：【修复】重置时过滤掉配置为 defaultHidden 的列-----
-              // 原开发代码：
-              // return item.dataIndex || item.title;
               if (item.defaultHidden) {
                 return '';
               }
               return item.dataIndex || item.title;
-              //update-end--Author:lipen -- Date:20260703 ----for：【修复】重置时过滤掉配置为 defaultHidden 的列-----
             })
             .filter(Boolean) as string[];
-          // update-end--author:liaozhiyang---date:20231103---for：【issues/825】tabel的列设置隐藏列保存后切换路由问题[重置没勾选]
           
-          //update-begin--Author:lipen -- Date:20260703 ----for：【修复】根据当前勾选列的数量动态计算 checkAll，而非强行设为 true-----
-          // 原开发代码：
-          // state.checkAll = true;
+          const originalOptions = getOriginalSchemaColumns();
+          plainOptions.value = originalOptions;
+          plainSortOptions.value = originalOptions;
+          
           state.checkAll = state.checkedList.length === plainOptions.value.length;
-          //update-end--Author:lipen -- Date:20260703 ----for：【修复】根据当前勾选列的数量动态计算 checkAll，而非强行设为 true-----
-          plainOptions.value = unref(cachePlainOptions);
-          plainSortOptions.value = unref(cachePlainOptions);
-          if (sortableOrder.value) {
-            sortable.sort(sortableOrder.value);
-          }
           resetSetting();
         }, 100);
-        //update-end--Author:lipen -- Date:20260703 ----for：【修复】通过 setTimeout 延迟机制，解决重置按钮需要点击一次才生效的问题(同步上游 TV360X-105 修复逻辑)-----
+        //update-end--Author:lipen -- Date:20260703 ----for：【修复】重置时直接使用缓存的原始 schema 列进行重排与勾选过滤，解决“更新时间”等列位置重置后不同步的问题-----
       }
 
       // Open the pop-up window for drag and drop initialization
@@ -367,27 +375,54 @@
               if (isNullAndUnDef(oldIndex) || isNullAndUnDef(newIndex) || oldIndex === newIndex) {
                 return;
               }
-              // Sort column
-              const columns = cloneDeep(plainSortOptions.value);
+              const parent = evt.from;
+              if (!parent) return;
 
-              if (oldIndex > newIndex) {
-                columns.splice(newIndex, 0, columns[oldIndex]);
-                columns.splice(oldIndex + 1, 1);
+              // 1. 从真实的 DOM 树顺序中提取当前可见列的最新拖拽排列值
+              const draggedValues = Array.from(parent.children)
+                .map((el) => el.getAttribute('data-value'))
+                .filter(Boolean) as string[];
+
+              // 物理恢复 DOM 结构，让 Vue 接管更新渲染，防止 Vue 虚拟 DOM 冲突报错
+              const children = Array.from(parent.children);
+              if (oldIndex < newIndex) {
+                parent.insertBefore(evt.item, children[oldIndex]);
               } else {
-                columns.splice(newIndex + 1, 0, columns[oldIndex]);
-                columns.splice(oldIndex, 1);
+                parent.insertBefore(evt.item, children[oldIndex].nextSibling);
               }
 
+              // 2. 根据拖拽值重构 columns
+              const plainSortVal = plainSortOptions.value;
+              const newVisibleCols = draggedValues
+                .map((val) => plainSortVal.find((item) => item.value === val))
+                .filter(Boolean) as BasicColumn[];
+
+              // 3. 将 ifShow 隐藏列（未渲染在 DOM 中的列）插回其原始相对位置
+              const columns = [...newVisibleCols];
+              const hiddenCols = plainSortVal.filter((item) => 'ifShow' in item && !item.ifShow);
+              hiddenCols.forEach((col) => {
+                const originalIndex = plainSortVal.findIndex((item) => item.value === col.value);
+                let insertIndex = 0;
+                for (let i = 0; i < originalIndex; i++) {
+                  const prevVal = plainSortVal[i].value;
+                  const newPrevIndex = columns.findIndex((item) => item.value === prevVal);
+                  if (newPrevIndex !== -1) {
+                    insertIndex = newPrevIndex + 1;
+                  }
+                }
+                columns.splice(insertIndex, 0, col);
+              });
+
+
+
               plainSortOptions.value = columns;
-              // update-begin--author:liaozhiyang---date:20230904---for：【QQYUN-6424】table字段列表设置不显示后，再拖拽字段顺序，原本不显示的，又显示了
-              // update-begin--author:liaozhiyang---date:20240522---for：【TV360X-108】刷新后勾选之前未勾选的字段拖拽之后该字段对应的表格列消失了
-              const cols = columns.map((item) => item.value);
-              const arr = cols.filter((cItem) => state.checkedList.find((lItem) => lItem === cItem));
-              setColumns(arr);
-              // 最开始的代码
-              // setColumns(columns);
-              // update-end--author:liaozhiyang---date:20240522---for：【TV360X-108】刷新后勾选之前未勾选的字段拖拽之后该字段对应的表格列消失了
-              // update-end--author:liaozhiyang---date:20230904---for：【QQYUN-6424】table字段列表设置不显示后，再拖拽字段顺序，原本不显示的，又显示了
+              plainOptions.value = columns;
+
+              const fullCols = columns.map(col => {
+                col.defaultHidden = !state.checkedList.includes(col.value);
+                return col;
+              });
+              setColumns(fullCols);
             },
           });
           // 记录原始 order 序列
@@ -433,8 +468,7 @@
       function setColumns(columns: BasicColumn[] | string[]) {
         table.setColumns(columns);
         const data: ColumnChangeParam[] = unref(plainSortOptions).map((col) => {
-          const visible =
-            columns.findIndex((c: BasicColumn | string) => c === col.value || (typeof c !== 'string' && c.dataIndex === col.value)) !== -1;
+          const visible = state.checkedList.includes(col.value);
           return { dataIndex: col.value, fixed: col.fixed, visible };
         });
 

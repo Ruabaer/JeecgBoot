@@ -245,7 +245,10 @@ export function useColumns(
       columnsRef.value = columns as BasicColumn[];
     } else {
       const columnKeys = (columns as (string | string[])[]).map((m) => m.toString());
-      const newColumns: BasicColumn[] = [];
+      
+      //update-begin--Author:lipen -- Date:20260703 ----for：【修复】解决未勾选隐藏列在 setColumns 排序中被排到最前边导致列配置顺序不一致的问题-----
+      // 原开发代码：
+      /* const newColumns: BasicColumn[] = [];
       cacheColumns.forEach((item) => {
         newColumns.push({
           ...item,
@@ -258,7 +261,55 @@ export function useColumns(
           return columnKeys.indexOf(prev.dataIndex?.toString() as string) - columnKeys.indexOf(next.dataIndex?.toString() as string);
         });
       }
+      columnsRef.value = newColumns; */
+
+      const getColumnKey = (col: BasicColumn): string => {
+        const key = col.dataIndex || col.key || (typeof col.title === 'string' ? col.title : '') || col.customTitle;
+        return (key?.toString() || '') as string;
+      };
+
+      // Separate checked and unchecked columns
+      const checkedCols: BasicColumn[] = [];
+      const uncheckedCols: { col: BasicColumn; originalIndex: number }[] = [];
+      
+      cacheColumns.forEach((item, index) => {
+        const itemKey = getColumnKey(item);
+        const isChecked = columnKeys.includes(itemKey);
+        const newItem = {
+          ...item,
+          defaultHidden: !isChecked,
+        };
+        if (isChecked) {
+          checkedCols.push(newItem);
+        } else {
+          uncheckedCols.push({ col: newItem, originalIndex: index });
+        }
+      });
+      
+      // Sort checked columns according to columnKeys
+      checkedCols.sort((prev, next) => {
+        return columnKeys.indexOf(getColumnKey(prev)) - columnKeys.indexOf(getColumnKey(next));
+      });
+      
+      // Insert unchecked columns back at their original relative positions
+      const newColumns = [...checkedCols];
+      uncheckedCols.forEach(({ col, originalIndex }) => {
+        let insertIndex = 0;
+        for (let i = 0; i < originalIndex; i++) {
+          const originalPrevCol = cacheColumns[i];
+          const originalPrevKey = getColumnKey(originalPrevCol);
+          const newPrevIndex = newColumns.findIndex(
+            (c) => getColumnKey(c) === originalPrevKey
+          );
+          if (newPrevIndex !== -1) {
+            insertIndex = newPrevIndex + 1;
+          }
+        }
+        newColumns.splice(insertIndex, 0, col);
+      });
+      
       columnsRef.value = newColumns;
+      //update-end--Author:lipen -- Date:20260703 ----for：【修复】解决未勾选隐藏列在 setColumns 排序中被排到最前边导致列配置顺序不一致的问题-----
     }
   }
   // update-end--author:sunjianlei---date:20220523---for: 【VUEN-1089】合并vben最新版代码，解决表格字段排序问题
