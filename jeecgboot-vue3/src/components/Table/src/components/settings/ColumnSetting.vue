@@ -91,7 +91,7 @@
 </template>
 <script lang="ts">
   import type { BasicColumn, ColumnChangeParam } from '../../types/table';
-  import { defineComponent, ref, reactive, toRefs, watchEffect, nextTick, unref, computed } from 'vue';
+  import { defineComponent, ref, reactive, toRefs, watchEffect, nextTick, unref, computed, watch } from 'vue';
   import { Tooltip, Popover, Checkbox, Divider } from 'ant-design-vue';
   import type { CheckboxChangeEvent } from 'ant-design-vue/lib/checkbox/interface';
   import { SettingOutlined, DragOutlined } from '@ant-design/icons-vue';
@@ -104,7 +104,7 @@
   // import { useSortable } from '/@/hooks/web/useSortable';
   import { isFunction, isNullAndUnDef } from '/@/utils/is';
   import { getPopupContainer as getParentContainer } from '/@/utils';
-  import { cloneDeep, omit } from 'lodash-es';
+  import { cloneDeep, omit, isEqual } from 'lodash-es';
   import Sortablejs from 'sortablejs';
   import type Sortable from 'sortablejs';
 
@@ -204,6 +204,29 @@
           }
         }, 0);
       });
+
+      //update-begin--Author:lipen -- Date:20260703 ----for：【修复】监听表格列的动态变更，同步更新列设置列表的顺序及选项，防止切换路由/表格时出现不同步-----
+      watch(
+        () => table.getColumns(),
+        (newVal) => {
+          if (!newVal || !newVal.length) return;
+          const plainKeys = plainOptions.value.map((item) => item.value);
+          const newKeys = newVal
+            .filter((item) => !item.flag)
+            .map((item) => (item.dataIndex || item.title) as string);
+          
+          if (!isEqual(plainKeys, newKeys)) {
+            plainOptions.value = [];
+            plainSortOptions.value = [];
+            cachePlainOptions.value = [];
+            state.isInit = false;
+            inited = false;
+            init();
+          }
+        },
+        { deep: true }
+      );
+      //update-end--Author:lipen -- Date:20260703 ----for：【修复】监听表格列的动态变更，同步更新列设置列表的顺序及选项，防止切换路由/表格时出现不同步-----
 
       watchEffect(() => {
         const values = unref(getValues);
