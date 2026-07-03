@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" name="icon-list">
-  import { ScrollContainer } from '@/components/Container';
+  import ScrollContainer from '@/components/Container/src/ScrollContainer.vue';
   import SvgIcon from '@/components/Icon/src/SvgIcon.vue';
   import Icon from '@/components/Icon/src/Icon.vue';
   import { defineComponent, ref, unref, watchEffect} from 'vue';
