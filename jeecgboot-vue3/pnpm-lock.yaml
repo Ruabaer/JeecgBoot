@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@jeecg/online':
+    hash: 6c56b27ce2610159799d7a3b1bc35e95fe88b916aa59eccffb654c5cda081129
+    path: patches/@jeecg__online.patch
+
 importers:
 
   .:
@@ -19,7 +24,7 @@ importers:
         version: 3.1.1
       '@jeecg/online':
         specifier: 3.7.0-beta
-        version: 3.7.0-beta
+        version: 3.7.0-beta(patch_hash=6c56b27ce2610159799d7a3b1bc35e95fe88b916aa59eccffb654c5cda081129)
       '@tinymce/tinymce-vue':
         specifier: 4.0.7
         version: 4.0.7(vue@3.5.39(typescript@4.9.5))
@@ -7147,7 +7152,7 @@ snapshots:
 
   '@istanbuljs/schema@0.1.6': {}
 
-  '@jeecg/online@3.7.0-beta': {}
+  '@jeecg/online@3.7.0-beta(patch_hash=6c56b27ce2610159799d7a3b1bc35e95fe88b916aa59eccffb654c5cda081129)': {}
 
   '@jest/console@29.7.0':
     dependencies:

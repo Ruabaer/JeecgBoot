@@ -289,23 +289,38 @@
 
       // reset columns
       function reset() {
-        // state.checkedList = [...state.defaultCheckList];
-        // update-begin--author:liaozhiyang---date:20231103---for：【issues/825】tabel的列设置隐藏列保存后切换路由问题[重置没勾选]
-        state.checkedList = table
-          .getColumns({ ignoreAction: true })
-          .map((item) => {
-            return item.dataIndex || item.title;
-          })
-          .filter(Boolean) as string[];
-        // update-end--author:liaozhiyang---date:20231103---for：【issues/825】tabel的列设置隐藏列保存后切换路由问题[重置没勾选]
-        state.checkAll = true;
-        plainOptions.value = unref(cachePlainOptions);
-        plainSortOptions.value = unref(cachePlainOptions);
+        //update-begin--Author:lipen -- Date:20260703 ----for：【修复】通过 setTimeout 延迟机制，解决重置按钮需要点击两次才生效的问题(同步上游 TV360X-105 修复逻辑)-----
         setColumns(table.getCacheColumns());
-        if (sortableOrder.value) {
-          sortable.sort(sortableOrder.value);
-        }
-        resetSetting();
+        setTimeout(() => {
+          // update-begin--author:liaozhiyang---date:20231103---for：【issues/825】tabel的列设置隐藏列保存后切换路由问题[重置没勾选]
+          state.checkedList = table
+            .getColumns({ ignoreAction: true })
+            .map((item) => {
+              //update-begin--Author:lipen -- Date:20260703 ----for：【修复】重置时过滤掉配置为 defaultHidden 的列-----
+              // 原开发代码：
+              // return item.dataIndex || item.title;
+              if (item.defaultHidden) {
+                return '';
+              }
+              return item.dataIndex || item.title;
+              //update-end--Author:lipen -- Date:20260703 ----for：【修复】重置时过滤掉配置为 defaultHidden 的列-----
+            })
+            .filter(Boolean) as string[];
+          // update-end--author:liaozhiyang---date:20231103---for：【issues/825】tabel的列设置隐藏列保存后切换路由问题[重置没勾选]
+          
+          //update-begin--Author:lipen -- Date:20260703 ----for：【修复】根据当前勾选列的数量动态计算 checkAll，而非强行设为 true-----
+          // 原开发代码：
+          // state.checkAll = true;
+          state.checkAll = state.checkedList.length === plainOptions.value.length;
+          //update-end--Author:lipen -- Date:20260703 ----for：【修复】根据当前勾选列的数量动态计算 checkAll，而非强行设为 true-----
+          plainOptions.value = unref(cachePlainOptions);
+          plainSortOptions.value = unref(cachePlainOptions);
+          if (sortableOrder.value) {
+            sortable.sort(sortableOrder.value);
+          }
+          resetSetting();
+        }, 100);
+        //update-end--Author:lipen -- Date:20260703 ----for：【修复】通过 setTimeout 延迟机制，解决重置按钮需要点击一次才生效的问题(同步上游 TV360X-105 修复逻辑)-----
       }
 
       // Open the pop-up window for drag and drop initialization
