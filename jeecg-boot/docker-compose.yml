@@ -1,4 +1,3 @@
-version: '2'
 services:
   jeecg-boot-mysql:
     build:
@@ -10,6 +9,8 @@ services:
     restart: always
     container_name: jeecg-boot-mysql
     image: jeecg-boot-mysql
+    cap_add:
+      - SYS_NICE
     command:
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_general_ci

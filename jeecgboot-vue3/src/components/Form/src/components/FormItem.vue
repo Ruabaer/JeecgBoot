@@ -500,13 +500,23 @@
           return colSlot ? getSlot(slots, colSlot, values) : renderColContent ? renderColContent(values) : renderItem();
         };
 
-        return (
+        //update-begin--Author:lipen -- Date:20260703 ----for：【修复】使用 v-if (isShow) 替代 v-show，解决隐藏字段在栅格布局中留白占位的问题-----
+        // 原开发代码：
+        /* return (
           isIfShow && (
             <Col {...realColProps} v-show={isShow}>
               {getContent()}
             </Col>
           )
+        ); */
+        return (
+          isIfShow && isShow && (
+            <Col {...realColProps}>
+              {getContent()}
+            </Col>
+          )
         );
+        //update-end--Author:lipen -- Date:20260703 ----for：【修复】使用 v-if (isShow) 替代 v-show，解决隐藏字段在栅格布局中留白占位的问题-----
       };
     },
   });

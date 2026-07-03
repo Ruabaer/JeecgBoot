@@ -167,7 +167,7 @@ const page: AppRouteModule = {
         },
         {
           path: '404',
-          name: 'PageNotFound',
+          name: 'PageNotFoundDemo',
           component: ExceptionPage,
           props: {
             status: ExceptionEnum.PAGE_NOT_FOUND,
