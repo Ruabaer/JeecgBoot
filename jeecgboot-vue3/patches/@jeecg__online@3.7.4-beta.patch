@@ -1,5 +1,5 @@
 diff --git a/CodeGeneratorModal-2e1dc13d.mjs b/CodeGeneratorModal-2e1dc13d.mjs
-index de34d4242814d61baa3fa95c54045613041dcfc0..306c588e5b4dfd528ae4b5763fd088e955ca0c59 100644
+index de34d4242814d61baa3fa95c54045613041dcfc0..777ea2a0a2cd4199a60dac3f3ac01cf45eb81ea6 100644
 --- a/CodeGeneratorModal-2e1dc13d.mjs
 +++ b/CodeGeneratorModal-2e1dc13d.mjs
 @@ -115,7 +115,7 @@ const ye = ie({
@@ -11,6 +11,16 @@ index de34d4242814d61baa3fa95c54045613041dcfc0..306c588e5b4dfd528ae4b5763fd088e9
            if (B.value) {
              if (yield p.value.validateTable())
                return;
+@@ -199,7 +199,8 @@ function Te(t, o, c, F, p, T) {
+       cancelText: "取消",
+       onOk: t.onSubmit,
+       onCancel: t.onCancel,
+-      wrapClassName: t.wrapClassName
++      wrapClassName: t.wrapClassName,
++      maskClosable: !1
+     }, {
+       default: r(() => [
+         u(a, { spinning: t.confirmLoading }, {
 diff --git a/FieldExtendJsonModal-bf04d70e.mjs b/FieldExtendJsonModal-bf04d70e.mjs
 index e3612a72d96d43beb69e832afcc027f920e41070..810714f769c9a288aa5475a017fea7cec7038583 100644
 --- a/FieldExtendJsonModal-bf04d70e.mjs
