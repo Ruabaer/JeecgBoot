@@ -1,4 +1,4 @@
-﻿package org.jeecg.modules.dcs.testnote.service.impl;
+package org.jeecg.modules.dcs.testnote.service.impl;
 
 import org.jeecg.modules.dcs.testnote.entity.TestNote;
 import org.jeecg.modules.dcs.testnote.mapper.TestNoteMapper;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 /**
- * @Description: 璇峰亣鍗旲JS澧炲己绀轰緥
+ * @Description: 请假单@JS增强示例
  * @Author: jeecg-boot
  * @Date:   2026-07-04
  * @Version: V1.0
@@ -17,4 +17,3 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 public class TestNoteServiceImpl extends ServiceImpl<TestNoteMapper, TestNote> implements ITestNoteService {
 
 }
-

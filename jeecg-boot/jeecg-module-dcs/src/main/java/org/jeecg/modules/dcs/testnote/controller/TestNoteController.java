@@ -1,4 +1,4 @@
-﻿package org.jeecg.modules.dcs.testnote.controller;
+package org.jeecg.modules.dcs.testnote.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,12 +38,12 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
  /**
- * @Description: 璇峰亣鍗旲JS澧炲己绀轰緥
+ * @Description: 请假单@JS增强示例
  * @Author: jeecg-boot
  * @Date:   2026-07-04
  * @Version: V1.0
  */
-@Api(tags="璇峰亣鍗旲JS澧炲己绀轰緥")
+@Api(tags="请假单@JS增强示例")
 @RestController
 @RequestMapping("/org.jeecg.modules.dcs/testNote")
 @Slf4j
@@ -52,7 +52,7 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
 	private ITestNoteService testNoteService;
 	
 	/**
-	 * 鍒嗛〉鍒楄〃鏌ヨ
+	 * 分页列表查询
 	 *
 	 * @param testNote
 	 * @param pageNo
@@ -60,8 +60,8 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
 	 * @param req
 	 * @return
 	 */
-	//@AutoLog(value = "璇峰亣鍗旲JS澧炲己绀轰緥-鍒嗛〉鍒楄〃鏌ヨ")
-	@ApiOperation(value="璇峰亣鍗旲JS澧炲己绀轰緥-鍒嗛〉鍒楄〃鏌ヨ", notes="璇峰亣鍗旲JS澧炲己绀轰緥-鍒嗛〉鍒楄〃鏌ヨ")
+	//@AutoLog(value = "请假单@JS增强示例-分页列表查询")
+	@ApiOperation(value="请假单@JS增强示例-分页列表查询", notes="请假单@JS增强示例-分页列表查询")
 	@GetMapping(value = "/list")
 	public Result<IPage<TestNote>> queryPageList(TestNote testNote,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
@@ -74,84 +74,84 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
 	}
 	
 	/**
-	 *   娣诲姞
+	 *   添加
 	 *
 	 * @param testNote
 	 * @return
 	 */
-	@AutoLog(value = "璇峰亣鍗旲JS澧炲己绀轰緥-娣诲姞")
-	@ApiOperation(value="璇峰亣鍗旲JS澧炲己绀轰緥-娣诲姞", notes="璇峰亣鍗旲JS澧炲己绀轰緥-娣诲姞")
+	@AutoLog(value = "请假单@JS增强示例-添加")
+	@ApiOperation(value="请假单@JS增强示例-添加", notes="请假单@JS增强示例-添加")
 	@RequiresPermissions("org.jeecg.modules.dcs:test_note:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody TestNote testNote) {
 		testNoteService.save(testNote);
-		return Result.OK("娣诲姞鎴愬姛锛?);
+		return Result.OK("添加成功！");
 	}
 	
 	/**
-	 *  缂栬緫
+	 *  编辑
 	 *
 	 * @param testNote
 	 * @return
 	 */
-	@AutoLog(value = "璇峰亣鍗旲JS澧炲己绀轰緥-缂栬緫")
-	@ApiOperation(value="璇峰亣鍗旲JS澧炲己绀轰緥-缂栬緫", notes="璇峰亣鍗旲JS澧炲己绀轰緥-缂栬緫")
+	@AutoLog(value = "请假单@JS增强示例-编辑")
+	@ApiOperation(value="请假单@JS增强示例-编辑", notes="请假单@JS增强示例-编辑")
 	@RequiresPermissions("org.jeecg.modules.dcs:test_note:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody TestNote testNote) {
 		testNoteService.updateById(testNote);
-		return Result.OK("缂栬緫鎴愬姛!");
+		return Result.OK("编辑成功!");
 	}
 	
 	/**
-	 *   閫氳繃id鍒犻櫎
+	 *   通过id删除
 	 *
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "璇峰亣鍗旲JS澧炲己绀轰緥-閫氳繃id鍒犻櫎")
-	@ApiOperation(value="璇峰亣鍗旲JS澧炲己绀轰緥-閫氳繃id鍒犻櫎", notes="璇峰亣鍗旲JS澧炲己绀轰緥-閫氳繃id鍒犻櫎")
+	@AutoLog(value = "请假单@JS增强示例-通过id删除")
+	@ApiOperation(value="请假单@JS增强示例-通过id删除", notes="请假单@JS增强示例-通过id删除")
 	@RequiresPermissions("org.jeecg.modules.dcs:test_note:delete")
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
 		testNoteService.removeById(id);
-		return Result.OK("鍒犻櫎鎴愬姛!");
+		return Result.OK("删除成功!");
 	}
 	
 	/**
-	 *  鎵归噺鍒犻櫎
+	 *  批量删除
 	 *
 	 * @param ids
 	 * @return
 	 */
-	@AutoLog(value = "璇峰亣鍗旲JS澧炲己绀轰緥-鎵归噺鍒犻櫎")
-	@ApiOperation(value="璇峰亣鍗旲JS澧炲己绀轰緥-鎵归噺鍒犻櫎", notes="璇峰亣鍗旲JS澧炲己绀轰緥-鎵归噺鍒犻櫎")
+	@AutoLog(value = "请假单@JS增强示例-批量删除")
+	@ApiOperation(value="请假单@JS增强示例-批量删除", notes="请假单@JS增强示例-批量删除")
 	@RequiresPermissions("org.jeecg.modules.dcs:test_note:deleteBatch")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		this.testNoteService.removeByIds(Arrays.asList(ids.split(",")));
-		return Result.OK("鎵归噺鍒犻櫎鎴愬姛!");
+		return Result.OK("批量删除成功!");
 	}
 	
 	/**
-	 * 閫氳繃id鏌ヨ
+	 * 通过id查询
 	 *
 	 * @param id
 	 * @return
 	 */
-	//@AutoLog(value = "璇峰亣鍗旲JS澧炲己绀轰緥-閫氳繃id鏌ヨ")
-	@ApiOperation(value="璇峰亣鍗旲JS澧炲己绀轰緥-閫氳繃id鏌ヨ", notes="璇峰亣鍗旲JS澧炲己绀轰緥-閫氳繃id鏌ヨ")
+	//@AutoLog(value = "请假单@JS增强示例-通过id查询")
+	@ApiOperation(value="请假单@JS增强示例-通过id查询", notes="请假单@JS增强示例-通过id查询")
 	@GetMapping(value = "/queryById")
 	public Result<TestNote> queryById(@RequestParam(name="id",required=true) String id) {
 		TestNote testNote = testNoteService.getById(id);
 		if(testNote==null) {
-			return Result.error("鏈壘鍒板搴旀暟鎹?);
+			return Result.error("未找到对应数据");
 		}
 		return Result.OK(testNote);
 	}
 
     /**
-    * 瀵煎嚭excel
+    * 导出excel
     *
     * @param request
     * @param testNote
@@ -159,11 +159,11 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
     @RequiresPermissions("org.jeecg.modules.dcs:test_note:exportXls")
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(HttpServletRequest request, TestNote testNote) {
-        return super.exportXls(request, testNote, TestNote.class, "璇峰亣鍗旲JS澧炲己绀轰緥");
+        return super.exportXls(request, testNote, TestNote.class, "请假单@JS增强示例");
     }
 
     /**
-      * 閫氳繃excel瀵煎叆鏁版嵁
+      * 通过excel导入数据
     *
     * @param request
     * @param response
@@ -176,4 +176,3 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
     }
 
 }
-

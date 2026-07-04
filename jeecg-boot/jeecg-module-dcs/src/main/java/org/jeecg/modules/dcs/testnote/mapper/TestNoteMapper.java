@@ -1,4 +1,4 @@
-﻿package org.jeecg.modules.dcs.testnote.mapper;
+package org.jeecg.modules.dcs.testnote.mapper;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import org.jeecg.modules.dcs.testnote.entity.TestNote;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
- * @Description: 璇峰亣鍗旲JS澧炲己绀轰緥
+ * @Description: 请假单@JS增强示例
  * @Author: jeecg-boot
  * @Date:   2026-07-04
  * @Version: V1.0
@@ -15,4 +15,3 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface TestNoteMapper extends BaseMapper<TestNote> {
 
 }
-
