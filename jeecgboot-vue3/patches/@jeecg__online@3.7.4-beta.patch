@@ -1,5 +1,5 @@
 diff --git a/CodeGeneratorModal-2e1dc13d.mjs b/CodeGeneratorModal-2e1dc13d.mjs
-index de34d4242814d61baa3fa95c54045613041dcfc0..e7ce1cabc075cc28058c902f7deedb5fe2049738 100644
+index de34d4242814d61baa3fa95c54045613041dcfc0..306c588e5b4dfd528ae4b5763fd088e955ca0c59 100644
 --- a/CodeGeneratorModal-2e1dc13d.mjs
 +++ b/CodeGeneratorModal-2e1dc13d.mjs
 @@ -115,7 +115,7 @@ const ye = ie({
@@ -7,7 +7,7 @@ index de34d4242814d61baa3fa95c54045613041dcfc0..e7ce1cabc075cc28058c902f7deedb5f
          try {
            const e = yield K();
 -          let s = Object.assign({}, e, { code: N.value, tableName: e.tableName_tmp });
-+          let s = Object.assign({ jformType: a.jformType, codeTypes: a.codeTypes }, e, { code: N.value, tableName: e.tableName_tmp });
++          let s = Object.assign({}, e, { jformType: a.jformType, codeTypes: a.codeTypes, code: N.value, tableName: e.tableName_tmp || a.tableName_tmp });
            if (B.value) {
              if (yield p.value.validateTable())
                return;
