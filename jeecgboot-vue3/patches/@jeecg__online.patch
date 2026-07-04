@@ -1,3 +1,16 @@
+diff --git a/CodeGeneratorModal-b722d976.mjs b/CodeGeneratorModal-b722d976.mjs
+index 1dcecf7959eea616a5c452ff4cfad34a4ee859c3..ba3bb66745d53b4b2c2e41fc099fe3682cf36377 100644
+--- a/CodeGeneratorModal-b722d976.mjs
++++ b/CodeGeneratorModal-b722d976.mjs
+@@ -115,7 +115,7 @@ const Me = le({
+       return T(this, null, function* () {
+         try {
+           const e = yield A();
+-          let l = Object.assign({}, e, { code: _.value, tableName: e.tableName_tmp });
++          let l = Object.assign({ jformType: o.jformType, codeTypes: o.codeTypes }, e, { code: _.value, tableName: e.tableName_tmp });
+           if (j.value) {
+             if (yield c.value.validateTable())
+               return;
 diff --git a/FieldExtendJsonModal-cc7fce26.mjs b/FieldExtendJsonModal-cc7fce26.mjs
 index f54f4d7d2d1d27c427a9502940c83c92aed87db7..2b5861b8f020755d7f599015fcabc3a7a7308e90 100644
 --- a/FieldExtendJsonModal-cc7fce26.mjs

@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   '@jeecg/online':
-    hash: e27beeb1252bd7ef9633c00e7a4a818fb6b4c715b746e0d39e2d4c3b96f724b5
+    hash: f1ad388d3707098edbce5bcc8680500d202bef042d9e14e173e132f3101dfdc8
     path: patches/@jeecg__online.patch
 
 importers:
@@ -24,7 +24,7 @@ importers:
         version: 3.1.1
       '@jeecg/online':
         specifier: 3.7.0-beta
-        version: 3.7.0-beta(patch_hash=e27beeb1252bd7ef9633c00e7a4a818fb6b4c715b746e0d39e2d4c3b96f724b5)
+        version: 3.7.0-beta(patch_hash=f1ad388d3707098edbce5bcc8680500d202bef042d9e14e173e132f3101dfdc8)
       '@tinymce/tinymce-vue':
         specifier: 4.0.7
         version: 4.0.7(vue@3.5.39(typescript@4.9.5))
@@ -7152,7 +7152,7 @@ snapshots:
 
   '@istanbuljs/schema@0.1.6': {}
 
-  '@jeecg/online@3.7.0-beta(patch_hash=e27beeb1252bd7ef9633c00e7a4a818fb6b4c715b746e0d39e2d4c3b96f724b5)': {}
+  '@jeecg/online@3.7.0-beta(patch_hash=f1ad388d3707098edbce5bcc8680500d202bef042d9e14e173e132f3101dfdc8)': {}
 
   '@jest/console@29.7.0':
     dependencies:
