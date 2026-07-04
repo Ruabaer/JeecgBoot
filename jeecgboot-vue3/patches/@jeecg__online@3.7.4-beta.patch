@@ -1,0 +1,69 @@
+diff --git a/CodeGeneratorModal-2e1dc13d.mjs b/CodeGeneratorModal-2e1dc13d.mjs
+index de34d4242814d61baa3fa95c54045613041dcfc0..e7ce1cabc075cc28058c902f7deedb5fe2049738 100644
+--- a/CodeGeneratorModal-2e1dc13d.mjs
++++ b/CodeGeneratorModal-2e1dc13d.mjs
+@@ -115,7 +115,7 @@ const ye = ie({
+       return E(this, null, function* () {
+         try {
+           const e = yield K();
+-          let s = Object.assign({}, e, { code: N.value, tableName: e.tableName_tmp });
++          let s = Object.assign({ jformType: a.jformType, codeTypes: a.codeTypes }, e, { code: N.value, tableName: e.tableName_tmp });
+           if (B.value) {
+             if (yield p.value.validateTable())
+               return;
+diff --git a/FieldExtendJsonModal-bf04d70e.mjs b/FieldExtendJsonModal-bf04d70e.mjs
+index e3612a72d96d43beb69e832afcc027f920e41070..810714f769c9a288aa5475a017fea7cec7038583 100644
+--- a/FieldExtendJsonModal-bf04d70e.mjs
++++ b/FieldExtendJsonModal-bf04d70e.mjs
+@@ -221,7 +221,7 @@ const Z = C({
+     }));
+     function E() {
+       return R(this, null, function* () {
+-        let e = yield b(), s = l.value, o = {};
++        let e = yield b(), s = l.value, o = Object.assign({}, D(i));
+         if (s === "file" || s === "image" ? e.uploadnum && e.uploadnum > 0 && (o.uploadnum = e.uploadnum) : s === "textarea" || s === "text" ? e.showLength && e.showLength > 0 && (o.showLength = e.showLength) : s === "sel_user" || s === "sel_depart" ? o = z(e, "store", "text", "multiSelect") : (s === "popup" || s === "popup_dict") && (o.popupMulti = e.popupMulti), e.orderRule && (o.orderRule = e.orderRule), e.validateError && (o.validateError = e.validateError), e.labelLength && (o.labelLength = e.labelLength), e.isFixed && (o.isFixed = e.isFixed), e.isOneRow && (o.isOneRow = e.isOneRow), e.picker && (o.picker = e.picker), e.switchOptions) {
+           const u = e.switchOptions.split(",");
+           let g = Number(u[0]), S = Number(u[1]);
+@@ -229,7 +229,7 @@ const Z = C({
+         }
+         for (let u in o)
+           o[u] === "" && delete o[u];
+-        a("success", o, e.rowKey), k();
++        a("success", o, d.value), k();
+       });
+     }
+     return _({
+diff --git a/useExtendComponent-bb98e568.mjs b/useExtendComponent-bb98e568.mjs
+index 41a6edd8dee1650f1cf3e321c3d45dd88c988ce3..11ede69bf5c4e0424aae2b67571935257d02e33a 100644
+--- a/useExtendComponent-bb98e568.mjs
++++ b/useExtendComponent-bb98e568.mjs
+@@ -3642,8 +3642,14 @@ function Pl(n, e) {
+     } : f.value = null, v.value = l.scrollFlag == 1;
+     let a = l.columns;
+     a.forEach((u) => {
+-      var w;
+-      if (u.fieldExtendJson && JSON.parse(u.fieldExtendJson).isFixed && (u.fixed = "left"), u.hrefSlotName && u.scopedSlots) {
++      if (u.fieldExtendJson) {
++        try {
++          const ext = JSON.parse(u.fieldExtendJson);
++          if (ext.isFixed) u.fixed = "left";
++          Object.assign(u, ext);
++        } catch (err) {}
++      }
++      if (u.hrefSlotName && u.scopedSlots) {
+         const R = (w = l.fieldHrefSlots) == null ? void 0 : w.find((q) => q.slotName === u.hrefSlotName);
+         R && (u.fieldHref = R);
+       }
+diff --git a/useListButton-98908683.mjs b/useListButton-98908683.mjs
+index 0fe62c0db4795fcdc326af401433d1596b4d6c8f..d2d17a1e5090001e67b8211b3e3d7bee5e8dd75d 100644
+--- a/useListButton-98908683.mjs
++++ b/useListButton-98908683.mjs
+@@ -414,7 +414,7 @@ function mt(l, m, s = {}) {
+     form_sub_open_add: !0,
+     // 子表编辑
+     form_sub_open_edit: !0
+-  }, [T, { openModal: R }] = H(), [g, { openModal: v }] = H(), [S, { openModal: O }] = H(), [J, { openModal: ne }] = H(), { createMessage: h } = De(), b = re(M), k = re([]), i = re([]), w = re({}), U = (e) => Me(() => b[e] === !0 ? w[e] : { enabled: !1 }), le = U("query"), ie = U("reset"), oe = U("form_confirm");
++  }, [T, { openModal: R }] = H(), [g, { openModal: v }] = H(), [S, { openModal: O }] = H(), [J, { openModal: ne }] = H(), { createMessage: h } = De(), b = re(M), k = re([]), i = re([]), w = re({ add: {}, import: {}, export: {}, batch_delete: {}, super_query: {}, delete: {}, edit: {}, bpm: {}, detail: {} }), U = (e) => Me(() => b[e] === !0 ? w[e] : { enabled: !1 }), le = U("query"), ie = U("reset"), oe = U("form_confirm");
+   function N(e) {
+     if (k.length = 0, i.length = 0, e && e.length > 0)
+       for (let t = 0; t < e.length; t++) {
