@@ -86,6 +86,7 @@
         <module>jeecg-boot-base-core</module>
         <module>jeecg-module-demo</module>
         <module>jeecg-module-system</module>
+        <module>jeecg-module-dcs</module>
     </modules>
 
 	<repositories>
