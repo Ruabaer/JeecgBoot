@@ -107,6 +107,7 @@
   import { cloneDeep, omit, isEqual } from 'lodash-es';
   import Sortablejs from 'sortablejs';
   import type Sortable from 'sortablejs';
+  import { useLocaleStoreWithOut } from '/@/store/modules/locale';
 
   interface State {
     checkAll: boolean;
@@ -156,6 +157,10 @@
 
       const columnListRef = ref<ComponentRef>(null);
 
+      const restAfterOptions = {
+        value: null,
+      };
+
       const state = reactive<State>({
         checkAll: true,
         checkedList: [],
@@ -181,9 +186,9 @@
 
       let sortable: Sortable;
       const sortableOrder = ref<string[]>();
-
+      const localeStore = useLocaleStoreWithOut();
       // 列表字段配置缓存
-      const { saveSetting, resetSetting } = useColumnsCache(
+      const { saveSetting, resetSetting, getCache } = useColumnsCache(
         {
           state,
           popoverVisible,
@@ -191,6 +196,7 @@
           plainSortOptions,
           sortableOrder,
           checkIndex,
+          restAfterOptions,
         },
         setColumns,
         handleColumnFixed
@@ -198,8 +204,7 @@
 
       watchEffect(() => {
         setTimeout(() => {
-          const columns = table.getColumns();
-          if (columns.length && !state.isInit) {
+          if (!state.isInit) {
             init();
           }
         }, 0);
@@ -234,10 +239,24 @@
         checkIndex.value = !!values.showIndexColumn;
         checkSelect.value = !!values.rowSelection;
       });
+      // update-begin--author:liaozhiyang---date:20240724---for：【issues/6908】多语言无刷新切换时，BasicColumn和FormSchema里面的值不能正常切换
+      watch(localeStore, () => {
+        const columns = getColumns();
+        plainOptions.value = columns;
+        plainSortOptions.value = columns;
+        cachePlainOptions.value = columns;
+      });
+      // update-end--author:liaozhiyang---date:20240724---for：【issues/6908】多语言无刷新切换时，BasicColumn和FormSchema里面的值不能正常切换
 
       function getColumns() {
         const ret: Options[] = [];
-        table.getColumns({ ignoreIndex: true, ignoreAction: true }).forEach((item) => {
+        // update-begin--author:liaozhiyang---date:20250403---for：【issues/7996】表格列组件取消所有或者只勾选中间，显示非预期
+        let t = table.getColumns({ ignoreIndex: true, ignoreAction: true });
+        if (!t.length) {
+          t = table.getCacheColumns();
+        }
+        // update-end--author:liaozhiyang---date:20250403---for：【issues/7996】表格列组件取消所有或者只勾选中间，显示非预期
+        t.forEach((item) => {
           ret.push({
             label: (item.title as string) || (item.customTitle as string),
             value: (item.dataIndex || item.title) as string,
@@ -247,11 +266,11 @@
         return ret;
       }
 
-      function init() {
+      async function init() {
         const columns = getColumns();
 
         const checkList = table
-          .getColumns({ ignoreAction: true })
+          .getColumns({ ignoreAction: true, ignoreIndex: true })
           .map((item) => {
             if (item.defaultHidden) {
               return '';
@@ -259,11 +278,22 @@
             return item.dataIndex || item.title;
           })
           .filter(Boolean) as string[];
-
+        // update-begin--author:liaozhiyang---date:20250403---for：【issues/7996】表格列组件取消所有或者只勾选中间，显示非预期
+        const { sortedList = [] } = getCache() || {};
+        await nextTick();
+        // update-end--author:liaozhiyang---date:20250403---for：【issues/7996】表格列组件取消所有或者只勾选中间，显示非预期
         if (!plainOptions.value.length) {
-          plainOptions.value = columns;
-          plainSortOptions.value = columns;
-          cachePlainOptions.value = columns;
+          // update-begin--author:liaozhiyang---date:20250403---for：【issues/7996】表格列组件取消所有或者只勾选中间，显示非预期
+          let tmp = columns;
+          if (sortedList?.length) {
+            tmp = columns.sort((prev, next) => {
+              return sortedList.indexOf(prev.value) - sortedList.indexOf(next.value);
+            });
+          }
+          // update-end--author:liaozhiyang---date:20250403---for：【issues/7996】表格列组件取消所有或者只勾选中间，显示非预期
+          plainOptions.value = tmp;
+          plainSortOptions.value = tmp;
+          cachePlainOptions.value = tmp;
           state.defaultCheckList = checkList;
         } else {
           // const fixedColumns = columns.filter((item) =>
@@ -276,9 +306,19 @@
               item.fixed = findItem.fixed;
             }
           });
+          // update-begin--author:liaozhiyang---date:20250403---for：【issues/7996】表格列组件取消所有或者只勾选中间，显示非预期
+          if (sortedList?.length) {
+            plainOptions.value.sort((prev, next) => {
+              return sortedList.indexOf(prev.value) - sortedList.indexOf(next.value);
+            });
+          }
+          // update-end--author:liaozhiyang---date:20250403---for：【issues/7996】表格列组件取消所有或者只勾选中间，显示非预期
         }
         state.isInit = true;
         state.checkedList = checkList;
+        // update-begin--author:liaozhiyang---date:20240612---for：【TV360X-105】列展示设置问题[列展示如果存在未勾选的列，保存并刷新后，列展示复选框样式会错乱]
+        state.checkAll = columns.length === checkList.length;
+        // update-end--author:liaozhiyang---date:20240612---for：【TV360X-105】列展示设置问题[列展示如果存在未勾选的列，保存并刷新后，列展示复选框样式会错乱]
       }
 
       // checkAll change
@@ -296,7 +336,9 @@
       const indeterminate = computed(() => {
         const len = plainOptions.value.length;
         let checkedLen = state.checkedList.length;
-        unref(checkIndex) && checkedLen--;
+        // update-begin--author:liaozhiyang---date:20240612---for：【TV360X-105】列展示设置问题[列展示复选框不应该判断序号列复选框的状态]
+        // unref(checkIndex) && checkedLen--;
+        // update-end--author:liaozhiyang---date:20240612---for：【TV360X-105】列展示设置问题[列展示复选框不应该判断序号列复选框的状态]
         return checkedLen > 0 && checkedLen < len;
       });
 

@@ -2,9 +2,11 @@
   <div :class="prefixCls">
     <div v-show="!isEdit" :class="{ [`${prefixCls}__normal`]: true, 'ellipsis-cell': column.ellipsis }" @click="handleEdit">
       <div class="cell-content" :title="column.ellipsis ? getValues ?? '' : ''">
+        <!-- update-begin--author:liaozhiyang---date:20240731---for：【issues/6957】editableCell组件值长度为0，无法编辑 -->
         <!-- update-begin--author:liaozhiyang---date:20240709---for：【issues/6851】editableCell组件值为0时不展示 -->
-        {{ getValues ?? '&nbsp;' }}
+        {{ typeof getValues === 'string' && getValues.length === 0 ? '&nbsp;' : getValues ?? '&nbsp;' }}
         <!-- update-end--author:liaozhiyang---date:20240709---for：【issues/6851】editableCell组件值为0时不展示 -->
+        <!-- update-end--author:liaozhiyang---date:20240731---for：【issues/6957】editableCell组件值长度为0，无法编辑 -->
       </div>
       <FormOutlined :class="`${prefixCls}__normal-icon`" v-if="!column.editRow" />
     </div>
@@ -111,10 +113,17 @@
         const val = unref(currentValueRef);
 
         const value = isCheckValue ? (isNumber(val) && isBoolean(val) ? val : !!val) : val;
-
+        //update-begin---author:wangshuai---date:2024-09-19---for:【issues/7136】单元格上的tooltip提示，如果表格有滚动条，会不跟着单元格滚动---
+        let tooltipPosition:any = unref(table?.wrapRef.value)?.parentElement?.querySelector('.ant-table-body');
+        if(tooltipPosition){
+          tooltipPosition.style.position = 'relative';
+        }
+        //update-end---author:wangshuai---date:2024-09-19---for:【issues/7136】单元格上的tooltip提示，如果表格有滚动条，会不跟着单元格滚动---
         return {
           size: 'small',
-          getPopupContainer: () => unref(table?.wrapRef.value) ?? document.body,
+          //update-begin---author:wangshuai---date:2024-09-19---for:【issues/7136】单元格上的tooltip提示，如果表格有滚动条，会不跟着单元格滚动---
+          getPopupContainer: () => tooltipPosition ?? document.body,
+          //update-end---author:wangshuai---date:2024-09-19---for:【issues/7136】单元格上的tooltip提示，如果表格有滚动条，会不跟着单元格滚动---
           getCalendarContainer: () => unref(table?.wrapRef.value) ?? document.body,
           placeholder: createPlaceholderMessage(unref(getComponent)),
           ...apiSelectProps,
@@ -362,7 +371,9 @@
 
         if (props.column.dataIndex) {
           if (!props.record.editValueRefs) props.record.editValueRefs = {};
-          props.record.editValueRefs[props.column.dataIndex] = currentValueRef;
+          // update-begin--author:liaozhiyang---date:20250206---for：【issues/7709】当dataSource是响应式时，单元格编辑输入会自动关闭
+          props.record.editValueRefs[props.column.dataIndex] = unref(currentValueRef);
+          // update-end--author:liaozhiyang---date:20250206---for：【issues/7709】当dataSource是响应式时，单元格编辑输入会自动关闭
         }
         /* eslint-disable  */
         props.record.onCancelEdit = () => {

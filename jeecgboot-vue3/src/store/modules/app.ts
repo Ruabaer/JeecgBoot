@@ -1,3 +1,4 @@
+import type { MainAppProps } from "#/main";
 import type { ProjectConfig, HeaderSetting, MenuSetting, TransitionSetting, MultiTabsSetting } from '/#/config';
 import type { BeforeMiniState } from '/#/store';
 
@@ -10,6 +11,7 @@ import { Persistent } from '/@/utils/cache/persistent';
 import { darkMode } from '/@/settings/designSetting';
 import { resetRouter } from '/@/router';
 import { deepMerge } from '/@/utils';
+import { getHideLayoutTypes } from '/@/utils/env';
 
 interface AppState {
   darkMode?: ThemeEnum;
@@ -20,7 +22,9 @@ interface AppState {
   // When the window shrinks, remember some states, and restore these states when the window is restored
   beforeMiniInfo: BeforeMiniState;
   // 页面跳转临时参数存储
-  messageHrefParams: any
+  messageHrefParams: any,
+  // 应用参数
+  mainAppProps: MainAppProps,
 }
 let timeId: TimeoutHandle;
 export const useAppStore = defineStore({
@@ -30,7 +34,8 @@ export const useAppStore = defineStore({
     pageLoading: false,
     projectConfig: Persistent.getLocal(PROJ_CFG_KEY),
     beforeMiniInfo: {},
-    messageHrefParams: {}
+    messageHrefParams: {},
+    mainAppProps: {},
   }),
   getters: {
     getPageLoading(): boolean {
@@ -62,7 +67,32 @@ export const useAppStore = defineStore({
     },
     getMessageHrefParams():any{
       return this.messageHrefParams;
-    }
+    },
+    getMainAppProps(): MainAppProps {
+      return this.mainAppProps;
+    },
+
+    getLayoutHideSider(): boolean {
+      const hideLayoutTypes = getHideLayoutTypes();
+      if (hideLayoutTypes.includes('sider')) {
+        return true;
+      }
+      return !!this.mainAppProps.hideSider;
+    },
+    getLayoutHideHeader(): boolean {
+      const hideLayoutTypes = getHideLayoutTypes();
+      if (hideLayoutTypes.includes('header')) {
+        return true;
+      }
+      return !!this.mainAppProps.hideHeader;
+    },
+    getLayoutHideMultiTabs(): boolean {
+      const hideLayoutTypes = getHideLayoutTypes();
+      if (hideLayoutTypes.includes('multi-tabs')) {
+        return true;
+      }
+      return !!this.mainAppProps.hideMultiTabs;
+    },
   },
   actions: {
     setPageLoading(loading: boolean): void {
@@ -104,7 +134,14 @@ export const useAppStore = defineStore({
     setMessageHrefParams(params: any): void {
       this.messageHrefParams = params;
     },
-    
+
+    // 设置主应用参数
+    setMainAppProps(args: MainAppProps)  {
+      this.mainAppProps.hideHeader = args.hideHeader ?? false;
+      this.mainAppProps.hideSider = args.hideSider ?? false;
+      this.mainAppProps.hideMultiTabs = args.hideMultiTabs ?? false;
+    },
+
   },
 });
 

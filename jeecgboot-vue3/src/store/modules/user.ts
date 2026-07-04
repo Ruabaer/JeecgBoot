@@ -249,7 +249,10 @@ export const useUserStore = defineStore({
       try {
         const { goHome = true, mode, ...loginParams } = params;
         const data = await phoneLoginApi(loginParams, mode);
-        const { token } = data;
+        //update-begin---author:wangshuai---date:2024-11-25---for:【issues/7488】手机号码登录，在请求头中无法获取租户id---
+        const { token , userInfo } = data;
+        this.setTenant(userInfo!.loginTenantId);
+        //update-end---author:wangshuai---date:2024-11-25---for:【issues/7488】手机号码登录，在请求头中无法获取租户id---
         // save token
         this.setToken(token);
         return this.afterLoginAction(goHome, data);
@@ -357,7 +360,10 @@ export const useUserStore = defineStore({
       try {
         const { goHome = true, mode, ...ThirdLoginParams } = params;
         const data = await thirdLogin(ThirdLoginParams, mode);
-        const { token } = data;
+        //update-begin---author:wangshuai---date:2024-07-01---for:【issues/6652】开启租户数据隔离，接入钉钉后登录默认租户为0了---
+        const { token, userInfo } = data;
+        this.setTenant(userInfo?.loginTenantId);
+        //update-end---author:wangshuai---date:2024-07-01---for:【issues/6652】开启租户数据隔离，接入钉钉后登录默认租户为0了---
         // save token
         this.setToken(token);
         return this.afterLoginAction(goHome, data);

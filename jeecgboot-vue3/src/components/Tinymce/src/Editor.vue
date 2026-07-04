@@ -5,6 +5,7 @@
       <ImgUpload
         :fullscreen="fullscreen"
         @uploading="handleImageUploading"
+        @loading="handleLoading"
         @done="handleDone"
         v-show="editorRef"
         :disabled="disabled"
@@ -13,10 +14,12 @@
     <!-- update-end--author:liaozhiyang---date:20240517---for：【TV360X-35】富文本，图片上传遮挡其他按钮 -->
     <Editor :id="tinymceId" ref="elRef" :disabled="disabled" :init="initOptions" :style="{ visibility: 'hidden' }" v-if="!initOptions.inline"></Editor>
     <slot v-else></slot>
+    <ProcessMask ref="processMaskRef" :show="showUploadMask"/>
   </div>
 </template>
 
 <script lang="ts">
+  import type { RawEditorOptions } from 'tinymce';
   import tinymce from 'tinymce/tinymce';
   import Editor from '@tinymce/tinymce-vue'
   import 'tinymce/themes/silver';
@@ -32,6 +35,7 @@
   import 'tinymce/plugins/image';
   import { defineComponent, computed, nextTick, ref, unref, watch, onDeactivated, onBeforeUnmount, onMounted } from 'vue';
   import ImgUpload from './ImgUpload.vue';
+  import ProcessMask from './ProcessMask.vue';
   import {simpleToolbar, menubar, simplePlugins} from './tinymce';
   import { buildShortUUID } from '/@/utils/uuid';
   import { bindHandlers } from './helper';
@@ -45,7 +49,7 @@
   import { ThemeEnum } from '/@/enums/appEnum';
   const tinymceProps = {
     options: {
-      type: Object as PropType<Partial<RawEditorSettings>>,
+      type: Object as PropType<Partial<RawEditorOptions>>,
       default: {},
     },
     value: {
@@ -81,22 +85,32 @@
       type: Boolean,
       default: true,
     },
+    showUploadMask: {
+      type: Boolean,
+      default: false,
+    },
+    //是否聚焦
+    autoFocus:{
+      type: Boolean,
+      default: true,
+    }
   };
 
   export default defineComponent({
     name: 'Tinymce',
-    components: { ImgUpload,Editor },
+    components: { ImgUpload,Editor,ProcessMask },
     inheritAttrs: false,
-    props: tinymceProps,
+    props: tinymceProps as any,
     emits: ['change', 'update:modelValue', 'inited', 'init-error'],
     setup(props, { emit, attrs }) {
       console.log("---Tinymce---初始化---")
-      
+
       const editorRef = ref<Nullable<any>>(null);
       const fullscreen = ref(false);
       const tinymceId = ref<string>(buildShortUUID('tiny-vue'));
       const elRef = ref<Nullable<HTMLElement>>(null);
       const editorRootRef = ref<Nullable<HTMLElement>>(null);
+      const processMaskRef = ref<any>(null);
       const imgUploadShow = ref(false);
       const targetElem = ref<null | HTMLDivElement>(null);
 
@@ -144,7 +158,9 @@
           link_title: false,
           object_resizing: true,
           toolbar_mode: 'sliding',
-          auto_focus: true,
+          //update-begin---author:wangshuai---date:2024-08-01---for:【TV360X-416】单表代码生成，表单打开时，会先聚焦富文本组件，并滚动到富文本组件所在的位置---
+          auto_focus: props.autoFocus,
+          //update-end---author:wangshuai---date:2024-08-01---for:【TV360X-416】单表代码生成，表单打开时，会先聚焦富文本组件，并滚动到富文本组件所在的位置---
           // toolbar_groups: true,
           skin: skinName.value,
           skin_url: publicPath + 'resource/tinymce/skins/ui/' + skinName.value,
@@ -306,16 +322,31 @@
         setValue(editor, content);
       }
 
-      function handleDone(name: string, url: string) {
+      async function handleDone(name: string, url: string) {
         const editor = unref(editorRef);
         if (!editor) {
           return;
         }
+        await handleImageUploading(name);
         const content = editor?.getContent() ?? '';
         const val = content?.replace(getUploadingImgName(name), `<img src="${url}"/>`) ?? '';
         setValue(editor, val);
       }
 
+      /**
+       * 上传进度计算
+       * @param file
+       * @param fileList
+       */
+      function handleLoading(fileLength,showMask){
+        if(fileLength && fileLength > 0){
+          setTimeout(() => {
+              props?.showUploadMask && processMaskRef.value.calcProcess(fileLength)
+          },100)
+        }else{
+           props?.showUploadMask && (processMaskRef.value.showMask = showMask);
+        }
+      }
       function getUploadingImgName(name: string) {
         return `[uploading:${name}]`;
       }
@@ -388,6 +419,9 @@
         editorRootRef,
         imgUploadShow,
         targetElem,
+
+        handleLoading,
+        processMaskRef
       };
     },
   });
@@ -419,6 +453,7 @@
     }
     // update-end--author:liaozhiyang---date:20240527---for：【TV360X-329】富文本禁用状态下工具栏划过边框丢失
   }
+
   html[data-theme='dark'] {
     .@{prefix-cls} {
       .tox .tox-edit-area__iframe {background-color: #141414;}

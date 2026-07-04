@@ -1,6 +1,7 @@
 <#list subTables as sub>
 #segment#${sub.entityName}List.vue
 <#assign need_pca = false>
+<#assign is_like = false>
 <template>
  <div class="p-2">
    <#-- 结束循环 -->
@@ -87,6 +88,7 @@
       useSearchForm: false,
       actionColumn: {
         width: 180,
+        fixed:'right'
       },
       beforeFetch: (params) => {
         return Object.assign(params, queryParam);
