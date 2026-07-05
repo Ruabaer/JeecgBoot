@@ -310,10 +310,16 @@ export const useUserStore = defineStore({
 
       this.setToken('');
       setAuthCache(TOKEN_KEY, null);
+      setAuthCache(ROLES_KEY, null);
       this.setSessionTimeout(false);
       this.setUserInfo(null);
       this.setLoginInfo(null);
       this.setTenant(null);
+      
+      // 退出登录时清除权限状态
+      const permissionStore = usePermissionStore();
+      permissionStore.resetState();
+
       // update-begin--author:liaozhiyang---date:20240517---for：【TV360X-23】退出登录后会提示「Token时效，请重新登录」
       setTimeout(() => {
         this.setAllDictItems(null);
