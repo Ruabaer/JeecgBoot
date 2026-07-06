@@ -17,6 +17,7 @@
   const attrs = useAttrs();
   const isUpdate = ref(true);
   const menuType = ref(0);
+  const recordId = ref('');
   const isButton = (type) => type === 2;
   const [registerForm, { setProps, resetFields, setFieldsValue, updateSchema, validate, clearValidate }] = useForm({
     labelCol: {
@@ -36,6 +37,7 @@
     setDrawerProps({ confirmLoading: false });
     isUpdate.value = !!data?.isUpdate;
     menuType.value = data?.record?.menuType;
+    recordId.value = data?.record?.id || '';
 
     //获取下拉树信息
     const treeData = await list();
@@ -84,7 +86,11 @@
       }
       setDrawerProps({ confirmLoading: true });
       //提交表单
-      await saveOrUpdateMenu(values, unref(isUpdate));
+      const params = { ...values };
+      if (unref(isUpdate)) {
+        params.id = unref(recordId);
+      }
+      await saveOrUpdateMenu(params, unref(isUpdate));
       closeDrawer();
       emit('success');
     } finally {
