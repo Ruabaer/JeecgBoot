@@ -19,6 +19,10 @@ services:
       --default-authentication-plugin=caching_sha2_password
     ports:
       - 3306:3306
+    volumes:
+      - ./jeecg-boot/db/MySQL:/var/lib/mysql
+      - ./jeecg-boot/db/insert_menu_dcs.sql:/docker-entrypoint-initdb.d/insert_menu_dcs.sql
+      - ./jeecg-boot/db/insert_gateway_route_dcs.sql:/docker-entrypoint-initdb.d/insert_gateway_route_dcs.sql
     networks:
       - jeecg-boot
 
@@ -38,6 +42,8 @@ services:
       context: ./jeecg-boot/jeecg-server-cloud/jeecg-cloud-nacos
     ports:
       - 8848:8848
+      - 9848:9848
+      - 9849:9849
     container_name: jeecg-boot-nacos
     depends_on:
       - jeecg-boot-mysql
@@ -55,9 +61,16 @@ services:
     restart: on-failure
     environment:
       - TZ=Asia/Shanghai
+    volumes:
+      - ./jeecg-boot/jeecg-server-cloud/jeecg-system-cloud-start/target/jeecg-system-cloud-start-${JEECG_VERSION}.jar:/jeecg-system-cloud/jeecg-system-cloud-start-${JEECG_VERSION}.jar
+    command: >
+      /bin/sh -c "
+      sleep 60;
+      java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar jeecg-system-cloud-start-${JEECG_VERSION}.jar
+      "
     networks:
       - jeecg-boot
-
+ 
   jeecg-boot-demo:
     depends_on:
       - jeecg-boot-nacos
@@ -68,6 +81,23 @@ services:
     restart: on-failure
     environment:
       - TZ=Asia/Shanghai
+    volumes:
+      - ./jeecg-boot/jeecg-server-cloud/jeecg-demo-cloud-start/target/jeecg-demo-cloud-start-${JEECG_VERSION}.jar:/jeecg-demo-cloud/jeecg-demo-cloud-start-${JEECG_VERSION}.jar
+    networks:
+      - jeecg-boot
+ 
+  jeecg-boot-dcs:
+    depends_on:
+      - jeecg-boot-nacos
+    build:
+      context: ./jeecg-boot/jeecg-server-cloud/jeecg-dcs-cloud-start
+    container_name: jeecg-dcs-start
+    hostname: jeecg-boot-dcs
+    restart: on-failure
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./jeecg-boot/jeecg-server-cloud/jeecg-dcs-cloud-start/target/jeecg-dcs-cloud-start-${JEECG_VERSION}.jar:/jeecg-dcs-cloud/jeecg-dcs-cloud-start-${JEECG_VERSION}.jar
     networks:
       - jeecg-boot
 
