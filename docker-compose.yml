@@ -19,6 +19,10 @@ services:
       --default-authentication-plugin=caching_sha2_password
     ports:
       - 3306:3306
+    volumes:
+      - ./jeecg-boot/db/MySQL:/var/lib/mysql
+      - ./jeecg-boot/db/insert_menu_dcs.sql:/docker-entrypoint-initdb.d/insert_menu_dcs.sql
+      - ./jeecg-boot/db/insert_gateway_route_dcs.sql:/docker-entrypoint-initdb.d/insert_gateway_route_dcs.sql
     networks:
       - jeecg-boot
 

@@ -148,6 +148,12 @@
 			<artifactId>commonmark</artifactId>
 			<version>${commonmark.version}</version>
 		</dependency>
+		<!-- 兼容 Online 代码生成器导出的旧版 Swagger 注解 -->
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>1.5.22</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

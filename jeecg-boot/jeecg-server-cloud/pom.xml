@@ -18,6 +18,7 @@
         <module>jeecg-cloud-nacos</module>
         <module>jeecg-system-cloud-start</module>
         <module>jeecg-demo-cloud-start</module>
+        <module>jeecg-dcs-cloud-start</module>
         
         <!-- 监控和测试例子 -->
         <module>jeecg-visual</module>
@@ -38,6 +39,7 @@
                             <target>
                                 <!-- 只写入需要的一行版本号，保持 .env 文件干净 -->
                                 <echo file="${project.basedir}/.env">JEECG_VERSION=${project.version}</echo>
+                                <echo file="${project.basedir}/../../.env">JEECG_VERSION=${project.version}</echo>
                             </target>
                         </configuration>
                     </execution>
