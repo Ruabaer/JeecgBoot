@@ -18,6 +18,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -32,6 +35,9 @@ import java.net.UnknownHostException;
  */
 @Slf4j
 @SpringBootApplication
+@ComponentScan(basePackages = {"org.jeecg"}, excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org\\.jeecg\\.modules\\.airag\\.flow\\.component\\..*")
+})
 @EnableFeignClients(basePackages = {"org.jeecg"})
 @EnableScheduling
 @EnableAutoConfiguration(exclude={MongoAutoConfiguration.class})

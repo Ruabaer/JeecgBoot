@@ -41,7 +41,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
  * @Date:   2026-07-04
  * @Version: V1.0
  */
-@RestController
+@RestController("testNote1Controller")
 @RequestMapping("/org.jeecg.modules.dcs/testNote")
 @Slf4j
 public class TestNoteController extends JeecgController<TestNote, ITestNoteService> {
