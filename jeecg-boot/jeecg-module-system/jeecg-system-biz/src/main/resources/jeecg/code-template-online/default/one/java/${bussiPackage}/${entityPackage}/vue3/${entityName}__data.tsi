@@ -71,6 +71,18 @@ export const columns: BasicColumn[] = [
    <#else>
     dataIndex: '${po.fieldName}'
    </#if>
+    <#if po.extendParams?exists && po.extendParams.defaultHidden?exists>
+    ,defaultHidden: ${po.extendParams.defaultHidden?c}
+    </#if>
+    <#if po.extendParams?exists && po.extendParams.width?exists>
+    ,width: ${po.extendParams.width?c}
+    </#if>
+    <#if po.extendParams?exists && po.extendParams.fixed?exists>
+    ,fixed: '${po.extendParams.fixed}'
+    </#if>
+    <#if po.extendParams?exists && po.extendParams.resizable?exists>
+    ,resizable: ${po.extendParams.resizable?c}
+    </#if>
    },
    </#if>
  </#list>
@@ -484,10 +496,18 @@ export const formSchema: FormSchema[] = [
      </#if>
      },
     </#if>
-    <#if po.readonly=='Y'>
-    dynamicDisabled:true
-    </#if>
-  },
+     <#if po.readonly=='Y'>
+     dynamicDisabled:true
+     <#elseif po.extendParams?exists && po.extendParams.disabled?exists>
+     dynamicDisabled: ${po.extendParams.disabled?c}
+     </#if>
+     <#if po.extendParams?exists && po.extendParams.helpMessage?exists>
+     ,helpMessage: '${po.extendParams.helpMessage}'
+     </#if>
+     <#if po.extendParams?exists && po.extendParams.span?exists>
+     ,colProps: { span: ${po.extendParams.span?c} }
+     </#if>
+   },
 </#if>
 </#list>
 <#if id_exists == false>
