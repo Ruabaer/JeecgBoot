@@ -13,7 +13,20 @@ echo [INFO] Current directory: %cd%
 echo [INFO] Launching java process...
 echo ----------------------------------------------------------
 
-java "-Dfile.encoding=utf-8" -jar jeecg-system-cloud-start-3.7.4.jar --spring.profiles.active=dev,SpringCloud
+:: Find jar file using wildcard to avoid hardcoded version
+set JAR_FILE=
+for %%f in (jeecg-system-cloud-start-*.jar) do (
+    set "JAR_FILE=%%f"
+)
+
+if "%JAR_FILE%"=="" (
+    echo [ERROR] No jeecg-system-cloud-start-*.jar file found in target directory!
+    pause
+    exit /b 1
+)
+
+echo [INFO] Found target JAR: %JAR_FILE%
+java "-Dfile.encoding=utf-8" -jar "%JAR_FILE%" --spring.profiles.active=dev,SpringCloud
 
 echo ----------------------------------------------------------
 echo [WARNING] Service has terminated!
