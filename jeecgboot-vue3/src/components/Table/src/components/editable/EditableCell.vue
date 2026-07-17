@@ -100,7 +100,14 @@
       });
 
       const getComponentProps = computed(() => {
-        const compProps = props.column?.editComponentProps ?? {};
+        let compProps;
+        // update-begin--author:liaozhiyang---date:20250818---for：【issues/8680】editComponentProps可接受一个函数传入record
+        if (isFunction(props.column?.editComponentProps)) {
+          compProps = props.column?.editComponentProps(props.record);
+        } else {
+          compProps = props.column?.editComponentProps ?? {};
+        }
+        // update-end--author:liaozhiyang---date:20250818---for：【issues/8680】editComponentProps可接受一个函数传入record
         const component = unref(getComponent);
         const apiSelectProps: Recordable = {};
         if (component === 'ApiSelect') {
@@ -148,7 +155,27 @@
 
         const options: LabelValueOptions = editComponentProps?.options ?? (unref(optionsRef) || []);
         const option = options.find((item) => `${item.value}` === `${value}`);
-
+        // update-begin---author:liaozhiyang---date:2025-07-28---for:【QQYUN-13251】表格可编辑单元格apiSelect多选不翻译 ---
+        if (['tags', 'multiple'].includes(editComponentProps?.mode)) {
+          const result = options
+            .filter((item) => {
+              let v = value;
+              if (isString(value)) {
+                v = value.split(',');
+              } else if (isNumber(value)) {
+                v = [value];
+              }
+              if (v.includes(item.value)) {
+                return true;
+              }
+            })
+            .map((item) => item.label);
+          if (result.length) {
+            return result.join(',');
+          }
+          return value;
+        }
+        // update-end---author:liaozhiyang---date:2025-07-28---for:【QQYUN-13251】表格可编辑单元格apiSelect多选不翻译 ---
         return option?.label ?? value;
       });
 
@@ -371,9 +398,7 @@
 
         if (props.column.dataIndex) {
           if (!props.record.editValueRefs) props.record.editValueRefs = {};
-          // update-begin--author:liaozhiyang---date:20250206---for：【issues/7709】当dataSource是响应式时，单元格编辑输入会自动关闭
-          props.record.editValueRefs[props.column.dataIndex] = unref(currentValueRef);
-          // update-end--author:liaozhiyang---date:20250206---for：【issues/7709】当dataSource是响应式时，单元格编辑输入会自动关闭
+          props.record.editValueRefs[props.column.dataIndex] = currentValueRef;
         }
         /* eslint-disable  */
         props.record.onCancelEdit = () => {

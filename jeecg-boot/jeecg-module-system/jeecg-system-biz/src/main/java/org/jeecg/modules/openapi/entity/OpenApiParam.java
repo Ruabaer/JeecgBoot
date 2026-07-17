@@ -1,7 +1,5 @@
 package org.jeecg.modules.openapi.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -17,16 +15,6 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class OpenApiParam implements Serializable {
     private static final long serialVersionUID = -6174831468578022357L;
-    /**
-     * id
-     */
-    @TableId(type = IdType.ASSIGN_ID)
-    private String id;
-
-    /**
-     * 接口ID
-     */
-    private String apiId;
 
     /**
      * key
