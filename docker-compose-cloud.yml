@@ -28,8 +28,8 @@ services:
 
   jeecg-boot-redis:
     image: registry.cn-hangzhou.aliyuncs.com/jeecgdocker/redis:5.0
-#    ports:
-#      - 6379:6379
+    ports:
+      - 6379:6379
     restart: always
     hostname: jeecg-boot-redis
     container_name: jeecg-boot-redis
@@ -69,6 +69,8 @@ services:
       - jeecg-boot-nacos
     build:
       context: ./jeecg-boot/jeecg-server-cloud/jeecg-system-cloud-start
+      args:
+        JEECG_VERSION: ${JEECG_VERSION}
     container_name: jeecg-system-start
     hostname: jeecg-boot-system
     restart: on-failure
@@ -89,6 +91,8 @@ services:
       - jeecg-boot-nacos
     build:
       context: ./jeecg-boot/jeecg-server-cloud/jeecg-demo-cloud-start
+      args:
+        JEECG_VERSION: ${JEECG_VERSION}
     container_name: jeecg-demo-start
     hostname: jeecg-boot-demo
     restart: on-failure
@@ -104,6 +108,8 @@ services:
       - jeecg-boot-nacos
     build:
       context: ./jeecg-boot/jeecg-server-cloud/jeecg-dcs-cloud-start
+      args:
+        JEECG_VERSION: ${JEECG_VERSION}
     container_name: jeecg-dcs-start
     hostname: jeecg-boot-dcs
     restart: on-failure
@@ -118,6 +124,8 @@ services:
     restart: on-failure
     build:
       context: ./jeecg-boot/jeecg-server-cloud/jeecg-cloud-gateway
+      args:
+        JEECG_VERSION: ${JEECG_VERSION}
     ports:
       - 9999:9999
     depends_on:

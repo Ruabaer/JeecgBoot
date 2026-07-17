@@ -1,4 +1,4 @@
-ARG JEECG_VERSION=3.7.4
+ARG JEECG_VERSION=3.8.3
 FROM registry.cn-hangzhou.aliyuncs.com/dockerhub_mirror/java:21-anolis
 
 MAINTAINER jeecgos@163.com
