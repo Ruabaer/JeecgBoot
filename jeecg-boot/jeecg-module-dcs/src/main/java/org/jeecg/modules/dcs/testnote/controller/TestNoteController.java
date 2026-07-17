@@ -32,8 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
@@ -43,7 +41,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
  * @Date:   2026-07-04
  * @Version: V1.0
  */
-@Api(tags="请假单@JS增强示例")
 @RestController
 @RequestMapping("/org.jeecg.modules.dcs/testNote")
 @Slf4j
@@ -61,7 +58,6 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
 	 * @return
 	 */
 	//@AutoLog(value = "请假单@JS增强示例-分页列表查询")
-	@ApiOperation(value="请假单@JS增强示例-分页列表查询", notes="请假单@JS增强示例-分页列表查询")
 	@GetMapping(value = "/list")
 	public Result<IPage<TestNote>> queryPageList(TestNote testNote,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
@@ -80,7 +76,6 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
 	 * @return
 	 */
 	@AutoLog(value = "请假单@JS增强示例-添加")
-	@ApiOperation(value="请假单@JS增强示例-添加", notes="请假单@JS增强示例-添加")
 	@RequiresPermissions("org.jeecg.modules.dcs:test_note:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody TestNote testNote) {
@@ -95,7 +90,6 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
 	 * @return
 	 */
 	@AutoLog(value = "请假单@JS增强示例-编辑")
-	@ApiOperation(value="请假单@JS增强示例-编辑", notes="请假单@JS增强示例-编辑")
 	@RequiresPermissions("org.jeecg.modules.dcs:test_note:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody TestNote testNote) {
@@ -110,7 +104,6 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
 	 * @return
 	 */
 	@AutoLog(value = "请假单@JS增强示例-通过id删除")
-	@ApiOperation(value="请假单@JS增强示例-通过id删除", notes="请假单@JS增强示例-通过id删除")
 	@RequiresPermissions("org.jeecg.modules.dcs:test_note:delete")
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
@@ -125,7 +118,6 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
 	 * @return
 	 */
 	@AutoLog(value = "请假单@JS增强示例-批量删除")
-	@ApiOperation(value="请假单@JS增强示例-批量删除", notes="请假单@JS增强示例-批量删除")
 	@RequiresPermissions("org.jeecg.modules.dcs:test_note:deleteBatch")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
@@ -140,7 +132,6 @@ public class TestNoteController extends JeecgController<TestNote, ITestNoteServi
 	 * @return
 	 */
 	//@AutoLog(value = "请假单@JS增强示例-通过id查询")
-	@ApiOperation(value="请假单@JS增强示例-通过id查询", notes="请假单@JS增强示例-通过id查询")
 	@GetMapping(value = "/queryById")
 	public Result<TestNote> queryById(@RequestParam(name="id",required=true) String id) {
 		TestNote testNote = testNoteService.getById(id);
