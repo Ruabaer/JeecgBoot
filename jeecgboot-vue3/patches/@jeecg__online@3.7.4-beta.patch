@@ -1,3 +1,47 @@
+diff --git a/CgformModal-c4a4e0c2.mjs b/CgformModal-c4a4e0c2.mjs
+index ae134d76c59fba3b76388bcadcb751d4d57a12fa..0e7dabb724b6ef289354d7328176396d34d590dd 100644
+--- a/CgformModal-c4a4e0c2.mjs
++++ b/CgformModal-c4a4e0c2.mjs
+@@ -174,6 +174,22 @@ const pt = (a, l) => v.post({ url: `/online/cgform/api/doDbSynch/${a}/${l}`, tim
+     }
+     function ie(e, t) {
+       return D(this, null, function* () {
++        if (e && e.length > 0) {
++          e.forEach((row) => {
++            if (row.fieldExtendJson) {
++              try {
++                const ext = JSON.parse(row.fieldExtendJson);
++                if (ext.defaultHidden === true || ext.defaultHidden === "1") {
++                  row.defaultHidden = "1";
++                } else {
++                  row.defaultHidden = "0";
++                }
++              } catch (err) {}
++            } else {
++              row.defaultHidden = "0";
++            }
++          });
++        }
+         const { dbTable: n, pageTable: o, checkTable: r, fkTable: i, queryTable: f } = d;
+         n.value || (yield Z(), yield V(1)), n.value.setDataSource(e, t), setTimeout(() => {
+           o.value.setDataSource(e, t), r.value.setDataSource(e, t), i.value.setDataSource(e, t), f.value.setDataSource(e, t);
+@@ -292,6 +308,16 @@ const pt = (a, l) => v.post({ url: `/online/cgform/api/doDbSynch/${a}/${l}`, tim
+       };
+       return t.head = Object.assign(g, e.values), t.head.isDesForm = s.isDesForm, t.head.desFormCode = s.desFormCode, delete s.isDesForm, delete s.desFormCode, t.head.extConfigJson = JSON.stringify(s), e.dbTable.tableData.forEach((n, o) => {
+         let r = n.id, i = Object.assign({}, n), f = e.pageTable.tableData[o];
++        let ext = {};
++        if (f.fieldExtendJson) {
++          try { ext = JSON.parse(f.fieldExtendJson); } catch (err) {}
++        }
++        if (f.defaultHidden === "1") {
++          ext.defaultHidden = true;
++        } else {
++          delete ext.defaultHidden;
++        }
++        f.fieldExtendJson = Object.keys(ext).length > 0 ? JSON.stringify(ext) : "";
+         i = Object.assign(f, i);
+         let C = e.checkTable.tableData[o];
+         i = Object.assign(C, i);
 diff --git a/CodeGeneratorModal-2e1dc13d.mjs b/CodeGeneratorModal-2e1dc13d.mjs
 index de34d4242814d61baa3fa95c54045613041dcfc0..777ea2a0a2cd4199a60dac3f3ac01cf45eb81ea6 100644
 --- a/CodeGeneratorModal-2e1dc13d.mjs
@@ -21,6 +65,96 @@ index de34d4242814d61baa3fa95c54045613041dcfc0..777ea2a0a2cd4199a60dac3f3ac01cf4
      }, {
        default: r(() => [
          u(a, { spinning: t.confirmLoading }, {
+diff --git a/DetailForm-c592b8d8.mjs b/DetailForm-c592b8d8.mjs
+index adfa615ed003cfc7039be03e4d5b790cdcca2733..38212950a5cf42d8ebec75619fa33087cb5917fc 100644
+--- a/DetailForm-c592b8d8.mjs
++++ b/DetailForm-c592b8d8.mjs
+@@ -281,7 +281,7 @@ function xe(a) {
+   function G(e) {
+     return e ? e.substring(e.lastIndexOf("/") + 1) : "";
+   }
+-  const X = ["file", "image", "markdown", "umeditor"];
++  const X = ["file", "image", "markdown", "umeditor", "textarea"];
+   function Z(e) {
+     return X.indexOf(e.view) >= 0 ? a.span == 12 ? "span12" : a.span == 8 ? "span8" : a.span == 6 ? "span6" : "span24" : "";
+   }
+@@ -320,6 +320,44 @@ const Te = se({
+   },
+   setup(a) {
+     const { formContainerClass: s, detailFormData: d, getItemSpan: k, handleDownloadFile: b, handleViewImage: L, getFilename: x, getLabelWidthClass: w } = xe(a);
++    const formattedSchemas = re(() => {
++      const list = (a.schemas || []).filter((r) => !r.hidden);
++      const result = [];
++      let remainingSpan = 24;
++      let placeholderCount = 0;
++      for (const r of list) {
++        let itemSpan = r.span || a.span || 8;
++        if (itemSpan > remainingSpan) {
++          result.push({
++            isPlaceholder: true,
++            span: remainingSpan,
++            field: "placeholder_" + (placeholderCount++),
++            label: "",
++            view: "placeholder",
++            hidden: false,
++            fieldExtendJson: ""
++          });
++          remainingSpan = 24;
++        }
++        result.push(r);
++        remainingSpan -= itemSpan;
++        if (remainingSpan <= 0) {
++          remainingSpan = 24;
++        }
++      }
++      if (remainingSpan < 24) {
++        result.push({
++          isPlaceholder: true,
++          span: remainingSpan,
++          field: "placeholder_" + (placeholderCount++),
++          label: "",
++          view: "placeholder",
++          hidden: false,
++          fieldExtendJson: ""
++        });
++      }
++      return result;
++    });
+     return {
+       formContainerClass: s,
+       detailFormData: d,
+@@ -328,6 +366,7 @@ const Te = se({
+       handleViewImage: L,
+       getFilename: x,
+       getLabelWidthClass: w,
++      formattedSchemas,
+       filterLable: (c) => {
+         if (c.fieldExtendJson) {
+           const F = JSON.parse(c.fieldExtendJson);
+@@ -383,12 +422,20 @@ function Xe(a, s, d, k, b, L) {
+   }, [
+     $(F, null, {
+       default: q(() => [
+-        (f(!0), u(S, null, V(a.schemas, (r, v) => (f(), K(c, {
+-          key: v,
++        (f(!0), u(S, null, V(a.formattedSchemas || [], (r, v) => (f(), K(c, {
++          key: r.field,
+           span: a.getItemSpan(r)
+         }, {
+           default: q(() => [
+-            r.hidden ? (f(), u(S, { key: 0 }, [], 64)) : (f(), u("div", Le, [
++            r.isPlaceholder ? (f(), u("div", {
++              key: 3,
++              class: "detail-item placeholder-item"
++            }, [
++              p("div", {
++                class: "item-content",
++                style: { "border-right": "1px solid rgba(5,5,5,.06)", "flex-grow": 1, "height": "100%" }
++              })
++            ])) : r.hidden ? (f(), u(S, { key: 0 }, [], 64)) : (f(), u("div", Le, [
+               p("div", {
+                 class: j(["item-title", a.getLabelWidthClass(r)]),
+                 title: r.label
 diff --git a/FieldExtendJsonModal-bf04d70e.mjs b/FieldExtendJsonModal-bf04d70e.mjs
 index e3612a72d96d43beb69e832afcc027f920e41070..810714f769c9a288aa5475a017fea7cec7038583 100644
 --- a/FieldExtendJsonModal-bf04d70e.mjs
@@ -43,13 +177,48 @@ index e3612a72d96d43beb69e832afcc027f920e41070..810714f769c9a288aa5475a017fea7ce
        });
      }
      return _({
+diff --git a/PageAttributeTable-66e7b485.mjs b/PageAttributeTable-66e7b485.mjs
+index 42644a9c10084dd318cbf82d20163c0bc52deb36..68af147888cce7f533f7a0ff0b10ba0b7b4e8074 100644
+--- a/PageAttributeTable-66e7b485.mjs
++++ b/PageAttributeTable-66e7b485.mjs
+@@ -109,6 +109,15 @@ const H = [
+         customValue: ["1", "0"],
+         defaultChecked: !0
+       },
++      {
++        title: "默认不显示",
++        key: "defaultHidden",
++        width: 90,
++        type: r.checkbox,
++        align: "center",
++        customValue: ["1", "0"],
++        defaultChecked: !0
++      },
+       {
+         title: "是否排序",
+         key: "sortFlag",
 diff --git a/useExtendComponent-bb98e568.mjs b/useExtendComponent-bb98e568.mjs
-index 41a6edd8dee1650f1cf3e321c3d45dd88c988ce3..11ede69bf5c4e0424aae2b67571935257d02e33a 100644
+index 41a6edd8dee1650f1cf3e321c3d45dd88c988ce3..4afebcaddccbd9757a676d40bbf186148c14c80b 100644
 --- a/useExtendComponent-bb98e568.mjs
 +++ b/useExtendComponent-bb98e568.mjs
-@@ -3642,8 +3642,14 @@ function Pl(n, e) {
+@@ -2141,7 +2141,7 @@ function Bs(n) {
+             },
+             Qe(L, ["view", "order", "fieldExtendJson", "dictTable", "dictText", "dictCode", "dict"])
+           );
+-          if (L.view == "file" && (A.span = 24, A.isFile = !0), L.view == "image" && (A.span = 24, A.isImage = !0), L.view == "link_table" && L.fieldExtendJson)
++          if (L.view == "file" && (A.span = 24, A.isFile = !0), L.view == "image" && (A.span = 24, A.isImage = !0), L.view == "textarea" && (A.span = 24), L.view == "link_table" && L.fieldExtendJson)
+             try {
+               let Q = JSON.parse(L.fieldExtendJson);
+               Q.showType != "select" && (A.isCard = !0), Q.multiSelect == !0 && (A.multi = !0);
+@@ -3641,9 +3641,20 @@ function Pl(n, e) {
+       type: o
      } : f.value = null, v.value = l.scrollFlag == 1;
      let a = l.columns;
++    if (a && a.length > 0) {
++      const dataIndexes = a.map((u) => u.dataIndex);
++      a = a.filter((u) => !dataIndexes.includes(u.dataIndex + "_dictText"));
++      l.columns = a;
++    }
      a.forEach((u) => {
 -      var w;
 -      if (u.fieldExtendJson && JSON.parse(u.fieldExtendJson).isFixed && (u.fixed = "left"), u.hrefSlotName && u.scopedSlots) {
