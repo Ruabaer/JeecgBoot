@@ -25,5 +25,10 @@ public class AiOcr {
      * 提示词
      */
     private String prompt;
+
+    /**
+     * 工作流ID
+     */
+    private String flowId;
     
 }

@@ -35,9 +35,7 @@ import java.net.UnknownHostException;
  */
 @Slf4j
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.jeecg"}, excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org\\.jeecg\\.modules\\.airag\\.flow\\.component\\..*")
-})
+@ComponentScan(basePackages = {"org.jeecg"})
 @EnableFeignClients(basePackages = {"org.jeecg"})
 @EnableScheduling
 @EnableAutoConfiguration(exclude={MongoAutoConfiguration.class})

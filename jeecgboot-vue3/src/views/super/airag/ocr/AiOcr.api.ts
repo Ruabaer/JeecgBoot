@@ -44,3 +44,12 @@ export const editOcr = (params) => {
 export const deleteOcrById = (params) => {
   return defHttp.delete({ url: Api.deleteById, params });
 };
+
+/**
+ * 查询工作流列表
+ */
+export const getFlowList = (params) => {
+  return defHttp.get({ url: '/airag/flow/list', params: { pageSize: 1000, ...params } }).then((res) => {
+    return res?.records || [];
+  });
+};

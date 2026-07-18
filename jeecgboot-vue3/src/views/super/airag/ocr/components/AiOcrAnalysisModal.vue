@@ -78,7 +78,7 @@
         {
           url: Api.flowRun,
           params: {
-            flowId: '1904779811574784002',
+            flowId: values.flowId || '1904779811574784002',
             inputParams: {
               content: values.prompt,
               images: values.url,
@@ -93,12 +93,23 @@
       )
       .then((res) => {
         if (res.success) {
-          let replace = res.result.data.replace(/\s+/g, '');
-          let parse = JSON.parse(replace);
+          let jsonStr = res.result.data.trim();
+          if (jsonStr.startsWith('```')) {
+            jsonStr = jsonStr.replace(/^```(json)?\s*/i, '').replace(/```$/, '').trim();
+          }
+          let parse = JSON.parse(jsonStr);
           let text = parse.text;
           let lastText = "";
-          for (const textKey in text) {
-            lastText = lastText + textKey +":"+ text[textKey] + "\n";
+          if (text && typeof text === 'object') {
+            for (const textKey in text) {
+              let val = text[textKey];
+              if (Array.isArray(val)) {
+                val = val.join(', ');
+              }
+              lastText = lastText + textKey + ": " + val + "\n";
+            }
+          } else {
+            lastText = text ? String(text) : "";
           }
           setFieldsValue({ analysisResult: lastText });
         } else {

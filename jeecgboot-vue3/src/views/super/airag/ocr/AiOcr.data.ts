@@ -1,4 +1,5 @@
 import { BasicColumn, FormSchema } from '@/components/Table';
+import { getFlowList } from './AiOcr.api';
 
 //ocr表格
 export const columns: BasicColumn[] = [
@@ -36,6 +37,18 @@ export const schemas: FormSchema[] = [
     required: true,
   },
   {
+    label: '绑定工作流',
+    field: 'flowId',
+    component: 'ApiSelect',
+    componentProps: {
+      api: getFlowList,
+      labelField: 'name',
+      valueField: 'id',
+      immediate: true,
+    },
+    required: true,
+  },
+  {
     label: '提示词',
     field: 'prompt',
     component: 'InputTextArea',
@@ -66,6 +79,12 @@ export const analysisSchemas: FormSchema[] = [
     field: 'prompt',
     component: 'InputTextArea',
     show:false,
+  },
+  {
+    label: '工作流ID',
+    field: 'flowId',
+    component: 'Input',
+    show: false,
   },
   {
     label: '解析结果',

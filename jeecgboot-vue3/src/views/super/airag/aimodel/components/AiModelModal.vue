@@ -98,6 +98,7 @@
     </div>
     <template v-if="dataIndex === 'add' || dataIndex === 'edit'" #footer>
       <a-button @click="cancel">关闭</a-button>
+      <a-button @click="handleTestOnly" v-if="modelActivate" :loading="testLoading" type="primary" ghost>测试连接</a-button>
       <a-button @click="save" type="primary" ghost="true">保存</a-button>
       <a-button @click="test" v-if="!modelActivate" :loading="testLoading" type="primary" >保存并激活</a-button>
     </template>
@@ -357,6 +358,45 @@
         emit('success');
       }
 
+      const { createMessage } = useMessage();
+
+      /**
+       * 测试连接（仅测试，不保存激活状态）
+       */
+      async function handleTestOnly() {
+        try {
+          testLoading.value = true;
+          let values = await validate();
+          if (modelId.value) {
+            values.id = modelId.value;
+          }
+          let credential = {
+            apiKey: values.apiKey,
+            secretKey: values.secretKey,
+          };
+          if (modelParamsRef.value) {
+            let modelParams = modelParamsRef.value.emitChange();
+            if (modelParams) {
+              values.modelParams = JSON.stringify(modelParams);
+            }
+          }
+          values.credential = JSON.stringify(credential);
+          if (!values.provider) {
+            values.provider = modelData.value.value;
+          }
+          await testConn(values);
+          createMessage.success('测试连接成功！');
+        } catch (e) {
+          if (e.hasOwnProperty('errorFields')) {
+            activeKey.value = 1;
+          } else {
+            createMessage.error('测试连接失败：' + (e.message || e));
+          }
+        } finally {
+          testLoading.value = false;
+        }
+      }
+
       /**
        * 测试连接
        */
@@ -461,6 +501,7 @@
         getTitle,
         test,
         testLoading,
+        handleTestOnly,
       };
     },
   };

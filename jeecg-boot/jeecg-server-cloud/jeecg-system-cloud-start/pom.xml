@@ -37,6 +37,18 @@
             </exclusions>
         </dependency>
 
+        <!-- AI Flow 脚本运行时依赖 -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-scripting-jsr223</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>liteflow-script-graaljs</artifactId>
+            <version>${liteflow.version}</version>
+        </dependency>
+
 
         <!-- feign 熔断限流、分布式锁、xxljob示例 
         <dependency>
