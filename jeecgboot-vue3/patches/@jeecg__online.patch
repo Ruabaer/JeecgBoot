@@ -42,6 +42,19 @@ index aebcf36e71f07143ca8479e02d8b8497995e9175..cad402f5afaa88a8a89377efbff447b3
          i = Object.assign(f, i);
          let C = e.checkTable.tableData[o];
          i = Object.assign(C, i);
+diff --git a/CgreportAigcModal-d1e62385.mjs b/CgreportAigcModal-d1e62385.mjs
+index 14eb02c8fc5233a16a786bf93a92436e2341d432..4ea4f9f91de6f5a6bf10cc187009dd17716fe195 100644
+--- a/CgreportAigcModal-d1e62385.mjs
++++ b/CgreportAigcModal-d1e62385.mjs
+@@ -92,7 +92,7 @@ const ie = { class: "aiWrap" }, ce = /* @__PURE__ */ Y({
+           const d = "/online/cgreport/head/api/aigc?cgformTableName=" + a + "&prompt=" + e, { success: b, result: f, message: N } = yield re.post({ url: d, timeout: 6e4 }, { isTransformResponse: !1 });
+           if (b) {
+             const { code: A, name: C, cgrSql: c } = f;
+-            A && C && c ? (x("generate", f), u()) : m.warn("生成失败，Ai开小差了，请稍后重试…");
++            A && C && c ? (x("generate", f), u()) : m.warn("生成失败，大模型未能返回有效的报表编码、名称或SQL内容，请丰富描述后重试！");
+           } else
+             m.error(N);
+         } finally {
 diff --git a/CodeGeneratorModal-791b1695.mjs b/CodeGeneratorModal-791b1695.mjs
 index 7908a2bb74309f17e528fffef02beab1e7a47cdc..5a76c74b3af399a242613b58ed0d0541a8ffe362 100644
 --- a/CodeGeneratorModal-791b1695.mjs
@@ -175,6 +188,19 @@ index 4934fbba0f763c1d96ba804e18462f15569bbb80..cec95c2be69997d9bbe6982449b35160
        {
          title: "是否排序",
          key: "sortFlag",
+diff --git a/aiModal-6e338c79.mjs b/aiModal-6e338c79.mjs
+index 5376f20ceb8186648b1fe7c9735d3e8019b7f6c8..dbed3e45cd5da94e16909b703109e63964794253 100644
+--- a/aiModal-6e338c79.mjs
++++ b/aiModal-6e338c79.mjs
+@@ -51,6 +51,8 @@ const X = { class: "ai-modal-content" }, Y = { class: "ai-header" }, Z = { class
+       ).then((t) => {
+         t.code == 200 ? I(t.result) : h.warn(t.message), o.loading = !1;
+       }).catch((t) => {
++        const errorMsg = t.response?.data?.message || t.message || "请求失败，请稍后重试";
++        h.error(`生成失败：${errorMsg}`);
+         o.loading = !1;
+       });
+     }, R = () => {
 diff --git a/useExtendComponent-d1db211d.mjs b/useExtendComponent-d1db211d.mjs
 index aa242e61e26a5b17c7eb7ed5be7cde4c7fd81e78..1841e7885684a65db7edc7d9eb6715a8a23d363a 100644
 --- a/useExtendComponent-d1db211d.mjs

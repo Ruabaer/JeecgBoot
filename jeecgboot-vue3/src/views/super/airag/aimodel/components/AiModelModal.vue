@@ -162,6 +162,8 @@
       const testLoading = ref<boolean>(false);
       //模型是否已激活
       const modelActivate = ref<boolean>(false);
+      // 模型 ID 缓存
+      const modelId = ref<string>('');
 
       const getImage = (name) => {
         return imageList.value[name];
@@ -189,6 +191,7 @@
         }
         setModalProps({ minHeight: 500 });
         if (data.id) {
+          modelId.value = data.id;
           dataIndex.value = 'edit';
           let values = await queryById({ id: data.id });
           if (values) {
@@ -206,6 +209,7 @@
               return item.value.includes(provider);
             });
             if (data && data.length > 0) {
+              modelData.value = data[0];
               modelTypeAddOption.value = data[0].type;
               modelNameAddOption.value = data[0][values.result.modelType];
             }
@@ -229,6 +233,7 @@
             initModelProvider();
           }
         } else {
+          modelId.value = '';
           modelTypeDisabled.value = false;
           //初始化模型提供者
           initModelProvider();
@@ -301,6 +306,12 @@
         try {
           setModalProps({ confirmLoading: true });
           let values = await validate();
+          if (modelId.value) {
+            values.id = modelId.value;
+          }
+          if (!values.provider && modelData.value && modelData.value.value) {
+            values.provider = modelData.value.value;
+          }
           let credential = {
             apiKey: values.apiKey,
             secretKey: values.secretKey
@@ -353,6 +364,9 @@
         try {
           testLoading.value = true;
           let values = await validate();
+          if (modelId.value) {
+            values.id = modelId.value;
+          }
           let credential = {
             apiKey: values.apiKey,
             secretKey: values.secretKey,

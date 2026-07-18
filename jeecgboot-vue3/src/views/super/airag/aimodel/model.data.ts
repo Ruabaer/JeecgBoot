@@ -16,7 +16,7 @@ export const formSchema: FormSchema[] = [
     label: 'id',
     field: 'id',
     component: 'Input',
-    show: false,
+    ifShow: false,
   },
   {
     label: '模型名称',

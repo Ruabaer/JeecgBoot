@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   '@jeecg/online':
-    hash: a534813fdebd06488d00cd7bf73de74c79b607b8fa075dad149093aec669f21f
+    hash: 5afa3dd3faaf158279bad581b5b0b969f08580c9ed200e4da6186ec8f613c7a1
     path: patches/@jeecg__online.patch
 
 importers:
@@ -27,7 +27,7 @@ importers:
         version: 1.1.1
       '@jeecg/online':
         specifier: 3.8.2-beta
-        version: 3.8.2-beta(patch_hash=a534813fdebd06488d00cd7bf73de74c79b607b8fa075dad149093aec669f21f)
+        version: 3.8.2-beta(patch_hash=5afa3dd3faaf158279bad581b5b0b969f08580c9ed200e4da6186ec8f613c7a1)
       '@logicflow/core':
         specifier: ^2.0.10
         version: 2.2.4
@@ -7374,7 +7374,7 @@ snapshots:
 
   '@jeecg/aiflow@1.1.1': {}
 
-  '@jeecg/online@3.8.2-beta(patch_hash=a534813fdebd06488d00cd7bf73de74c79b607b8fa075dad149093aec669f21f)': {}
+  '@jeecg/online@3.8.2-beta(patch_hash=5afa3dd3faaf158279bad581b5b0b969f08580c9ed200e4da6186ec8f613c7a1)': {}
 
   '@jest/console@29.7.0':
     dependencies:
