@@ -50,6 +50,9 @@
                 <a-tooltip v-if="!item.activateFlag" title="未激活模型暂无法被系统其他功能调用，激活后可正常使用。">
                   <span class="no-activate">未激活</span>
                 </a-tooltip>
+                <a-tooltip v-else title="已激活模型可被系统其他功能调用。" placement="top">
+                  <span class="activate">已激活</span>
+                </a-tooltip>
               </li>
               <li class="flex mr-14 mt-6">
                 <span class="label">基础模型</span>
@@ -321,6 +324,17 @@
     font-size: 10px;
     color: #ff4d4f;
     border: 1px solid #ff4d4f;
+    border-radius: 10px;
+    padding: 0 6px;
+    height: 14px;
+    line-height: 12px;
+    margin-left: 6px;
+    align-self: center;
+  }
+  .activate{
+    font-size: 10px;
+    color: #52c41a;
+    border: 1px solid #52c41a;
     border-radius: 10px;
     padding: 0 6px;
     height: 14px;
