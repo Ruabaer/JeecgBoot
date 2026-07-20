@@ -67,6 +67,8 @@ services:
       - jeecg-boot-nacos
     build:
       context: ./jeecg-system-cloud-start
+      args:
+        - JEECG_VERSION=${JEECG_VERSION}
     container_name: jeecg-system-start
     hostname: jeecg-boot-system
     restart: on-failure
@@ -87,6 +89,8 @@ services:
       - jeecg-boot-nacos
     build:
       context: ./jeecg-demo-cloud-start
+      args:
+        - JEECG_VERSION=${JEECG_VERSION}
     container_name: jeecg-demo-start
     hostname: jeecg-boot-demo
     restart: on-failure
@@ -94,6 +98,11 @@ services:
       - TZ=Asia/Shanghai
     volumes:
       - ./jeecg-demo-cloud-start/target/jeecg-demo-cloud-start-${JEECG_VERSION}.jar:/jeecg-demo-cloud/jeecg-demo-cloud-start-${JEECG_VERSION}.jar
+    command: >
+      /bin/sh -c "
+      sleep 80;
+      java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar jeecg-demo-cloud-start-${JEECG_VERSION}.jar
+      "
     networks:
       - jeecg-boot
 
@@ -102,6 +111,8 @@ services:
       - jeecg-boot-nacos
     build:
       context: ./jeecg-dcs-cloud-start
+      args:
+        - JEECG_VERSION=${JEECG_VERSION}
     container_name: jeecg-dcs-start
     hostname: jeecg-boot-dcs
     restart: on-failure
@@ -109,6 +120,11 @@ services:
       - TZ=Asia/Shanghai
     volumes:
       - ./jeecg-dcs-cloud-start/target/jeecg-dcs-cloud-start-${JEECG_VERSION}.jar:/jeecg-dcs-cloud/jeecg-dcs-cloud-start-${JEECG_VERSION}.jar
+    command: >
+      /bin/sh -c "
+      sleep 80;
+      java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar jeecg-dcs-cloud-start-${JEECG_VERSION}.jar
+      "
     networks:
       - jeecg-boot
 
@@ -116,6 +132,8 @@ services:
     restart: on-failure
     build:
       context: ./jeecg-cloud-gateway
+      args:
+        - JEECG_VERSION=${JEECG_VERSION}
     ports:
       - 9999:9999
     depends_on:
@@ -125,6 +143,11 @@ services:
     hostname: jeecg-boot-gateway
     volumes:
       - ./jeecg-cloud-gateway/target/jeecg-cloud-gateway-${JEECG_VERSION}.jar:/jeecg-cloud-gateway/jeecg-cloud-gateway-${JEECG_VERSION}.jar
+    command: >
+      /bin/sh -c "
+      sleep 100;
+      java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar jeecg-cloud-gateway-${JEECG_VERSION}.jar
+      "
     networks:
       - jeecg-boot
 
