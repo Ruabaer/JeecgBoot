@@ -111,7 +111,7 @@ public class SysGatewayRouteServiceImpl extends ServiceImpl<SysGatewayRouteMappe
         params.put(GlobalConstants.HANDLER_NAME, GlobalConstants.LODER_ROUDER_HANDLER);
         params.put("delRouterId", delRouterId);
         //刷新网关
-        redisTemplate.convertAndSend(GlobalConstants.REDIS_TOPIC_NAME, params);
+        redisTemplate.convertAndSend("gateway_redis_topic", params);
     }
 
     @Override

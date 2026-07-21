@@ -74,6 +74,6 @@ public class JeecgSystemCloudApplication extends SpringBootServletInitializer im
         BaseMap params = new BaseMap();
         params.put(GlobalConstants.HANDLER_NAME, GlobalConstants.LODER_ROUDER_HANDLER);
         //刷新网关
-        redisTemplate.convertAndSend(GlobalConstants.REDIS_TOPIC_NAME, params);
+        redisTemplate.convertAndSend("gateway_redis_topic", params);
     }
 }
