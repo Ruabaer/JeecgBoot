@@ -168,8 +168,41 @@ index a629b4a19f744601911ed0815ad60a439e4c4e35..877b0ad94102b9e6d7b69fc4be306f62
                p("div", {
                  class: j(["item-title", a.getLabelWidthClass(r)]),
                  title: r.label
+diff --git a/FieldExtendJsonModal-73bab5b5.mjs b/FieldExtendJsonModal-73bab5b5.mjs
+index a77ee9cf03aa208d7989d3b8614e30807f97afac..91a0a85453b0c1500fbdf0f7d8c4407321cadadc 100644
+--- a/FieldExtendJsonModal-73bab5b5.mjs
++++ b/FieldExtendJsonModal-73bab5b5.mjs
+@@ -48,7 +48,7 @@ const Z = C({
+   setup(t, { emit: a }) {
+     const n = m(!1);
+     function f() {
+-      i.uploadnum = 0, i.showLength = "", i.popupMulti = !0, i.multiSelect = !0, i.store = "", i.text = "", i.orderRule = "", i.validateError = "", i.labelLength = x;
++      i.uploadnum = 0, i.showLength = "", i.popupMulti = !0, i.multiSelect = !0, i.store = "", i.text = "", i.orderRule = "", i.validateError = "", i.labelLength = void 0;
+     }
+     const i = j({
+       uploadnum: 0,
+@@ -59,7 +59,7 @@ const Z = C({
+       multiSelect: !0,
+       orderRule: "",
+       validateError: "",
+-      labelLength: x
++      labelLength: void 0
+     }), l = m(""), d = m(""), p = m("0"), r = m(""), c = [
+       {
+         label: "rowKey",
+@@ -229,7 +229,9 @@ const Z = C({
+         }
+         for (let u in o)
+           o[u] === "" && delete o[u];
+-        a("success", o, e.rowKey), k();
++        console.log("FieldExtendJsonModal handleSubmit: form values", e);
++        console.log("FieldExtendJsonModal handleSubmit: data to emit", o);
++        a("success", o, d.value), k();
+       });
+     }
+     return _({
 diff --git a/PageAttributeTable-21314341.mjs b/PageAttributeTable-21314341.mjs
-index 4934fbba0f763c1d96ba804e18462f15569bbb80..cec95c2be69997d9bbe6982449b351602f02b5ab 100644
+index 4934fbba0f763c1d96ba804e18462f15569bbb80..3eeeb56f7bd3bd51009e82dfb5a827792b2034c1 100644
 --- a/PageAttributeTable-21314341.mjs
 +++ b/PageAttributeTable-21314341.mjs
 @@ -109,6 +109,15 @@ const H = [
@@ -188,6 +221,28 @@ index 4934fbba0f763c1d96ba804e18462f15569bbb80..cec95c2be69997d9bbe6982449b35160
        {
          title: "是否排序",
          key: "sortFlag",
+@@ -366,7 +375,10 @@ const H = [
+       }
+     }
+     function z(e) {
+-      let t = e.row.fieldExtendJson || "", l = e.rowId, a = e.row.fieldShowType || "", o = e.row.sortFlag || "0";
++      let l = e.rowId;
++      let t = s.value.getTableData({ rowIds: [l] })[0]?.fieldExtendJson || "";
++      console.log("PageAttributeTable z (openExtJsonModal): rowId =", l, "fieldExtendJson =", t);
++      let a = e.row.fieldShowType || "", o = e.row.sortFlag || "0";
+       const m = e.row.dbType;
+       L(!0, {
+         jsonStr: t,
+@@ -378,7 +390,9 @@ const H = [
+     }
+     function W(e, t) {
+       let l;
++      console.log("PageAttributeTable W (handleExtJson success): data =", e, "rowKey =", t);
+       e && Object.keys(e).length > 0 ? l = [{ rowKey: t, values: { fieldExtendJson: JSON.stringify(e) } }] : l = [{ rowKey: t, values: { fieldExtendJson: "" } }], s.value.setValues(l);
++      console.log("PageAttributeTable W: after setValues, live rowData =", s.value.getTableData({ rowIds: [t] })[0]);
+     }
+     const G = (e) => {
+     };
 diff --git a/aiModal-6e338c79.mjs b/aiModal-6e338c79.mjs
 index 5376f20ceb8186648b1fe7c9735d3e8019b7f6c8..dbed3e45cd5da94e16909b703109e63964794253 100644
 --- a/aiModal-6e338c79.mjs
