@@ -201,6 +201,19 @@ index a77ee9cf03aa208d7989d3b8614e30807f97afac..91a0a85453b0c1500fbdf0f7d8c44073
        });
      }
      return _({
+diff --git a/OnlineQueryForm-528af6ed.mjs b/OnlineQueryForm-528af6ed.mjs
+index 5077750ce8e3d898c4b0aedb535f631073c2c080..652d3a65c32e38d995daa2e99aaed84a4ca67e2f 100644
+--- a/OnlineQueryForm-528af6ed.mjs
++++ b/OnlineQueryForm-528af6ed.mjs
+@@ -171,7 +171,7 @@ const qe = {
+           x.mode == "like" && x.view === "text" && x.originView === "text" && (u.component = "JInput"), s.push(u);
+         }
+         D.value = m, b.value = s, c.config = v({}, o), c.status = !c.status, setTimeout(() => {
+-          const p = n * 14 + n + 24;
++          const p = n * 14 + 24;
+           J.value = p;
+         }, 0);
+       });
 diff --git a/PageAttributeTable-21314341.mjs b/PageAttributeTable-21314341.mjs
 index 4934fbba0f763c1d96ba804e18462f15569bbb80..3eeeb56f7bd3bd51009e82dfb5a827792b2034c1 100644
 --- a/PageAttributeTable-21314341.mjs
