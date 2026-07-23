@@ -29,7 +29,7 @@ export const columns: BasicColumn[] = [
       <#else>
       return text;
       </#if>
-    },
+    }
     <#elseif po.fieldDbType=='Blob'>
     dataIndex: '${po.fieldName}String'
     <#elseif po.classType=='umeditor'>
@@ -420,7 +420,12 @@ export const formSchema: FormSchema[] = [
      </#if>
       },
   <#elseif po.classType=='umeditor'>
-    component: 'JEditor',
+     component: 'JEditor',
+     <#if po.extendParams?exists && po.extendParams.height?exists>
+     componentProps: {
+        height: ${po.extendParams.height?c}
+     },
+     </#if>
   <#elseif po.classType == 'sel_tree'>
     component: 'JTreeSelect',
     componentProps:{
@@ -512,9 +517,11 @@ export const formSchema: FormSchema[] = [
      <#if po.extendParams?exists && po.extendParams.helpMessage?exists>
      ,helpMessage: '${po.extendParams.helpMessage}'
      </#if>
-     <#if po.extendParams?exists && po.extendParams.span?exists>
-     ,colProps: { span: ${po.extendParams.span?c} }
-     </#if>
+      <#if po.extendParams?exists && po.extendParams.isOneRow?exists && po.extendParams.isOneRow>
+      ,colProps: { span: 24 }
+      <#elseif po.extendParams?exists && po.extendParams.span?exists>
+      ,colProps: { span: ${po.extendParams.span?c} }
+      </#if>
    },
 </#if>
 </#list>

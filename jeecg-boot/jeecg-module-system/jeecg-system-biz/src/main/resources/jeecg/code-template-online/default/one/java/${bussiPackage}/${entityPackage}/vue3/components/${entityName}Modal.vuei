@@ -35,6 +35,8 @@
     const [registerForm, { setProps,resetFields, setFieldsValue, validate, scrollToField }] = useForm({
         <#if tableVo.fieldRowNum == 1>
         labelWidth: 150,
+        <#else>
+        labelWidth: 120,
         </#if>
         schemas: formSchema,
         showActionButtonGroup: false,

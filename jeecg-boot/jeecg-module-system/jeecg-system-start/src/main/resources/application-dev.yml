@@ -334,3 +334,10 @@ justauth:
     type: default
     prefix: 'demo::'
     timeout: 1h
+
+jeecg:
+  path:
+    # 代码生成器 Java / Vue3 目标目录（默认留空，系统会自动根据运行环境推导当前绝对路径；也可在 .env 文件中通过 PROJECT_PATH 和 UI_PROJECT_PATH 覆盖）
+    project-path: ${PROJECT_PATH:}
+    ui-project-path: ${UI_PROJECT_PATH:}
+

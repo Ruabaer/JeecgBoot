@@ -21,3 +21,9 @@ spring:
   config:
     import:
       - optional:nacos:jeecg.yaml
+
+jeecg:
+  path:
+    # 微服务模式代码生成器 Java / Vue3 目标目录（默认留空自动计算；也可通过环境变量 PROJECT_PATH / UI_PROJECT_PATH 覆盖）
+    project-path: ${PROJECT_PATH:}
+    ui-project-path: ${UI_PROJECT_PATH:}
