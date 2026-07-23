@@ -55,6 +55,21 @@ index 14eb02c8fc5233a16a786bf93a92436e2341d432..4ea4f9f91de6f5a6bf10cc187009dd17
            } else
              m.error(N);
          } finally {
+diff --git a/CodeFileListModal-25fad54f.mjs b/CodeFileListModal-25fad54f.mjs
+index c034da5dc3017efcc20c8a330c04b398fb5f1944..9b78ab2d23147bfd3ac923a602dbac37162e79a2 100644
+--- a/CodeFileListModal-25fad54f.mjs
++++ b/CodeFileListModal-25fad54f.mjs
+@@ -98,7 +98,9 @@ function U(m, e, i, o, c, p) {
+       onRegister: o.registerModal,
+       width: 1200,
+       defaultFullscreen: !1,
+-      canFullscreen: !1
++      canFullscreen: !1,
++      maskClosable: !1,
++      keyboard: !1
+     }, {
+       title: d(() => [
+         s(r),
 diff --git a/CodeGeneratorModal-791b1695.mjs b/CodeGeneratorModal-791b1695.mjs
 index 7908a2bb74309f17e528fffef02beab1e7a47cdc..5a76c74b3af399a242613b58ed0d0541a8ffe362 100644
 --- a/CodeGeneratorModal-791b1695.mjs
@@ -269,11 +284,54 @@ index 5376f20ceb8186648b1fe7c9735d3e8019b7f6c8..dbed3e45cd5da94e16909b703109e639
          o.loading = !1;
        });
      }, R = () => {
+diff --git a/index-c5737cbb.mjs b/index-c5737cbb.mjs
+index 0d5e63f91836bfe29f93fa580cc8bde21652d8bd..81de0b699243fbc7fede4b903cff20e56bf89b07 100644
+--- a/index-c5737cbb.mjs
++++ b/index-c5737cbb.mjs
+@@ -20,7 +20,7 @@ import { useListPage as W } from "/@/hooks/system/useListPage";
+ import { l as X, c as Y, s as Z, C as ee, b as te, g as oe, d as ne } from "./CgreportModal-2e4421e6.mjs";
+ import { useModal as N } from "/@/components/Modal";
+ import re from "./CgreportAigcModal-d1e62385.mjs";
+-import R from "clipboard";
++import * as R_ns from "clipboard"; const R = R_ns.default || R_ns;
+ import { useRouter as ie } from "vue-router";
+ import { buildUUID as ae } from "/@/utils/uuid";
+ import "/@/components/Form/index";
 diff --git a/useExtendComponent-d1db211d.mjs b/useExtendComponent-d1db211d.mjs
-index aa242e61e26a5b17c7eb7ed5be7cde4c7fd81e78..1841e7885684a65db7edc7d9eb6715a8a23d363a 100644
+index aa242e61e26a5b17c7eb7ed5be7cde4c7fd81e78..918905c6121cd40351da30bf616ac1f743b97baf 100644
 --- a/useExtendComponent-d1db211d.mjs
 +++ b/useExtendComponent-d1db211d.mjs
-@@ -2141,7 +2141,7 @@ function Ns(n) {
+@@ -658,19 +658,18 @@ class Si extends ee {
+ class Fi extends ee {
+   getItem() {
+     let e = super.getItem();
++    let extend = this.getExtendData();
++    let props = {
++      options: {
++        auto_focus: !1
++      }
++    };
++    if (extend && extend.height) {
++      props.height = extend.height;
++    }
+     return Object.assign({}, e, {
+       component: "JEditor",
+-      componentProps: {
+-        //update-begin-author:taoyan date:2022-6-1 for: VUEN-1159 第一次加载时，点击第一个输入框，光标会跑到富文本输入框
+-        options: {
+-          auto_focus: !1
+-        }
+-        //update-end-author:taoyan date:2022-6-1 for: VUEN-1159 第一次加载时，点击第一个输入框，光标会跑到富文本输入框
+-        // fileMax:1,
+-        // showImageUpload:false,
+-        // width:"966px",
+-        // height:"200px"
+-      }
++      componentProps: props
+     });
+   }
+ }
+@@ -2141,7 +2140,7 @@ function Ns(n) {
              },
              Qe(L, ["view", "order", "fieldExtendJson", "dictTable", "dictText", "dictCode", "dict"])
            );
@@ -282,7 +340,7 @@ index aa242e61e26a5b17c7eb7ed5be7cde4c7fd81e78..1841e7885684a65db7edc7d9eb6715a8
              try {
                let z = JSON.parse(L.fieldExtendJson);
                z.showType != "select" && (A.isCard = !0), z.multiSelect == !0 && (A.multi = !0);
-@@ -3641,6 +3641,11 @@ function Ol(n, e) {
+@@ -3641,6 +3640,11 @@ function Ol(n, e) {
        type: o
      } : f.value = null, v.value = l.scrollFlag == 1;
      let a = l.columns;
