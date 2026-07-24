@@ -216,6 +216,36 @@ index a77ee9cf03aa208d7989d3b8614e30807f97afac..91a0a85453b0c1500fbdf0f7d8c44073
        });
      }
      return _({
+diff --git a/OnlineAutoModal-38f2d522.mjs b/OnlineAutoModal-38f2d522.mjs
+index a619f1795e28dd591534a67e9df9bb1e7d0ea1b0..a56d0127b5d4700cd6437917bf7f52a44402b951 100644
+--- a/OnlineAutoModal-38f2d522.mjs
++++ b/OnlineAutoModal-38f2d522.mjs
+@@ -174,7 +174,9 @@ function oe(e, p, o, d, s, f) {
+     title: e.title,
+     onCancel: e.onCloseEvent,
+     enableComment: e.enableComment,
+-    width: e.modalWidth
++    width: e.modalWidth,
++    maskClosable: !1,
++    keyboard: !1
+   }, e.$attrs, {
+     maxHeight: 600,
+     onRegister: e.registerModal,
+diff --git a/OnlineDetailModal-79085ba8.mjs b/OnlineDetailModal-79085ba8.mjs
+index 0c714bdf4e386c75c5da019a5f6aad8545b29041..18331a9f85fff53a897c15a4b96425b2958357f9 100644
+--- a/OnlineDetailModal-79085ba8.mjs
++++ b/OnlineDetailModal-79085ba8.mjs
+@@ -154,7 +154,9 @@ function K(e, i, o, l, n, p) {
+     width: e.modalWidth,
+     maxHeight: 600,
+     enableComment: e.enableComment,
+-    defaultFullscreen: !1
++    defaultFullscreen: !1,
++    maskClosable: !1,
++    keyboard: !1
+   }, e.$attrs, {
+     onRegister: e.registerModal,
+     wrapClassName: "jeecg-online-detail-modal"
 diff --git a/OnlineQueryForm-528af6ed.mjs b/OnlineQueryForm-528af6ed.mjs
 index 5077750ce8e3d898c4b0aedb535f631073c2c080..652d3a65c32e38d995daa2e99aaed84a4ca67e2f 100644
 --- a/OnlineQueryForm-528af6ed.mjs
