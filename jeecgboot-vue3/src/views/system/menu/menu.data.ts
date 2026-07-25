@@ -3,8 +3,14 @@ import { FormSchema } from '/@/components/Table';
 import { h } from 'vue';
 import { Icon } from '/@/components/Icon';
 import { duplicateCheck } from '../user/user.api';
-import { ajaxGetDictItems ,checkPermDuplication } from './menu.api';
+import { ajaxGetDictItems, checkPermDuplication } from './menu.api';
 import { render } from '/@/utils/common/renderUtils';
+
+// 统一配置帮助提示属性
+const MENU_HELP_PROPS = {
+  placement: 'top',
+  maxWidth: '480px',
+};
 
 const isDir = (type) => type === 0;
 const isMenu = (type) => type === 1;
@@ -102,7 +108,7 @@ export const formSchema: FormSchema[] = [
             },
           ]);
           //update-begin---author:wangshuai ---date:20220729  for：[VUEN-1834]只有一级菜单，才默认值，子菜单的时候，清空------------
-          if (isMenu(e) && !formModel.id && (formModel.component=='layouts/default/index' || formModel.component=='layouts/RouteView')) {
+          if (isMenu(e) && !formModel.id && (formModel.component == 'layouts/default/index' || formModel.component == 'layouts/RouteView')) {
             formModel.component = '';
           }
           //update-end---author:wangshuai ---date:20220729  for：[VUEN-1834]只有一级菜单，才默认值，子菜单的时候，清空------------
@@ -144,8 +150,8 @@ export const formSchema: FormSchema[] = [
     //update-begin-author:liusq date:2023-06-06 for: [issues/5008]子表数据权限设置不生效
     ifShow: ({ values }) => !(values.component === ComponentTypes.IFrame && values.internalOrExternal),
     //update-begin-author:zyf date:2022-11-02 for: 聚合路由允许路径重复
-     dynamicRules: ({ model, schema,values }) => {
-       return checkPermDuplication(model, schema,  values.menuType !== 2?true:false);
+    dynamicRules: ({ model, schema, values }) => {
+      return checkPermDuplication(model, schema, values.menuType !== 2 ? true : false);
     },
     //update-end-author:zyf date:2022-11-02 for: 聚合路由允许路径重复
     //update-end-author:liusq date:2022-06-06 for:  [issues/5008]子表数据权限设置不生效
@@ -157,7 +163,7 @@ export const formSchema: FormSchema[] = [
     componentProps: {
       placeholder: '请输入前端组件',
     },
-    defaultValue:'layouts/default/index',
+    defaultValue: 'layouts/default/index',
     required: true,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
@@ -275,6 +281,11 @@ export const formSchema: FormSchema[] = [
       checkedChildren: '是',
       unCheckedChildren: '否',
     },
+    helpMessage: [
+      '1. 设为“是”（默认，开启路由）：在左侧菜单栏点击该菜单时，页面会触发路由跳转并加载渲染对应的前端 View 组件。',
+      '2. 设为“否”（关闭路由）：系统仅将其作为分类目录或权限节点使用，不注册前端路由。点击该菜单不会触发页面跳转（常用于仅展开子菜单的父级目录、独立按钮权限点或组织节点）。',
+    ],
+    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
@@ -286,6 +297,11 @@ export const formSchema: FormSchema[] = [
       checkedChildren: '是',
       unCheckedChildren: '否',
     },
+    helpMessage: [
+      '1. 设为“是”（开启隐藏）：该菜单不会在左侧侧边栏菜单树中出现，但路由映射依然有效（可通过页面内部按钮跳转、URL直接访问或隐藏路由传参）。',
+      '2. 设为“否”（默认，显示菜单）：菜单正常在左侧侧边栏中按层级展现。',
+    ],
+    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
@@ -297,6 +313,11 @@ export const formSchema: FormSchema[] = [
       checkedChildren: '是',
       unCheckedChildren: '否',
     },
+    helpMessage: [
+      '1. 设为“是”（开启隐藏Tab）：打开该页面时，页面正常渲染展示，但顶部多 Tab 栏中不会生成对应的页签卡片（常用于独立详情页、大屏可视化或不希望留存 Tab 的页面）。',
+      '2. 设为“否”（默认，显示Tab）：打开该页面时，正常在顶部页签栏生成并切换对应的 Tab 标签。',
+    ],
+    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
@@ -308,6 +329,12 @@ export const formSchema: FormSchema[] = [
       checkedChildren: '是',
       unCheckedChildren: '否',
     },
+    helpMessage: [
+      '1. 设为“是”（开启缓存）：切换到其它 Tab 页再切回时，保持当前操作状态（如已选数据、查询条件），不重新刷网路请求。',
+      '2. 设为“否”（默认，关闭缓存）：每次切回该标签页时，组件都会被重新销毁并重新初始化挂载。',
+      '⚠️ 生效前提：前端 .vue 组件代码中的 name 属性（如 <script setup name="...">）必须与 Vue Router 路由名称完全一致。',
+    ],
+    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
@@ -319,6 +346,11 @@ export const formSchema: FormSchema[] = [
       checkedChildren: '是',
       unCheckedChildren: '否',
     },
+    helpMessage: [
+      '1. 设为“是”（强制展示父级）：即使该父级菜单下只有 1 个子菜单，侧边栏也依然保留父级菜单目录节点（展开/折叠二层结构）。',
+      '2. 设为“否”（默认，自动聚合）：若父菜单下只有 1 个子菜单，系统会自动合并层级，直接将该子菜单提至一级菜单位置展示。',
+    ],
+    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
@@ -330,6 +362,11 @@ export const formSchema: FormSchema[] = [
       checkedChildren: '外部',
       unCheckedChildren: '内部',
     },
+    helpMessage: [
+      '1. 设为“外部”：点击菜单时，会在浏览器中新建一个独立页面标签（window.open）打开外部 URL。',
+      '2. 设为“内部”（默认）：点击菜单时，在当前后台系统内部的主框架区域以嵌入式 Iframe 的形式打开该页面。',
+    ],
+    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
 ];

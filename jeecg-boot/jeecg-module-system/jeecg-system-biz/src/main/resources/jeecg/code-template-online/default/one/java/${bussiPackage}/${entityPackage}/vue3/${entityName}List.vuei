@@ -94,7 +94,7 @@
   </div>
 </template>
 
-<script lang="ts" name="${entityPackage}-${entityName?uncap_first}" setup>
+<script lang="ts" name="${entityPackage?replace('.','-')}-${entityName?uncap_first}List" setup>
   import {ref, reactive, computed, unref} from 'vue';
   import {BasicTable, useTable, TableAction} from '/@/components/Table';
   import {useModal} from '/@/components/Modal';

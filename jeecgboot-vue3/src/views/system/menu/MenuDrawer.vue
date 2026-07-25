@@ -21,12 +21,12 @@
   const isButton = (type) => type === 2;
   const [registerForm, { setProps, resetFields, setFieldsValue, updateSchema, validate, clearValidate }] = useForm({
     labelCol: {
-      md: { span: 4 },
-      sm: { span: 6 },
+      md: { span: 6 },
+      sm: { span: 8 },
     },
     wrapperCol: {
-      md: { span: 20 },
-      sm: { span: 18 },
+      md: { span: 18 },
+      sm: { span: 16 },
     },
     schemas: formSchema,
     showActionButtonGroup: false,
