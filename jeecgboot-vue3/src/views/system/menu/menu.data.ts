@@ -2,7 +2,6 @@ import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 import { h } from 'vue';
 import { Icon } from '/@/components/Icon';
-import { duplicateCheck } from '../user/user.api';
 import { ajaxGetDictItems, checkPermDuplication } from './menu.api';
 import { render } from '/@/utils/common/renderUtils';
 
@@ -275,98 +274,92 @@ export const formSchema: FormSchema[] = [
   {
     field: 'route',
     label: '是否路由菜单',
-    component: 'Switch',
+    component: 'JSwitch',
     defaultValue: true,
     componentProps: {
-      checkedChildren: '是',
-      unCheckedChildren: '否',
+      options: [true, false],
+      labelOptions: ['是', '否'],
+      helpMessage: [
+        '1. 设为“是”（默认，开启路由）：在左侧菜单栏点击该菜单时，页面会触发路由跳转并加载渲染对应的前端 View 组件。',
+        '2. 设为“否”（关闭路由）：系统仅将其作为分类目录或权限节点使用，不注册前端路由。点击该菜单不会触发页面跳转（常用于仅展开子菜单的父级目录、独立按钮权限点或组织节点）。',
+      ],
     },
-    helpMessage: [
-      '1. 设为“是”（默认，开启路由）：在左侧菜单栏点击该菜单时，页面会触发路由跳转并加载渲染对应的前端 View 组件。',
-      '2. 设为“否”（关闭路由）：系统仅将其作为分类目录或权限节点使用，不注册前端路由。点击该菜单不会触发页面跳转（常用于仅展开子菜单的父级目录、独立按钮权限点或组织节点）。',
-    ],
-    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
     field: 'hidden',
     label: '隐藏路由',
-    component: 'Switch',
+    component: 'JSwitch',
     defaultValue: 0,
     componentProps: {
-      checkedChildren: '是',
-      unCheckedChildren: '否',
+      options: [1, 0],
+      labelOptions: ['是', '否'],
+      helpMessage: [
+        '1. 设为“是”（开启隐藏）：该菜单不会在左侧侧边栏菜单树中出现，但路由映射依然有效（可通过页面内部按钮跳转、URL直接访问或隐藏路由传参）。',
+        '2. 设为“否”（默认，显示菜单）：菜单正常在左侧侧边栏中按层级展现。',
+      ],
     },
-    helpMessage: [
-      '1. 设为“是”（开启隐藏）：该菜单不会在左侧侧边栏菜单树中出现，但路由映射依然有效（可通过页面内部按钮跳转、URL直接访问或隐藏路由传参）。',
-      '2. 设为“否”（默认，显示菜单）：菜单正常在左侧侧边栏中按层级展现。',
-    ],
-    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
     field: 'hideTab',
     label: '隐藏Tab',
-    component: 'Switch',
+    component: 'JSwitch',
     defaultValue: 0,
     componentProps: {
-      checkedChildren: '是',
-      unCheckedChildren: '否',
+      options: [1, 0],
+      labelOptions: ['是', '否'],
+      helpMessage: [
+        '1. 设为“是”（开启隐藏Tab）：打开该页面时，页面正常渲染展示，但顶部多 Tab 栏中不会生成对应的页签卡片（常用于独立详情页、大屏可视化或不希望留存 Tab 的页面）。',
+        '2. 设为“否”（默认，显示Tab）：打开该页面时，正常在顶部页签栏生成并切换对应的 Tab 标签。',
+      ],
     },
-    helpMessage: [
-      '1. 设为“是”（开启隐藏Tab）：打开该页面时，页面正常渲染展示，但顶部多 Tab 栏中不会生成对应的页签卡片（常用于独立详情页、大屏可视化或不希望留存 Tab 的页面）。',
-      '2. 设为“否”（默认，显示Tab）：打开该页面时，正常在顶部页签栏生成并切换对应的 Tab 标签。',
-    ],
-    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
     field: 'keepAlive',
     label: '是否缓存路由',
-    component: 'Switch',
+    component: 'JSwitch',
     defaultValue: false,
     componentProps: {
-      checkedChildren: '是',
-      unCheckedChildren: '否',
+      options: [true, false],
+      labelOptions: ['是', '否'],
+      helpMessage: [
+        '1. 设为“是”（开启缓存）：切换到其它 Tab 页再切回时，保持当前操作状态（如已选数据、查询条件），不重新刷网路请求。',
+        '2. 设为“否”（默认，关闭缓存）：每次切回该标签页时，组件都会被重新销毁并重新初始化挂载。',
+        '⚠️ 生效前提：前端 .vue 组件代码中的 name 属性（如 <script setup name="...">）必须与 Vue Router 路由名称完全一致。',
+      ],
     },
-    helpMessage: [
-      '1. 设为“是”（开启缓存）：切换到其它 Tab 页再切回时，保持当前操作状态（如已选数据、查询条件），不重新刷网路请求。',
-      '2. 设为“否”（默认，关闭缓存）：每次切回该标签页时，组件都会被重新销毁并重新初始化挂载。',
-      '⚠️ 生效前提：前端 .vue 组件代码中的 name 属性（如 <script setup name="...">）必须与 Vue Router 路由名称完全一致。',
-    ],
-    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
     field: 'alwaysShow',
     label: '聚合路由',
-    component: 'Switch',
+    component: 'JSwitch',
     defaultValue: false,
     componentProps: {
-      checkedChildren: '是',
-      unCheckedChildren: '否',
+      options: [true, false],
+      labelOptions: ['是', '否'],
+      helpMessage: [
+        '1. 设为“是”（强制展示父级）：即使该父级菜单下只有 1 个子菜单，侧边栏也依然保留父级菜单目录节点（展开/折叠二层结构）。',
+        '2. 设为“否”（默认，自动聚合）：若父菜单下只有 1 个子菜单，系统会自动合并层级，直接将该子菜单提至一级菜单位置展示。',
+      ],
     },
-    helpMessage: [
-      '1. 设为“是”（强制展示父级）：即使该父级菜单下只有 1 个子菜单，侧边栏也依然保留父级菜单目录节点（展开/折叠二层结构）。',
-      '2. 设为“否”（默认，自动聚合）：若父菜单下只有 1 个子菜单，系统会自动合并层级，直接将该子菜单提至一级菜单位置展示。',
-    ],
-    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
   {
     field: 'internalOrExternal',
     label: '打开方式',
-    component: 'Switch',
+    component: 'JSwitch',
     defaultValue: false,
     componentProps: {
-      checkedChildren: '外部',
-      unCheckedChildren: '内部',
+      options: [true, false],
+      labelOptions: ['外部', '内部'],
+      helpMessage: [
+        '1. 设为“外部”：点击菜单时，会在浏览器中新建一个独立页面标签（window.open）打开外部 URL。',
+        '2. 设为“内部”（默认）：点击菜单时，在当前后台系统内部的主框架区域以嵌入式 Iframe 的形式打开该页面。',
+      ],
     },
-    helpMessage: [
-      '1. 设为“外部”：点击菜单时，会在浏览器中新建一个独立页面标签（window.open）打开外部 URL。',
-      '2. 设为“内部”（默认）：点击菜单时，在当前后台系统内部的主框架区域以嵌入式 Iframe 的形式打开该页面。',
-    ],
-    helpComponentProps: MENU_HELP_PROPS,
     ifShow: ({ values }) => !isButton(values.menuType),
   },
 ];
