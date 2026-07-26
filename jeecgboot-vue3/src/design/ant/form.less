@@ -1,0 +1,28 @@
+/**
+ * Form 表单项全局中线对齐样式覆写
+ */
+.ant-form-item {
+  align-items: center;
+
+  .ant-form-item-label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 32px;
+    line-height: 32px;
+
+    > label {
+      display: inline-flex;
+      align-items: center;
+      height: 32px;
+      line-height: 1;
+    }
+  }
+
+  .ant-form-item-control-input,
+  .ant-form-item-control-input-content {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+  }
+}
