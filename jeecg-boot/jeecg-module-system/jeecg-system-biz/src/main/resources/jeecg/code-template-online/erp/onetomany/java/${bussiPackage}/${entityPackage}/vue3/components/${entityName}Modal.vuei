@@ -53,7 +53,7 @@
     const [registerModal, {setModalProps, closeModal}] = useModalInner(async (data) => {
         //重置表单
         await resetFields();
-        setModalProps({confirmLoading: false,showCancelBtn:!!data?.showFooter,showOkBtn:!!data?.showFooter});
+        setModalProps({confirmLoading: false,showCancelBtn:true,showOkBtn:!!data?.showFooter});
         isUpdate.value = !!data?.isUpdate;
         isDetail.value = !!data?.showFooter;
         if (unref(isUpdate)) {
