@@ -391,7 +391,363 @@ index 7c899f746d20569e83521c79e51a9847374950ae..572e5d753c5a5cbe0dfc7a79ecffcce7
      // 生成测试数据
      aigc_mock_data: !0
 -  }, [R, { openModal: k }] = J(), [g, { openModal: v }] = J(), [D, { openModal: O }] = J(), [A, { openModal: ie }] = J(), { createMessage: h } = Te(), S = ne(B), P = ne([]), F = ne([]), b = ne({}), i = (e) => $e(() => S[e] === !0 ? b[e] : { enabled: !1 }), oe = i("query"), se = i("reset"), ue = i("form_confirm"), N = w(!1), q = w(!0);
-+  }, [R, { openModal: k }] = J(), [g, { openModal: v }] = J(), [D, { openModal: O }] = J(), [A, { openModal: ie }] = J(), { createMessage: h } = Te(), S = ne(B), P = ne([]), F = ne([]), b = ne({ add: {}, import: {}, export: {}, batch_delete: {}, super_query: {}, delete: {}, edit: {}, bpm: {}, detail: {} }), i = (e) => $e(() => S[e] === !0 ? b[e] : { enabled: !1 }), oe = i("query"), se = i("reset"), ue = i("form_confirm"), N = w(!1), q = w(!0);
    setTimeout(() => {
-     q.value = !1;
-   }, 4e3);
+    q.value = !1;
+  }, 4e3);
+
+diff --git a/useCgformList-52631580.mjs b/useCgformList-52631580.mjs
+--- a/useCgformList-52631580.mjs
++++ b/useCgformList-52631580.mjs
+@@ -300,12 +300,14 @@ function ve(e) {
+       {
+         // TODO 功能测试
+         label: "功能测试",
++        helpMessage: "预览并测试当前 Online 表单在实际运行环境下的页面布局、表单控件与数据操作能力",
+         class: ["low-app-hide"],
+         onClick: () => me(e),
+         ifShow: () => i ? e.isDbSynch == "Y" && e.tableType !== 3 : !0
+       },
+       {
+         label: "配置地址",
++        helpMessage: "查看并一键复制该表单的前端路由 Path 路径，用于在【菜单管理】中配置挂载为系统左侧菜单",
+         class: ["low-app-hide"],
+         onClick: () => ye(e),
+         ifShow: () => i ? e.isDbSynch == "Y" && e.tableType !== 3 : !0
+       },
+@@ -322,6 +324,7 @@ function ve(e) {
+       {
+         label: "视图管理",
++        helpMessage: "管理与配置当前表单派生出的复制视图（多视图/独立表单视图配置）",
+         class: ["low-app-hide"],
+         onClick: () => t.push(`/online/copyform/${e.id}`),
+
+diff --git a/index-c5737cbb.mjs b/index-c5737cbb.mjs
+--- a/index-c5737cbb.mjs
++++ b/index-c5737cbb.mjs
+@@ -110,6 +110,7 @@ function F(e) {
+         {
+           label: "功能测试",
++          helpMessage: "预览并测试当前 Online 报表的查询条件过滤与表格数据展示结果",
+           class: ["low-app-hide"],
+           onClick: () => V(e.id)
+
+diff --git a/CgformAddressModal-5d889870.mjs b/CgformAddressModal-5d889870.mjs
+--- a/CgformAddressModal-5d889870.mjs
++++ b/CgformAddressModal-5d889870.mjs
+@@ -74,7 +74,7 @@ export {
+       l.visible = !1;
+     }
+     return (t, e) => {
+-      const c = i("a-input"), m = i("a-col"), _ = i("a-row"), I = i("a-button"), T = i("a-collapse-panel"), E = i("a-collapse");
++      const c = i("a-input"), m = i("a-col"), _ = i("a-row"), I = i("a-button"), T = i("a-collapse-panel"), E = i("a-collapse"), D_div = i("a-divider");
+       return O(), V(K, null, [
+         o(L(U), {
+           onRegister: L(h),
+@@ -99,7 +99,7 @@ export {
+                     class: "j-collapse-panel no-header"
+                   }, {
+                     default: a(() => [
+-                      o(_, { style: { "margin-bottom": "8px" } }, {
++                      o(_, { style: { "margin-bottom": "12px" } }, {
+                         default: a(() => [
+                           o(m, { span: 24 }, {
+                             default: a(() => [
+@@ -110,11 +110,13 @@ export {
+                                 addonAfter: a(() => [
+                                   r("a", {
+                                     onClick: () => $(n.value.list),
+-                                    style: { "margin-right": "12px", "cursor": "pointer" }
+-                                  }, "一键复制"),
++                                    style: { "margin-right": "8px", "font-weight": "500", "cursor": "pointer" }
++                                  }, "一键复制"),
++                                  o(D_div, { type: "vertical" }),
+                                   r("a", {
+                                     href: n.value.list,
+-                                    target: "_blank"
++                                    target: "_blank",
++                                    style: { "margin-left": "8px" }
+                                   }, "打开", 8, G)
+                                 ]),
+                                 _: 1
+@@ -124,17 +124,18 @@ export {
+                         ]),
+                         _: 1
+                       }),
+-                      o(I, {
+-                        class: "copy-sql",
+-                        type: "primary",
+-                        size: "small",
+-                        onClick: A
+-                      }, {
+-                        default: a(() => e[5] || (e[5] = [
+-                          g("复制菜单SQL")
+-                        ])),
+-                        _: 1
+-                      })
++                      r("div", { style: { "display": "flex", "justify-content": "flex-end", "margin-bottom": "16px" } }, [
++                        o(I, {
++                          type: "primary",
++                          size: "small",
++                          onClick: A
++                        }, {
++                          default: a(() => e[5] || (e[5] = [
++                            g("复制菜单SQL")
++                          ])),
++                          _: 1
++                        })
++                      ])
+                     ]),
+                     _: 1
+                   }),
+@@ -142,7 +143,7 @@ export {
+                     header: "外部链接"
+                   }, {
+                     default: a(() => [
+-                      o(_, { style: { "margin-bottom": "8px" } }, {
++                      o(_, { style: { "margin-bottom": "12px" } }, {
+                         default: a(() => [
+                           o(m, { span: 24 }, {
+                             default: a(() => [
+@@ -153,11 +154,13 @@ export {
+                                 addonAfter: a(() => [
+                                   r("a", {
+                                     onClick: () => $(n.value.extLink.add),
+-                                    style: { "margin-right": "12px", "cursor": "pointer" }
+-                                  }, "一键复制"),
++                                    style: { "margin-right": "8px", "font-weight": "500", "cursor": "pointer" }
++                                  }, "一键复制"),
++                                  o(D_div, { type: "vertical" }),
+                                   r("a", {
+                                     href: n.value.extLink.add + "?token=" + k.value,
+-                                    target: "_blank"
++                                    target: "_blank",
++                                    style: { "margin-left": "8px" }
+                                   }, "打开", 8, W)
+                                 ]),
+                                 _: 1
+@@ -167,7 +170,7 @@ export {
+                         ]),
+                         _: 1
+                       }),
+-                      o(_, { style: { "margin-bottom": "8px" } }, {
++                      o(_, { style: { "margin-bottom": "12px" } }, {
+                         default: a(() => [
+                           o(m, { span: 24 }, {
+                             default: a(() => [
+@@ -178,21 +181,23 @@ export {
+                                 addonAfter: a(() => [
+                                   r("a", {
+                                     onClick: () => $(n.value.extLink.edit),
+-                                    style: { "margin-right": "12px", "cursor": "pointer" }
+-                                  }, "一键复制"),
+-                                  r("a", {
+-                                    onClick: e[0] || (e[0] = (s) => C(n.value.extLink.edit))
+-                                  }, "打开")
+-                                ]),
+-                                _: 1
+-                              }, 8, ["value"])
+-                            ]),
+-                            _: 1
+-                          })
+-                        ]),
+-                        _: 1
+-                      }),
+-                      o(_, { style: { "margin-bottom": "8px" } }, {
++                                    style: { "margin-right": "8px", "font-weight": "500", "cursor": "pointer" }
++                                  }, "一键复制"),
++                                  o(D_div, { type: "vertical" }),
++                                  r("a", {
++                                    onClick: e[0] || (e[0] = (s) => C(n.value.extLink.edit)),
++                                    style: { "margin-left": "8px" }
++                                  }, "打开")
++                                ]),
++                                _: 1
++                              }, 8, ["value"])
++                            ]),
++                            _: 1
++                          })
++                        ]),
++                        _: 1
++                      }),
++                      o(_, { style: { "margin-bottom": "12px" } }, {
+                         default: a(() => [
+                           o(m, { span: 24 }, {
+                             default: a(() => [
+@@ -203,21 +208,23 @@ export {
+                                 addonAfter: a(() => [
+                                   r("a", {
+                                     onClick: () => $(n.value.extLink.detail),
+-                                    style: { "margin-right": "12px", "cursor": "pointer" }
+-                                  }, "一键复制"),
+-                                  r("a", {
+-                                    onClick: e[1] || (e[1] = (s) => C(n.value.extLink.detail))
+-                                  }, "打开")
+-                                ]),
+-                                _: 1
+-                              }, 8, ["value"])
+-                            ]),
+-                            _: 1
+-                          })
+-                        ]),
+-                        _: 1
+-                      }),
+-                      e[6] || (e[6] = r("div", { style: { "text-align": "right", color: "red" } }, [
++                                    style: { "margin-right": "8px", "font-weight": "500", "cursor": "pointer" }
++                                  }, "一键复制"),
++                                  o(D_div, { type: "vertical" }),
++                                  r("a", {
++                                    onClick: e[1] || (e[1] = (s) => C(n.value.extLink.detail)),
++                                    style: { "margin-left": "8px" }
++                                  }, "打开")
++                                ]),
++                                _: 1
++                              }, 8, ["value"])
++                            ]),
++                            _: 1
++                          })
++                        ]),
++                        _: 1
++                      }),
++                      e[6] || (e[6] = r("div", { style: { "text-align": "right", color: "#ff4d4f", "font-size": "12px", "margin-bottom": "8px" } }, [
+                         g("注意："),
+                         r("span", { style: { "font-weight": "bold" } }, "{dataId}"),
+                         g(" 为数据id")
+@@ -230,13 +237,10 @@ export {
+               r("div", {
+                 class: "usage-tip-box",
+                 style: {
+-                  "margin-top": "16px",
+-                  "padding": "12px 16px",
+-                  "background-color": "#f6ffed",
+-                  "border": "1px solid #b7eb8f",
+-                  "border-radius": "6px",
+-                  "font-size": "13px",
+-                  "color": "#333"
++                  "padding": "16px",
++                  "background-color": "#f8fafc",
++                  "border": "1px solid #e2e8f0",
++                  "border-radius": "8px"
+                 }
+               }, [
+                 r("div", {
+@@ -243,7 +247,7 @@ export {
+-                    "font-weight": "bold",
++                    "font-weight": "600",
+                     "font-size": "14px",
+-                    "margin-bottom": "8px",
+-                    "color": "#389e0d",
++                    "color": "#1e293b",
++                    "margin-bottom": "12px",
+                     "display": "flex",
+                     "align-items": "center"
+                   }
+@@ -250,34 +254,76 @@ export {
+-                  r("span", { style: { "margin-right": "6px" } }, "💡"),
+-                  g(" 典型使用场景：")
+-                ]),
+-                r("div", { style: { "line-height": "1.8", "color": "#434343" } }, [
+-                  r("div", null, [
+-                    r("b", null, "步骤一："),
+-                    g("在在线表单列表中，找到已同步的表单，点击 “更多” -> “配置地址”。")
+-                  ]),
+-                  r("div", null, [
+-                    r("b", null, "步骤二："),
+-                    g("点击弹窗中的 “一键复制” 按钮，复制该表单的页面 Path 路由地址。")
+-                  ]),
+-                  r("div", null, [
+-                    r("b", null, "步骤三："),
+-                    g("进入系统 "),
+-                    r("b", null, "【系统管理 -> 菜单管理】"),
+-                    g("，点击“新增菜单”。")
+-                  ]),
+-                  r("div", null, [
+-                    r("b", null, "步骤四："),
+-                    g("填写菜单名称（如：客户报销申请单），并将刚才复制的 Path 地址粘贴到“前端组件 / 路由地址”输入框中保存。")
+-                  ]),
+-                  r("div", {
++                  r("span", {
+                     style: {
+-                      "margin-top": "6px",
+-                      "padding-top": "6px",
+-                      "border-top": "1px dashed #d9d9d9",
+-                      "color": "#237804"
++                      "display": "inline-flex",
++                      "align-items": "center",
++                      "justify-content": "center",
++                      "width": "22px",
++                      "height": "22px",
++                      "background": "#e0f2fe",
++                      "color": "#0284c7",
++                      "border-radius": "50%",
++                      "margin-right": "8px",
++                      "font-size": "12px"
+                     }
+-                  }, [
+-                    r("b", null, "结果："),
++                  }, "💡"),
++                  g(" 典型使用场景")
++                ]),
++                r("div", {
++                  style: {
++                    "display": "flex",
++                    "flex-direction": "column",
++                    "gap": "8px",
++                    "font-size": "13px",
++                    "color": "#334155"
++                  }
++                }, [
++                  r("div", { style: { "display": "flex", "align-items": "flex-start" } }, [
++                    r("span", { style: { "background": "#e2e8f0", "color": "#475569", "font-weight": "600", "padding": "1px 6px", "border-radius": "4px", "font-size": "12px", "margin-right": "8px", "flex-shrink": "0", "margin-top": "2px" } }, "步骤 1"),
++                    r("span", null, [
++                      g("在在线表单列表中，找到已同步的表单，点击 "),
++                      r("b", null, "“更多” → “配置地址”"),
++                      g("。")
++                    ])
++                  ]),
++                  r("div", { style: { "display": "flex", "align-items": "flex-start" } }, [
++                    r("span", { style: { "background": "#e2e8f0", "color": "#475569", "font-weight": "600", "padding": "1px 6px", "border-radius": "4px", "font-size": "12px", "margin-right": "8px", "flex-shrink": "0", "margin-top": "2px" } }, "步骤 2"),
++                    r("span", null, [
++                      g("点击弹窗中的 "),
++                      r("b", null, "“一键复制”"),
++                      g(" 按钮，复制该表单的页面 Path 路由地址。")
++                    ])
++                  ]),
++                  r("div", { style: { "display": "flex", "align-items": "flex-start" } }, [
++                    r("span", { style: { "background": "#e2e8f0", "color": "#475569", "font-weight": "600", "padding": "1px 6px", "border-radius": "4px", "font-size": "12px", "margin-right": "8px", "flex-shrink": "0", "margin-top": "2px" } }, "步骤 3"),
++                    r("span", null, [
++                      g("进入系统 "),
++                      r("b", null, "【系统管理 → 菜单管理】"),
++                      g("，点击“新增菜单”。")
++                    ])
++                  ]),
++                  r("div", { style: { "display": "flex", "align-items": "flex-start" } }, [
++                    r("span", { style: { "background": "#e2e8f0", "color": "#475569", "font-weight": "600", "padding": "1px 6px", "border-radius": "4px", "font-size": "12px", "margin-right": "8px", "flex-shrink": "0", "margin-top": "2px" } }, "步骤 4"),
++                    r("span", null, [
++                      g("填写菜单名称（如："),
++                      r("code", null, "客户报销申请单"),
++                      g("），并将刚才复制的 Path 地址粘贴到“前端组件 / 路由地址”输入框中保存。")
++                    ])
++                  ])
++                ]),
++                r("div", {
++                  style: {
++                    "margin-top": "12px",
++                    "padding": "10px 12px",
++                    "background": "#f0fdf4",
++                    "border": "1px solid #bbf7d0",
++                    "border-radius": "6px",
++                    "font-size": "13px",
++                    "color": "#166534",
++                    "display": "flex",
++                    "align-items": "flex-start"
++                  }
++                }, [
++                  r("span", { style: { "font-weight": "700", "margin-right": "6px", "flex-shrink": "0" } }, "🎉 结果："),
++                  r("span", null, [
+                     g("普通用户登录后台后，左侧菜单栏就会出现 "),
+                     r("b", null, "客户报销申请单"),
+                     g(" 导航项，点击即可直接打开这个 Online 表单进行数据录入与管理！")
+                   ])
+                 ])
+               ])
+             ])
