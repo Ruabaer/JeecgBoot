@@ -42,6 +42,30 @@ index aebcf36e71f07143ca8479e02d8b8497995e9175..cad402f5afaa88a8a89377efbff447b3
          i = Object.assign(f, i);
          let C = e.checkTable.tableData[o];
          i = Object.assign(C, i);
+diff --git a/cgform.data-0ca62d09.mjs b/cgform.data-0ca62d09.mjs
+--- a/cgform.data-0ca62d09.mjs
++++ b/cgform.data-0ca62d09.mjs
+@@ -43,7 +43,14 @@ const c = [
+     slots: { customRender: "dbSync" },
+     width: 120
+   },
++  {
++    title: "更新时间",
++    align: "center",
++    sorter: !0,
++    dataIndex: "updateTime",
++    width: 180
++  },
+   {
+     title: "创建时间",
+     align: "center",
+     sorter: !0,
+     dataIndex: "createTime",
+-    width: 240
++    width: 180
+   }
+ ], u = [
+ 
 diff --git a/CgreportAigcModal-d1e62385.mjs b/CgreportAigcModal-d1e62385.mjs
 index 14eb02c8fc5233a16a786bf93a92436e2341d432..4ea4f9f91de6f5a6bf10cc187009dd17716fe195 100644
 --- a/CgreportAigcModal-d1e62385.mjs
