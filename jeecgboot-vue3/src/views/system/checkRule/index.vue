@@ -136,7 +136,11 @@
    */
   function getDropDownAction(record): ActionItem[] {
     return [
-      { label: '功能测试', onClick: testRule.bind(null, record) },
+      {
+        label: '功能测试',
+        helpMessage: '输入测试值校验当前编码规则正则表达式或字段算法逻辑',
+        onClick: testRule.bind(null, record),
+      },
       {
         label: '删除',
         color: 'error',

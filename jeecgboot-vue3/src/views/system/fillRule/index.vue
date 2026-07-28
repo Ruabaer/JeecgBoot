@@ -132,7 +132,11 @@
    */
   function getDropDownAction(record): ActionItem[] {
     return [
-      { label: '功能测试', onClick: testRule.bind(null, record) },
+      {
+        label: '功能测试',
+        helpMessage: '测试当前填值规则在给定参数下的自动生成结果',
+        onClick: testRule.bind(null, record),
+      },
       {
         label: '删除',
         color: 'error',

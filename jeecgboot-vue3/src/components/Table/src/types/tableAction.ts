@@ -18,6 +18,10 @@ export interface ActionItem extends ButtonProps {
   class?: string | Record<string, boolean> | any[];
   // 自定义图标颜色
   iconColor?: string;
+  // 帮助提示文本
+  helpMessage?: string | string[];
+  // 帮助提示组件配置
+  helpComponentProps?: object;
 }
 
 export interface PopConfirm {

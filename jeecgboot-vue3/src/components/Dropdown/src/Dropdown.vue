@@ -5,10 +5,10 @@
     </span>
     <template #overlay>
       <a-menu :class="[`${prefixCls}-menu`]" :selectedKeys="selectedKeys">
-        <template v-for="item in dropMenuList" :key="`${item.event}`">
+        <template v-for="(item, index) in dropMenuList" :key="item.event ?? item.text ?? index">
           <a-menu-item
             v-if="!item.hide"
-            v-bind="getAttr(item.event)"
+            v-bind="getAttr(item.event ?? index)"
             @click="handleClickMenu(item)"
             :disabled="item.disabled"
             :class="[{ 'is-pop-confirm': item.popConfirm }, item.class ?? []]"
@@ -20,10 +20,16 @@
                 <Icon v-if="item.iconColor" :icon="item.popConfirm.icon" :color="item.iconColor" />
                 <Icon v-else :icon="item.popConfirm.icon" />
               </template>
-              <div class="dropdown-event-area">
+              <div class="dropdown-event-area inline-flex items-center">
                 <Icon :icon="item.icon" v-if="item.icon && item.iconColor" :color="item.iconColor" />
                 <Icon :icon="item.icon" v-else-if="item.icon" />
                 <span class="ml-1">{{ item.text }}</span>
+                <BasicHelp
+                  v-if="item.helpMessage"
+                  class="ml-1 inline-flex items-center"
+                  :text="item.helpMessage"
+                  v-bind="item.helpComponentProps"
+                />
               </div>
             </a-popconfirm>
             <!--  设置动态插槽   -->
@@ -31,12 +37,20 @@
               <slot :name="item.slot" :label="item.text"></slot>
             </template>
             <template v-else>
-              <Icon :icon="item.icon" v-if="item.icon && item.iconColor" :color="item.iconColor" />
-              <Icon :icon="item.icon" v-else-if="item.icon" />
-              <span class="ml-1">{{ item.text }}</span>
+              <div class="inline-flex items-center">
+                <Icon :icon="item.icon" v-if="item.icon && item.iconColor" :color="item.iconColor" />
+                <Icon :icon="item.icon" v-else-if="item.icon" />
+                <span class="ml-1">{{ item.text }}</span>
+                <BasicHelp
+                  v-if="item.helpMessage"
+                  class="ml-1 inline-flex items-center"
+                  :text="item.helpMessage"
+                  v-bind="item.helpComponentProps"
+                />
+              </div>
             </template>
           </a-menu-item>
-          <a-menu-divider v-if="item.divider" :key="`d-${item.event}`" />
+          <a-menu-divider v-if="item.divider" :key="`d-${item.event ?? index}`" />
         </template>
       </a-menu>
     </template>
@@ -48,6 +62,7 @@
   import type { DropMenu } from './typing';
   import { Dropdown, Menu, Popconfirm } from 'ant-design-vue';
   import { Icon } from '/@/components/Icon';
+  import { BasicHelp } from '/@/components/Basic';
   import { omit } from 'lodash-es';
   import { isFunction } from '/@/utils/is';
   import { useDesign } from '/@/hooks/web/useDesign';

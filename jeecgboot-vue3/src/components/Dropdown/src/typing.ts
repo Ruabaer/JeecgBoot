@@ -8,4 +8,6 @@ export interface DropMenu {
   // 是否隐藏
   hide?: boolean;
   divider?: boolean;
+  helpMessage?: string | string[];
+  helpComponentProps?: object;
 }

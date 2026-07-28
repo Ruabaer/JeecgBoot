@@ -171,6 +171,7 @@
           return {
             ...action,
             ...popConfirm,
+            event: action.event ?? index,
             onConfirm: handelConfirm(popConfirm?.confirm),
             onCancel: popConfirm?.cancel,
             text: label,
