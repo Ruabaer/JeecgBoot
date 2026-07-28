@@ -414,12 +414,23 @@ diff --git a/useCgformList-52631580.mjs b/useCgformList-52631580.mjs
          onClick: () => ye(e),
          ifShow: () => i ? e.isDbSynch == "Y" && e.tableType !== 3 : !0
        },
-@@ -322,6 +324,7 @@ function ve(e) {
+       {
+         label: "权限控制",
++        helpMessage: "配置当前表单的按钮权限（显隐）、字段列权限（读写/可访问性）与数据行级筛选权限规则",
+         onClick: () => W.openDrawer(!0, { cgformId: e.id, tableType: e.tableType })
+       },
+@@ -322,6 +325,7 @@ function ve(e) {
        {
          label: "视图管理",
 +        helpMessage: "管理与配置当前表单派生出的复制视图（多视图/独立表单视图配置）",
          class: ["low-app-hide"],
          onClick: () => t.push(`/online/copyform/${e.id}`),
+         ifShow: () => i && e.hascopy == 1
+       },
+       {
+         label: "生成视图",
++        helpMessage: "根据当前 Online 表单结构在数据库中自动创建 DB 物理视图与多视图副本配置",
+         class: ["low-app-hide"],
 
 diff --git a/index-c5737cbb.mjs b/index-c5737cbb.mjs
 --- a/index-c5737cbb.mjs
