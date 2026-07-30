@@ -455,6 +455,13 @@ diff --git a/useCgformList-52631580.mjs b/useCgformList-52631580.mjs
          label: "生成视图",
 +        helpMessage: "根据当前 Online 表单结构在数据库中自动创建 DB 物理视图与多视图副本配置",
          class: ["low-app-hide"],
+       },
+       {
+         label: "复制表",
++        helpMessage: "以当前表单结构为蓝本完整克隆出一张全新独立的低代码物理 DB 表与表单配置",
+         onClick: () => we(e),
+         ifShow: () => i
+       },
 
 diff --git a/index-c5737cbb.mjs b/index-c5737cbb.mjs
 --- a/index-c5737cbb.mjs
