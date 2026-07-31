@@ -79,6 +79,30 @@ index 14eb02c8fc5233a16a786bf93a92436e2341d432..4ea4f9f91de6f5a6bf10cc187009dd17
            } else
              m.error(N);
          } finally {
+diff --git a/CgreportModal-2e4421e6.mjs b/CgreportModal-2e4421e6.mjs
+index 327702f377508935c10222a00c6198f3956ca010..60b263b86060c1d1a61c5186b40e93237e8c3e8a 100644
+--- a/CgreportModal-2e4421e6.mjs
++++ b/CgreportModal-2e4421e6.mjs
+@@ -202,7 +202,7 @@ const Ne = [
+     colProps: {
++      span: 16,
+       sm: 24,
+       xs: 24,
+-      md: 18,
++      md: 16,
+       lg: 16,
+       xl: 16,
+       xxl: 16
+@@ -215,7 +215,7 @@ const Ne = [
+     colProps: {
++      span: 8,
+       xs: 24,
+       sm: 24,
+-      md: 6,
++      md: 8,
+       lg: 8,
+       xl: 8,
+       xxl: 8
 diff --git a/CodeFileListModal-25fad54f.mjs b/CodeFileListModal-25fad54f.mjs
 index c034da5dc3017efcc20c8a330c04b398fb5f1944..9b78ab2d23147bfd3ac923a602dbac37162e79a2 100644
 --- a/CodeFileListModal-25fad54f.mjs

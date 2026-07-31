@@ -41,6 +41,38 @@ body {
   overflow-x: hidden;
 }
 
+/* 强制代码编辑器 (JCodeEditor / CodeMirror) 极其所有层级包装容器在表单中铺满 100% 宽度 */
+.ant-form-item-control-input-content {
+  div[style*="display: flex"] {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+
+    > .j-form-item-middleware,
+    > div {
+      width: 100% !important;
+      flex: 1 1 100% !important;
+    }
+  }
+}
+
+.j-form-item-middleware {
+  width: 100% !important;
+  flex: 1 1 100% !important;
+}
+
+.jeecg-code-editer,
+.vben-code-editer,
+.code-editer {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+
+  .CodeMirror {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
 a:focus,
 a:active,
 button,

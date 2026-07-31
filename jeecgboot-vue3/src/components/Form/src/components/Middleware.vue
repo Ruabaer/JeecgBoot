@@ -16,6 +16,10 @@
 </script>
 
 <style lang="less" scoped>
+  .j-form-item-middleware {
+    flex: 1;
+    width: 100%;
+  }
   // update-begin--author:liaozhiyang---date:20240617---for：【TV360X-1253】代码生成查询区域和新增组件没撑满
   div > :deep(.ant-picker) {
     width: 100%;

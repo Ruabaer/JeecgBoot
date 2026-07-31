@@ -209,6 +209,7 @@
       //组件初始化
       function initialize() {
         coder = CodeMirror.fromTextArea(textarea.value!, options);
+        coder.setSize('100%', props.height || 'auto');
         //绑定值修改事件
         coder.on('change', onChange);
         // 初始化成功时赋值一次
@@ -290,8 +291,10 @@
   //noinspection LessUnresolvedVariable
   @prefix-cls: ~'@{namespace}-code-editer';
   .@{prefix-cls} {
+    width: 100% !important;
     &.auto-height {
       .CodeMirror {
+        width: 100% !important;
         height: v-bind(height) !important;
         min-height: 100px;
       }
