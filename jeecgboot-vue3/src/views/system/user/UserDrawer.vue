@@ -181,6 +181,9 @@
       let isUpdateVal = unref(isUpdate);
       // -update-begin--author:liaozhiyang---date:20240702---for：【TV360X-1737】部门用户编辑接口，增加参数updateFromPage:"deptUsers"
       let params = values;
+      if (isUpdateVal) {
+        params.id = rowId.value || params.id;
+      }
       if (isFormDepartUser) {
         params = { ...params, updateFromPage: 'deptUsers' };
       }
