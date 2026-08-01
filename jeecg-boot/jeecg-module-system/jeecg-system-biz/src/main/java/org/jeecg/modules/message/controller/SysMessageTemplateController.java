@@ -167,7 +167,14 @@ public class SysMessageTemplateController extends JeecgController<SysMessageTemp
 			md.setType(msgParams.getMsgType());
 			String testData = msgParams.getTestData();
 			if(oConvertUtils.isNotEmpty(testData)){
-				Map<String, Object> data = JSON.parseObject(testData, Map.class);
+				Map<String, Object> data;
+				try {
+					data = JSON.parseObject(testData, Map.class);
+				} catch (Exception parseEx) {
+					data = new java.util.HashMap<>();
+					data.put("content", testData);
+					data.put("text", testData);
+				}
 				md.setData(data);
 			}
 			sysBaseApi.sendTemplateMessage(md);

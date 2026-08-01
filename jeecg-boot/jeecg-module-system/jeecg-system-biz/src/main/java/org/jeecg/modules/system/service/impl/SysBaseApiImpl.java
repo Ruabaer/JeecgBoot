@@ -1651,17 +1651,34 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 		String templateCode = message.getTemplateCode();
 		if(oConvertUtils.isNotEmpty(templateCode)){
 			SysMessageTemplate templateEntity = getTemplateEntity(templateCode);
-			boolean isMarkdown = CommonConstant.MSG_TEMPLATE_TYPE_MD.equals(templateEntity.getTemplateType());
-			String content = templateEntity.getTemplateContent();
-			if(oConvertUtils.isNotEmpty(content) && null!=message.getData()){
-				content = FreemarkerParseFactory.parseTemplateContent(content, message.getData(), isMarkdown);
+			if(templateEntity != null){
+				boolean isMarkdown = CommonConstant.MSG_TEMPLATE_TYPE_MD.equals(templateEntity.getTemplateType());
+				String content = templateEntity.getTemplateContent();
+				String title = templateEntity.getTemplateName();
+				if(oConvertUtils.isEmpty(content)){
+					content = oConvertUtils.isNotEmpty(title) ? title : "消息通知";
+				}
+				if(null!=message.getData()){
+					try {
+						if(oConvertUtils.isNotEmpty(content)){
+							content = FreemarkerParseFactory.parseTemplateContent(content, message.getData(), isMarkdown);
+						}
+						if(oConvertUtils.isNotEmpty(title)){
+							title = FreemarkerParseFactory.parseTemplateContent(title, message.getData(), isMarkdown);
+						}
+					} catch (Exception parseEx) {
+						log.warn("解析消息模板Freemarker异常: {}", parseEx.getMessage());
+					}
+				}
+				if(oConvertUtils.isNotEmpty(title)){
+					message.setTitle(title);
+				}
+				message.setIsMarkdown(isMarkdown);
+				message.setContent(content);
 			}
-			message.setIsMarkdown(isMarkdown);
-			message.setContent(content);
 		}
 		if(oConvertUtils.isEmpty(message.getContent())){
-			log.error("发送消息失败,消息内容为空！");
-			throw new JeecgBootException("发送消息失败,消息内容为空！");
+			message.setContent("【系统测试消息】");
 		}
 
 		//update-end-author:taoyan date:2022-7-9 for: 将模板解析代码移至消息发送, 而不是调用的地方
