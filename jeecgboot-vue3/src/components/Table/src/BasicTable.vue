@@ -494,149 +494,225 @@
         return sbWidth > 0 ? sbWidth : 0;
       }
 
+      let isUpdatingCols = false;
+
       // 强行给表头 <colgroup>、表体 <colgroup> 及 TH 注入完全相等的 colWidths 数组，保证表头与表体网格线 100% 绝对对齐
       function ensureAllColWidthsExcept(targetColIndex: number = -1, targetW: number = 0) {
-        if (!wrapRef.value) return;
-        const thList = Array.from(wrapRef.value.querySelectorAll('.ant-table-thead > tr > th:not(.ant-table-cell-scrollbar)')) as HTMLElement[];
-        const headerCols = Array.from(wrapRef.value.querySelectorAll('.ant-table-header col')) as HTMLTableColElement[];
-        const bodyCols = Array.from(wrapRef.value.querySelectorAll('.ant-table-body col')) as HTMLTableColElement[];
-        if (!thList.length || (!headerCols.length && !bodyCols.length)) return;
+        if (!wrapRef.value || isUpdatingCols) return;
+        isUpdatingCols = true;
+        try {
+          const thList = Array.from(wrapRef.value.querySelectorAll('.ant-table-thead > tr > th:not(.ant-table-cell-scrollbar)')) as HTMLElement[];
+          const headerCols = Array.from(wrapRef.value.querySelectorAll('.ant-table-header col')) as HTMLTableColElement[];
+          const bodyCols = Array.from(wrapRef.value.querySelectorAll('.ant-table-body col')) as HTMLTableColElement[];
+          if (!thList.length || (!headerCols.length && !bodyCols.length)) return;
 
-        const viewCols = unref(getViewColumns);
-        const scrollbarW = getScrollbarWidth();
+          const viewCols = unref(getViewColumns);
+          const sourceCols = getColumns();
+          const scrollbarW = getScrollbarWidth();
 
-        // 当 viewCols 长度与 DOM thList 长度 1:1 相同时（均包含 Selection 列），无需做索引 -1 偏移
-        const useViewColsDirectly = viewCols.length === thList.length;
+          // 当 viewCols 长度与 DOM thList 长度 1:1 相同时（均包含 Selection 列），无需做索引 -1 偏移
+          const useViewColsDirectly = viewCols.length === thList.length;
 
-        // 1. 构建与 DOM thList 节点 1:1 对应的绝对像素宽度数组
-        const colWidths: number[] = [];
-        for (let i = 0; i < thList.length; i++) {
-          if (i === targetColIndex) {
-            colWidths[i] = Math.max(50, targetW);
-          } else {
-            const vIdx = useViewColsDirectly ? i : (i === 0 ? -1 : i - 1);
-            if (vIdx === -1) {
-              colWidths[0] = 50;
+          // 1. 构建与 DOM thList 节点 1:1 对应的绝对像素宽度数组
+          const colWidths: number[] = [];
+          for (let i = 0; i < thList.length; i++) {
+            if (i === targetColIndex) {
+              colWidths[i] = Math.max(50, targetW);
             } else {
-              const vcW = viewCols[vIdx]?.width ? Number(viewCols[vIdx].width) : 0;
-              if (vcW > 0) {
-                colWidths[i] = Math.max(50, Math.round(vcW));
-              } else if (targetColIndex === -1 && thList[i]) {
-                const domW = Math.round(thList[i].getBoundingClientRect().width);
-                colWidths[i] = Math.max(50, domW);
+              const vIdx = useViewColsDirectly ? i : (i === 0 ? -1 : i - 1);
+              if (vIdx === -1) {
+                colWidths[0] = 50;
               } else {
-                colWidths[i] = 100;
+                const viewCol = viewCols[vIdx];
+                const sourceCol = Array.isArray(sourceCols) ? sourceCols.find((c: any) => {
+                  if (c['dataIndex'] != null && viewCol['dataIndex'] != null) return String(c['dataIndex']) === String(viewCol['dataIndex']);
+                  if (c['key'] != null && viewCol['key'] != null) return String(c['key']) === String(viewCol['key']);
+                  if (c['title'] != null && viewCol['title'] != null) return String(c['title']) === String(viewCol['title']);
+                  return false;
+                }) : null;
+
+                const srcW = sourceCol?.width ? parseFloat(String(sourceCol.width)) : NaN;
+                const viewW = viewCol?.width ? parseFloat(String(viewCol.width)) : NaN;
+
+                // 优先采用前端实际生效列宽 (viewW)，缺省时兜底为原生 Schema 宽度 (srcW)
+                let targetWVal = NaN;
+                if (!isNaN(viewW) && viewW > 0) {
+                  targetWVal = viewW;
+                } else if (!isNaN(srcW) && srcW > 0) {
+                  targetWVal = srcW;
+                }
+
+                if (!isNaN(targetWVal) && targetWVal > 0) {
+                  colWidths[i] = Math.max(50, Math.round(targetWVal));
+                } else if (targetColIndex === -1 && thList[i]) {
+                  const domW = Math.round(thList[i].getBoundingClientRect().width);
+                  colWidths[i] = Math.max(50, domW);
+                } else {
+                  colWidths[i] = 100;
+                }
               }
             }
           }
-        }
 
-        // 2. 如果数据列宽度总和小于容器宽度，自动将剩余空间分配给最后一列数据列，保证列宽精确充满 100% 容器且 13/12 列绝对平铺对齐
-        const rawTotalColsW = colWidths.reduce((sum, w) => sum + w, 0);
-        const containerEl = (wrapRef.value.querySelector('.ant-table-body') as HTMLElement) || wrapRef.value;
-        const containerW = containerEl ? containerEl.clientWidth : 0;
-        const availableW = Math.max(0, containerW - scrollbarW);
+          // 2. 如果数据列宽度总和小于容器宽度，且非鼠标拖拽高频帧，自动将剩余空间分配给最后一列【非固定且非操作】业务数据列
+          const rawTotalColsW = colWidths.reduce((sum, w) => sum + w, 0);
+          const containerEl = (wrapRef.value.querySelector('.ant-table-body') as HTMLElement) || wrapRef.value;
+          const containerW = containerEl ? containerEl.clientWidth : 0;
+          const availableW = Math.max(0, containerW - scrollbarW);
 
-        if (containerW > 0 && rawTotalColsW < availableW && colWidths.length > 0) {
-          const extraW = availableW - rawTotalColsW;
-          colWidths[colWidths.length - 1] += extraW;
-        }
+          if (targetColIndex === -1 && containerW > 0 && rawTotalColsW < availableW && colWidths.length > 0) {
+            const extraW = availableW - rawTotalColsW;
+            let targetExpandIdx = colWidths.length - 1;
+            for (let k = thList.length - 1; k >= 0; k--) {
+              const thEl = thList[k];
+              const isFixedRight = thEl?.classList.contains('ant-table-cell-fix-right');
+              const thText = thEl?.textContent?.trim() || '';
+              const isActionCol = thText === '操作' || thText === 'Action' || thEl?.classList.contains('ant-table-row-cell-last');
+              if (!isFixedRight && !isActionCol) {
+                targetExpandIdx = k;
+                break;
+              }
+            }
+            colWidths[targetExpandIdx] += extraW;
 
-        const finalColsW = colWidths.reduce((sum, w) => sum + w, 0);
-
-        // 3. 分别强行对表头 <colgroup> 与表体 <colgroup> 的每一个 col 节点注入完全相同的 width 样式与 HTML width 属性
-        headerCols.forEach((colEl: HTMLTableColElement, idx: number) => {
-          if (idx < colWidths.length) {
-            const wStr = `${colWidths[idx]}px`;
-            colEl.style.width = wStr;
-            colEl.setAttribute('width', `${colWidths[idx]}`);
-          } else if (idx === colWidths.length && scrollbarW > 0) {
-            colEl.style.width = `${scrollbarW}px`;
-            colEl.setAttribute('width', `${scrollbarW}`);
-          } else {
-            colEl.style.width = '0px';
-            colEl.setAttribute('width', '0');
+            // 关键持久化：将补齐扩展后的实际宽度保存至 viewCols 中，
+            // 避免用户向右拖大其他列时最后一列突然复原坍塌导致整表缩小拉扯
+            const expandViewCol = viewCols[targetExpandIdx];
+            if (expandViewCol) {
+              expandViewCol.width = colWidths[targetExpandIdx];
+            }
           }
-        });
 
-        bodyCols.forEach((colEl: HTMLTableColElement, idx: number) => {
-          if (idx < colWidths.length) {
-            const wStr = `${colWidths[idx]}px`;
-            colEl.style.width = wStr;
-            colEl.setAttribute('width', `${colWidths[idx]}`);
-          } else {
-            colEl.style.width = '0px';
-            colEl.setAttribute('width', '0');
-          }
-        });
+          const finalColsW = colWidths.reduce((sum, w) => sum + w, 0);
 
-        // 4. 强行同步表头 <th> 与表体首行 <td> 的 inline 样式宽度 (width / minWidth / maxWidth)
-        const firstTdList = Array.from(wrapRef.value.querySelectorAll('.ant-table-tbody > tr:first-child > td:not(.ant-table-cell-scrollbar)')) as HTMLElement[];
-        [thList, firstTdList].forEach((cellList) => {
-          cellList.forEach((cellEl: HTMLElement, idx: number) => {
-            if (idx < colWidths.length) {
-              const wStr = `${colWidths[idx]}px`;
-              cellEl.style.width = wStr;
-              cellEl.style.minWidth = wStr;
-              cellEl.style.maxWidth = wStr;
+          // 3. 分别强行对表头 <colgroup> 与表体 <colgroup> 的每一个 col 节点注入完全相同的 width 样式与 HTML width 属性（跳过隐藏列）
+          let visibleHeaderIdx = 0;
+          headerCols.forEach((colEl: HTMLTableColElement) => {
+            const isHidden = colEl.style.display === 'none' || colEl.getAttribute('style')?.includes('display: none');
+            if (isHidden) {
+              colEl.style.setProperty('width', '0px', 'important');
+              colEl.setAttribute('width', '0');
+            } else if (visibleHeaderIdx < colWidths.length) {
+              const wStr = `${colWidths[visibleHeaderIdx]}px`;
+              colEl.style.setProperty('width', wStr, 'important');
+              colEl.setAttribute('width', `${colWidths[visibleHeaderIdx]}`);
+              visibleHeaderIdx++;
+            } else if (visibleHeaderIdx === colWidths.length && scrollbarW > 0) {
+              const sbStr = `${scrollbarW}px`;
+              colEl.style.setProperty('width', sbStr, 'important');
+              colEl.setAttribute('width', `${scrollbarW}`);
+              visibleHeaderIdx++;
+            } else {
+              colEl.style.setProperty('width', '0px', 'important');
+              colEl.setAttribute('width', '0');
             }
           });
-        });
 
-        // 5. 同步更新表头右侧滚动条占位 TH (th.ant-table-cell-scrollbar)
-        const scrollbarTH = wrapRef.value.querySelector('.ant-table-thead > tr > th.ant-table-cell-scrollbar') as HTMLElement;
-        if (scrollbarTH) {
-          if (scrollbarW > 0) {
-            const sbStr = `${scrollbarW}px`;
-            scrollbarTH.style.width = sbStr;
-            scrollbarTH.style.minWidth = sbStr;
-            scrollbarTH.style.maxWidth = sbStr;
-            scrollbarTH.style.display = '';
-          } else {
-            scrollbarTH.style.width = '0px';
-            scrollbarTH.style.minWidth = '0px';
-            scrollbarTH.style.maxWidth = '0px';
-            scrollbarTH.style.padding = '0';
-            scrollbarTH.style.margin = '0';
-            scrollbarTH.style.border = 'none';
-            scrollbarTH.style.display = 'none';
+          let visibleBodyIdx = 0;
+          bodyCols.forEach((colEl: HTMLTableColElement) => {
+            const isHidden = colEl.style.display === 'none' || colEl.getAttribute('style')?.includes('display: none');
+            if (isHidden) {
+              colEl.style.setProperty('width', '0px', 'important');
+              colEl.setAttribute('width', '0');
+            } else if (visibleBodyIdx < colWidths.length) {
+              const wStr = `${colWidths[visibleBodyIdx]}px`;
+              colEl.style.setProperty('width', wStr, 'important');
+              colEl.setAttribute('width', `${colWidths[visibleBodyIdx]}`);
+              visibleBodyIdx++;
+            } else {
+              colEl.style.setProperty('width', '0px', 'important');
+              colEl.setAttribute('width', '0');
+            }
+          });
+
+          // 4. 强行同步表头 <th> 与表体【真实数据行】 <td> 的 inline 样式宽度 (width / minWidth / maxWidth)
+          thList.forEach((thEl: HTMLElement, idx: number) => {
+            if (idx < colWidths.length && thEl && thEl.style) {
+              const wStr = `${colWidths[idx]}px`;
+              thEl.style.setProperty('width', wStr, 'important');
+              thEl.style.setProperty('min-width', wStr, 'important');
+              thEl.style.setProperty('max-width', wStr, 'important');
+            }
+          });
+
+          const allDataRows = Array.from(
+            wrapRef.value.querySelectorAll('.ant-table-tbody > tr.ant-table-row:not(.ant-table-expanded-row):not(.ant-table-placeholder)')
+          ) as HTMLElement[];
+
+          allDataRows.forEach((rowEl: HTMLElement) => {
+            const tdList = Array.from(rowEl.children).filter(
+              (child) => child.tagName === 'TD' && !child.classList.contains('ant-table-cell-scrollbar')
+            ) as HTMLElement[];
+
+            if (tdList.length >= thList.length) {
+              tdList.forEach((tdEl: HTMLElement, idx: number) => {
+                if (idx < colWidths.length && tdEl && tdEl.style) {
+                  const wStr = `${colWidths[idx]}px`;
+                  tdEl.style.setProperty('width', wStr, 'important');
+                  tdEl.style.setProperty('min-width', wStr, 'important');
+                  tdEl.style.setProperty('max-width', wStr, 'important');
+                }
+              });
+            }
+          });
+          // 5. 同步更新表头右侧滚动条占位 TH (th.ant-table-cell-scrollbar)
+          const scrollbarTH = wrapRef.value.querySelector('.ant-table-thead > tr > th.ant-table-cell-scrollbar') as HTMLElement;
+          if (scrollbarTH) {
+            if (scrollbarW > 0) {
+              const sbStr = `${scrollbarW}px`;
+              scrollbarTH.style.width = sbStr;
+              scrollbarTH.style.minWidth = sbStr;
+              scrollbarTH.style.maxWidth = sbStr;
+              scrollbarTH.style.display = '';
+            } else {
+              scrollbarTH.style.width = '0px';
+              scrollbarTH.style.minWidth = '0px';
+              scrollbarTH.style.maxWidth = '0px';
+              scrollbarTH.style.padding = '0';
+              scrollbarTH.style.margin = '0';
+              scrollbarTH.style.border = 'none';
+              scrollbarTH.style.display = 'none';
+            }
           }
-        }
 
-        // 6. 强行同步 headerTable 与 bodyTable 的 <table> 节点整体像素宽度，并追加 !important 彻底覆写 AntD Vue 默认的 width: max-content 内联样式
-        const headerTableEl = wrapRef.value.querySelector('.ant-table-header table') as HTMLElement;
-        const bodyTableEl = wrapRef.value.querySelector('.ant-table-body table') as HTMLElement;
-        if (headerTableEl) {
-          const hWidthStr = `${finalColsW + scrollbarW}px`;
-          headerTableEl.style.setProperty('width', hWidthStr, 'important');
-          headerTableEl.style.setProperty('min-width', hWidthStr, 'important');
-          headerTableEl.style.setProperty('max-width', hWidthStr, 'important');
-        }
-        if (bodyTableEl) {
-          const bWidthStr = `${finalColsW}px`;
-          bodyTableEl.style.setProperty('width', bWidthStr, 'important');
-          bodyTableEl.style.setProperty('min-width', bWidthStr, 'important');
-          bodyTableEl.style.setProperty('max-width', bWidthStr, 'important');
-        }
-
-        // 7. 动态防闪烁：总列宽小于等于容器宽时，强行屏蔽横向滚动条；只有真正超出容器时才开启横向滚动条
-        if (containerEl && containerW > 0) {
-          if (finalColsW <= containerW + 1) {
-            containerEl.style.setProperty('overflow-x', 'hidden', 'important');
-          } else {
-            containerEl.style.setProperty('overflow-x', 'auto', 'important');
+          // 6. 强行同步 headerTable 与 bodyTable 的 <table> 节点整体像素宽度，并追加 !important 彻底覆写 AntD Vue 默认的 width: max-content 内联样式
+          const headerTableEl = wrapRef.value.querySelector('.ant-table-header table') as HTMLElement;
+          const bodyTableEl = wrapRef.value.querySelector('.ant-table-body table') as HTMLElement;
+          if (headerTableEl) {
+            const hWidthStr = `${finalColsW + scrollbarW}px`;
+            headerTableEl.style.setProperty('width', hWidthStr, 'important');
+            headerTableEl.style.setProperty('min-width', hWidthStr, 'important');
+            headerTableEl.style.setProperty('max-width', hWidthStr, 'important');
           }
-        }
+          if (bodyTableEl) {
+            const bWidthStr = `${finalColsW}px`;
+            bodyTableEl.style.setProperty('width', bWidthStr, 'important');
+            bodyTableEl.style.setProperty('min-width', bWidthStr, 'important');
+            bodyTableEl.style.setProperty('max-width', bWidthStr, 'important');
+          }
 
-        // 初始化/刷新诊断日志输出
-        if (targetColIndex === -1) {
-          console.log(`[AlignInit] rawTotalColsW:${rawTotalColsW}px | finalColsW:${finalColsW}px | containerW:${containerW}px | scrollbarW:${scrollbarW}px | useViewColsDirectly:${useViewColsDirectly}`);
-          console.log(`[AlignInit] colWidths(${colWidths.length}):`, colWidths);
-          console.log(`[AlignInit] TH测得宽度(${thList.length}):`, thList.map((th) => Math.round(th.getBoundingClientRect().width)));
-          console.log(`[AlignInit] TD测得宽度(${firstTdList.length}):`, firstTdList.map((td) => Math.round(td.getBoundingClientRect().width)));
-          console.log(`[AlignInit] HeaderCols样式宽(${headerCols.length}):`, headerCols.map((c) => c.style.width || c.getAttribute('width') || 'auto'));
-          console.log(`[AlignInit] BodyCols样式宽(${bodyCols.length}):`, bodyCols.map((c) => c.style.width || c.getAttribute('width') || 'auto'));
-          console.log(`[AlignInit] headerTable宽:${headerTableEl?.offsetWidth ?? 'N/A'}px | bodyTable宽:${bodyTableEl?.offsetWidth ?? 'N/A'}px`);
+          // 7. 动态防闪烁：总列宽小于等于容器宽时，强行屏蔽横向滚动条；只有真正超出容器时才开启横向滚动条
+          if (containerEl && containerW > 0) {
+            if (finalColsW <= containerW + 1) {
+              containerEl.style.setProperty('overflow-x', 'hidden', 'important');
+            } else {
+              containerEl.style.setProperty('overflow-x', 'auto', 'important');
+            }
+          }
+
+          // 初始化/刷新诊断日志输出
+          if (targetColIndex === -1) {
+            console.log(`[AlignInit] rawTotalColsW:${rawTotalColsW}px | finalColsW:${finalColsW}px | containerW:${containerW}px | scrollbarW:${scrollbarW}px | useViewColsDirectly:${useViewColsDirectly}`);
+            console.log(`[AlignInit] colWidths(${colWidths.length}):`, colWidths);
+            console.log(`[AlignInit] TH测得宽度(${thList.length}):`, thList.map((th) => Math.round(th.getBoundingClientRect().width)));
+            console.log(`[AlignInit] HeaderCols样式宽(${headerCols.length}):`, headerCols.map((c) => c.style.width || c.getAttribute('width') || 'auto'));
+            console.log(`[AlignInit] BodyCols样式宽(${bodyCols.length}):`, bodyCols.map((c) => c.style.width || c.getAttribute('width') || 'auto'));
+            console.log(`[AlignInit] headerTable宽:${headerTableEl?.offsetWidth ?? 'N/A'}px | bodyTable宽:${bodyTableEl?.offsetWidth ?? 'N/A'}px`);
+          }
+        } catch (err) {
+          // 容错捕获，防护 MutationObserver / DOM 卸载异步报错
+        } finally {
+          isUpdatingCols = false;
         }
       }
 
@@ -712,39 +788,41 @@
       }
 
       // 监听数据与列配置变化，自动同步表头右侧滚动条占位 TH
+      let observerRafId: number | null = null;
+      const scheduleEnsureWidths = () => {
+        if (observerRafId !== null) return;
+        observerRafId = requestAnimationFrame(() => {
+          observerRafId = null;
+          ensureAllColWidthsExcept();
+        });
+      };
+
+      // 监听数据与列配置变化，异步数据渲染完后自动重排死锁表头与表体网格
       watch(
         [getDataSourceRef, () => unref(getViewColumns)],
         () => {
           nextTick(() => {
-            ensureAllColWidthsExcept();
-            requestAnimationFrame(() => ensureAllColWidthsExcept());
+            scheduleEnsureWidths();
+            requestAnimationFrame(() => scheduleEnsureWidths());
+            setTimeout(() => scheduleEnsureWidths(), 50);
+            setTimeout(() => scheduleEnsureWidths(), 200);
           });
         },
-        { deep: true }
+        { deep: true, immediate: true }
       );
 
-      // DOM 变动与尺寸监听器：处理 AntD 异步挂载 <thead> / <tbody>
-      let domObserver: MutationObserver | null = null;
+      // DOM 变动与尺寸监听器：处理 AntD 动态容器尺寸与初始化挂载
       let resizeObserver: ResizeObserver | null = null;
 
       onMounted(() => {
         nextTick(() => {
           ensureAllColWidthsExcept();
-          requestAnimationFrame(() => ensureAllColWidthsExcept());
           setTimeout(() => ensureAllColWidthsExcept(), 100);
           setTimeout(() => ensureAllColWidthsExcept(), 300);
 
           if (wrapRef.value) {
-            domObserver = new MutationObserver(() => {
-              ensureAllColWidthsExcept();
-            });
-            domObserver.observe(wrapRef.value, {
-              childList: true,
-              subtree: true,
-            });
-
             resizeObserver = new ResizeObserver(() => {
-              ensureAllColWidthsExcept();
+              scheduleEnsureWidths();
             });
             resizeObserver.observe(wrapRef.value);
           }
@@ -752,10 +830,6 @@
       });
 
       onUnmounted(() => {
-        if (domObserver) {
-          domObserver.disconnect();
-          domObserver = null;
-        }
         if (resizeObserver) {
           resizeObserver.disconnect();
           resizeObserver = null;
