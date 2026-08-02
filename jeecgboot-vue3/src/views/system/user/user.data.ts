@@ -7,57 +7,67 @@ export const columns: BasicColumn[] = [
   {
     title: '用户账号',
     dataIndex: 'username',
-    width: 120,
+    width: 150,
+    resizable: true,
   },
   {
     title: '用户姓名',
     dataIndex: 'realname',
-    width: 100,
+    width: 130,
+    resizable: true,
   },
   {
     title: '头像',
     dataIndex: 'avatar',
-    width: 120,
+    width: 100,
     customRender: render.renderAvatar,
+    resizable: true,
   },
   {
     title: '性别',
     dataIndex: 'sex',
-    width: 80,
+    width: 90,
     sorter: true,
     customRender: ({ text }) => {
       return render.renderDict(text, 'sex');
     },
+    resizable: true,
   },
   {
     title: '生日',
     dataIndex: 'birthday',
-    width: 100,
+    width: 130,
+    resizable: true,
   },
   {
     title: '手机号',
     dataIndex: 'phone',
-    width: 100,
+    width: 140,
+    resizable: true,
   },
   {
     title: '部门',
-    width: 150,
+    width: 195,
     dataIndex: 'orgCodeTxt',
+    resizable: true,
   },
   {
     title: '负责部门',
-    width: 150,
+    width: 195,
     dataIndex: 'departIds_dictText',
+    resizable: true,
   },
   {
     title: '主岗位',
-    width: 150,
+    width: 195,
     dataIndex: 'mainDepPostId_dictText',
+    resizable: true,
   },
   {
     title: '状态',
     dataIndex: 'status_dictText',
-    width: 80,
+    width: 100,
+    resizable: true,
   },
 ];
 

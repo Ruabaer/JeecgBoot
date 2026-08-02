@@ -89,6 +89,7 @@
       api: listNoCareTenant,
       columns: columns,
       size: 'small',
+      scroll: { x: 'max-content' },
       formConfig: {
         // labelWidth: 200,
         schemas: searchFormSchema,

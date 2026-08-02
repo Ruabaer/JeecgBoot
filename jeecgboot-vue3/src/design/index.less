@@ -73,6 +73,158 @@ body {
   }
 }
 
+/* 🌟 表格列拖拽虚影与竖直蓝色引导线样式 (Table Column Resize Ghost Line) */
+.ant-table-wrapper {
+  .ant-table-body,
+  .ant-table-content {
+    overflow-x: auto !important;
+  }
+
+  .ant-table-header {
+    overflow: hidden !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* 🌟 表头右侧伪滚动条列归零，消除表头与表体宽度的偏置 */
+  .ant-table-header col.ant-table-scrollbar-col {
+    width: 0 !important;
+  }
+  .ant-table-header th.ant-table-cell-scrollbar,
+  th.ant-table-cell-scrollbar {
+    width: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  .ant-table table,
+  .ant-table-header table,
+  .ant-table-body table,
+  .ant-table-content table {
+    table-layout: fixed !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+  }
+
+  .ant-table-container {
+    overflow: visible !important;
+  }
+
+  .ant-table-thead > tr > th:not(.ant-table-cell-scrollbar),
+  .ant-table-tbody > tr > td:not(.ant-table-cell-scrollbar),
+  th.react-resizable,
+  th.ant-table-cell:not(.ant-table-cell-scrollbar),
+  td.ant-table-cell {
+    box-sizing: border-box !important;
+    position: relative;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    min-width: 50px !important;
+  }
+
+  .ant-table-thead > tr > th .ant-table-column-title,
+  .ant-table-thead > tr > th .ant-table-column-sorters,
+  .ant-table-thead > tr > th .ant-table-cell-content,
+  .ant-table-thead > tr > th div,
+  .ant-table-tbody > tr > td .ant-table-cell-content,
+  .ant-table-tbody > tr > td div,
+  .ant-table-tbody > tr > td span {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  th.ant-table-cell-scrollbar {
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    background: inherit;
+  }
+
+  .table-draggable-handle,
+  .react-resizable-handle,
+  .ant-table-resizable-handle,
+  .ant-table-column-resize-handle {
+    position: absolute !important;
+    top: 0;
+    right: 0 !important;
+    bottom: 0;
+    width: 8px !important;
+    transform: translateX(50%) !important;
+    cursor: col-resize !important;
+    z-index: 100 !important;
+    touch-action: none;
+    background: transparent;
+
+    /* 悬浮时的深色引导线 */
+    &:hover::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      transform: translateX(-50%);
+      background-color: @primary-color;
+      box-shadow: 0 0 6px @primary-color;
+      opacity: 0.8;
+    }
+
+    /* 鼠标按住拖拽时的虚影高亮导轨 (Ghosting Line) */
+    &:active::after,
+    &.react-resizable-handle-active::after,
+    &.active::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      height: 1000px; /* 向下贯穿整个表格数据体 */
+      left: 50%;
+      width: 2px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, @primary-color 0%, rgba(24, 144, 255, 0.3) 100%);
+      border-left: 1px dashed @primary-color;
+      box-shadow: 0 0 8px rgba(24, 144, 255, 0.8);
+      opacity: 1;
+      z-index: 999;
+      pointer-events: none;
+    }
+  }
+}
+
+/* 🌟 全局固定拖拽导轨线（强行锁定 e.clientX 硬件指针） */
+.global-table-column-resize-line {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 2px !important;
+  background: linear-gradient(180deg, @primary-color 0%, rgba(24, 144, 255, 0.3) 100%) !important;
+  box-shadow: 0 0 10px rgba(24, 144, 255, 0.9) !important;
+  z-index: 99999 !important;
+  pointer-events: none !important;
+  display: none;
+}
+
+/* 🌟 拖拽过程中的全局光标锁定与文本防选中 */
+body.is-column-resizing,
+body.is-column-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+body.is-column-resizing .global-table-column-resize-line {
+  display: block !important;
+}
+
 a:focus,
 a:active,
 button,
