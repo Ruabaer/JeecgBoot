@@ -346,6 +346,13 @@
         innerPropsRef.value = { ...unref(innerPropsRef), ...props };
       }
 
+      const isFullWidthRef = ref<boolean>(true);
+
+      function toggleFullWidthMode() {
+        isFullWidthRef.value = !isFullWidthRef.value;
+        ensureAllColWidthsExcept();
+      }
+
       const tableAction: TableActionType = {
         reload,
         getSelectRows,
@@ -385,8 +392,10 @@
         // update-begin--author:liaozhiyang---date:20250904---for：【QQYUN-13558】erp风格主表在5条数据时也有滚动条
         getBindValuesRef: () => getBindValues,
         // update-end--author:liaozhiyang---date:20250904---for：【QQYUN-13558】erp风格主表在5条数据时也有滚动条
+        isFullWidthRef,
+        toggleFullWidthMode,
       };
-      createTableContext({ ...tableAction, wrapRef, getBindValues });
+      createTableContext({ ...tableAction, wrapRef, getBindValues, isFullWidthRef, toggleFullWidthMode });
 
       // update-begin--author:sunjianlei---date:220230718---for：【issues/179】兼容新老slots写法，移除控制台警告
       // 获取分组之后的slot名称
@@ -554,13 +563,28 @@
             }
           }
 
-          // 2. 如果数据列宽度总和小于容器宽度，且非鼠标拖拽高频帧，自动将剩余空间分配给最后一列【非固定且非操作】业务数据列
+          // 2. 如果开启了【行扩展 100% 屏宽模式】且数据列宽度总和小于容器宽度，自动将剩余空间分配给最后一列【非固定且非操作】业务数据列
           const rawTotalColsW = colWidths.reduce((sum, w) => sum + w, 0);
-          const containerEl = (wrapRef.value.querySelector('.ant-table-body') as HTMLElement) || wrapRef.value;
-          const containerW = containerEl ? containerEl.clientWidth : 0;
-          const availableW = Math.max(0, containerW - scrollbarW);
+          let containerW = 0;
+          if (wrapRef.value) {
+            const cardEl = (wrapRef.value.closest(
+              '.ant-card-body, .jeecg-basic-table-form-container, .ant-layout-content, .ant-table-wrapper'
+            ) as HTMLElement) || wrapRef.value.parentElement || wrapRef.value;
 
-          if (targetColIndex === -1 && containerW > 0 && rawTotalColsW < availableW && colWidths.length > 0) {
+            if (cardEl) {
+              const style = window.getComputedStyle(cardEl);
+              const pLeft = parseFloat(style.paddingLeft) || 0;
+              const pRight = parseFloat(style.paddingRight) || 0;
+              containerW = Math.max(0, cardEl.clientWidth - pLeft - pRight);
+            }
+            if (containerW <= 0) {
+              containerW = wrapRef.value.clientWidth;
+            }
+          }
+          // 扣除 16px 的多列网格边框 (ant-table-bordered) 与右侧布局容差，确保右侧操作列 100% 内嵌在视口以内
+          const availableW = Math.max(0, containerW - scrollbarW - 16);
+
+          if (isFullWidthRef.value && targetColIndex === -1 && containerW > 0 && rawTotalColsW < availableW && colWidths.length > 0) {
             const extraW = availableW - rawTotalColsW;
             let targetExpandIdx = colWidths.length - 1;
             for (let k = thList.length - 1; k >= 0; k--) {
@@ -574,36 +598,37 @@
               }
             }
             colWidths[targetExpandIdx] += extraW;
-
-            // 关键持久化：将补齐扩展后的实际宽度保存至 viewCols 中，
-            // 避免用户向右拖大其他列时最后一列突然复原坍塌导致整表缩小拉扯
-            const expandViewCol = viewCols[targetExpandIdx];
-            if (expandViewCol) {
-              expandViewCol.width = colWidths[targetExpandIdx];
-            }
           }
 
           const finalColsW = colWidths.reduce((sum, w) => sum + w, 0);
 
-          // 3. 分别强行对表头 <colgroup> 与表体 <colgroup> 的每一个 col 节点注入完全相同的 width 样式与 HTML width 属性（跳过隐藏列）
+          // 3. 分别强行对表头 <colgroup> 与表体 <colgroup> 的每一个 col 节点注入完全相同的 width / minWidth / maxWidth 样式与 HTML width 属性（跳过隐藏列）
           let visibleHeaderIdx = 0;
           headerCols.forEach((colEl: HTMLTableColElement) => {
             const isHidden = colEl.style.display === 'none' || colEl.getAttribute('style')?.includes('display: none');
             if (isHidden) {
               colEl.style.setProperty('width', '0px', 'important');
+              colEl.style.setProperty('min-width', '0px', 'important');
+              colEl.style.setProperty('max-width', '0px', 'important');
               colEl.setAttribute('width', '0');
             } else if (visibleHeaderIdx < colWidths.length) {
               const wStr = `${colWidths[visibleHeaderIdx]}px`;
               colEl.style.setProperty('width', wStr, 'important');
+              colEl.style.setProperty('min-width', wStr, 'important');
+              colEl.style.setProperty('max-width', wStr, 'important');
               colEl.setAttribute('width', `${colWidths[visibleHeaderIdx]}`);
               visibleHeaderIdx++;
             } else if (visibleHeaderIdx === colWidths.length && scrollbarW > 0) {
               const sbStr = `${scrollbarW}px`;
               colEl.style.setProperty('width', sbStr, 'important');
+              colEl.style.setProperty('min-width', sbStr, 'important');
+              colEl.style.setProperty('max-width', sbStr, 'important');
               colEl.setAttribute('width', `${scrollbarW}`);
               visibleHeaderIdx++;
             } else {
               colEl.style.setProperty('width', '0px', 'important');
+              colEl.style.setProperty('min-width', '0px', 'important');
+              colEl.style.setProperty('max-width', '0px', 'important');
               colEl.setAttribute('width', '0');
             }
           });
@@ -613,14 +638,20 @@
             const isHidden = colEl.style.display === 'none' || colEl.getAttribute('style')?.includes('display: none');
             if (isHidden) {
               colEl.style.setProperty('width', '0px', 'important');
+              colEl.style.setProperty('min-width', '0px', 'important');
+              colEl.style.setProperty('max-width', '0px', 'important');
               colEl.setAttribute('width', '0');
             } else if (visibleBodyIdx < colWidths.length) {
               const wStr = `${colWidths[visibleBodyIdx]}px`;
               colEl.style.setProperty('width', wStr, 'important');
+              colEl.style.setProperty('min-width', wStr, 'important');
+              colEl.style.setProperty('max-width', wStr, 'important');
               colEl.setAttribute('width', `${colWidths[visibleBodyIdx]}`);
               visibleBodyIdx++;
             } else {
               colEl.style.setProperty('width', '0px', 'important');
+              colEl.style.setProperty('min-width', '0px', 'important');
+              colEl.style.setProperty('max-width', '0px', 'important');
               colEl.setAttribute('width', '0');
             }
           });
@@ -789,13 +820,13 @@
 
       // 监听数据与列配置变化，自动同步表头右侧滚动条占位 TH
       let observerRafId: number | null = null;
-      const scheduleEnsureWidths = () => {
+      function scheduleEnsureWidths() {
         if (observerRafId !== null) return;
         observerRafId = requestAnimationFrame(() => {
           observerRafId = null;
           ensureAllColWidthsExcept();
         });
-      };
+      }
 
       // 监听数据与列配置变化，异步数据渲染完后自动重排死锁表头与表体网格
       watch(

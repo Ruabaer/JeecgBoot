@@ -2,6 +2,7 @@
   <div class="table-settings">
     <RedoSetting v-if="getSetting.redo" :isMobile="isMobile" :getPopupContainer="getTableContainer" />
     <SizeSetting v-if="getSetting.size" :isMobile="isMobile" :getPopupContainer="getTableContainer" />
+    <ExpandSetting v-if="getSetting.expand" :isMobile="isMobile" :getPopupContainer="getTableContainer" />
     <ColumnSetting v-if="getSetting.setting" :isMobile="isMobile" @columns-change="handleColumnChange" :getPopupContainer="getTableContainer" />
     <FullScreenSetting v-if="getSetting.fullScreen" :isMobile="isMobile" :getPopupContainer="getTableContainer" />
   </div>
@@ -14,6 +15,7 @@
   import SizeSetting from './SizeSetting.vue';
   import RedoSetting from './RedoSetting.vue';
   import FullScreenSetting from './FullScreenSetting.vue';
+  import ExpandSetting from './ExpandSetting.vue';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useTableContext } from '../../hooks/useTableContext';
 
@@ -24,6 +26,7 @@
       SizeSetting,
       RedoSetting,
       FullScreenSetting,
+      ExpandSetting,
     },
     props: {
       setting: {
@@ -41,6 +44,7 @@
         return {
           redo: true,
           size: true,
+          expand: true,
           setting: true,
           fullScreen: false,
           ...props.setting,

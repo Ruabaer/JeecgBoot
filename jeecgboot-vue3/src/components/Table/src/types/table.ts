@@ -122,6 +122,8 @@ export interface TableActionType {
   setCacheColumnsByField?: (dataIndex: string | undefined, value: BasicColumn) => void;
   getColumnsRef: () => ComputedRef<BasicColumn[]>;
   getBindValuesRef: () => ComputedRef<any>;
+  isFullWidthRef?: Ref<boolean>;
+  toggleFullWidthMode?: () => void;
 }
 
 export interface FetchSetting {
@@ -146,6 +148,8 @@ export interface TableSetting {
   cacheKey?: string;
   // 是否显示全屏按钮
   fullScreen?: boolean;
+  // 是否显示行扩展按钮（切换100%屏宽与实际宽度）
+  expand?: boolean;
 }
 
 export interface BasicTableProps<T = any> {
