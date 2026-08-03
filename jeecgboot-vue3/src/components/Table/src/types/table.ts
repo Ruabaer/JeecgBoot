@@ -1,4 +1,4 @@
-import type { VNodeChild, ComputedRef } from 'vue';
+import type { VNodeChild, ComputedRef, Ref } from 'vue';
 import type { PaginationProps } from './pagination';
 import type { FormProps } from '/@/components/Form';
 import type { TableRowSelection as ITableRowSelection } from 'ant-design-vue/lib/table/interface';
@@ -90,7 +90,7 @@ export interface GetColumnsParams {
 export type SizeType = 'middle' | 'small' | 'large';
 
 export interface TableActionType {
-  reload: (opt?: FetchParams) => Promise<void>;
+  reload: (opt?: FetchParams) => Promise<Recordable<any>[] | undefined>;
   getSelectRows: <T = Recordable>() => T[];
   clearSelectedRowKeys: () => void;
   expandAll: () => void;

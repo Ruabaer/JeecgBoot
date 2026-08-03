@@ -125,10 +125,10 @@
       'table-redo',
     ],
     setup(props, { attrs, emit, slots, expose }) {
-      const tableElRef = ref(null);
+      const tableElRef = ref<ComponentRef>(null);
       const tableData = ref<Recordable[]>([]);
 
-      const wrapRef = ref(null);
+      const wrapRef = ref<Nullable<HTMLElement>>(null);
       const innerPropsRef = ref<Partial<BasicTableProps>>();
 
       const { prefixCls } = useDesign('basic-table');
@@ -603,10 +603,11 @@
           // 2. 如果开启了【行扩展 100% 屏宽模式】且数据列宽度总和小于容器宽度，自动将剩余空间分配给最后一列【非固定且非操作】业务数据列
           const rawTotalColsW = colWidths.reduce((sum, w) => sum + w, 0);
           let containerW = 0;
-          if (wrapRef.value) {
-            const cardEl = (wrapRef.value.closest(
+          const wrapEl = (unref(wrapRef) || wrapRef.value) as HTMLElement | null;
+          if (wrapEl) {
+            const cardEl = (wrapEl.closest(
               '.ant-card-body, .jeecg-basic-table-form-container, .ant-layout-content, .ant-table-wrapper'
-            ) as HTMLElement) || wrapRef.value.parentElement || wrapRef.value;
+            ) as HTMLElement) || wrapEl.parentElement || wrapEl;
 
             if (cardEl) {
               const style = window.getComputedStyle(cardEl);
@@ -615,7 +616,7 @@
               containerW = Math.max(0, cardEl.clientWidth - pLeft - pRight);
             }
             if (containerW <= 0) {
-              containerW = wrapRef.value.clientWidth;
+              containerW = wrapEl.clientWidth;
             }
           }
           // 扣除 16px 的多列网格边框 (ant-table-bordered) 与右侧布局容差，确保右侧操作列 100% 内嵌在视口以内
