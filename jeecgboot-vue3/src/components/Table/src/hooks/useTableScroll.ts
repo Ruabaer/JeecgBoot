@@ -67,29 +67,28 @@ export function useTableScroll(
     const tableEl: Element = table.$el;
     if (!tableEl) return;
 
-    if (!bodyEl) {
-      //update-begin-author:taoyan date:2023-2-11 for: issues/355 前端-jeecgboot-vue3 3.4.4版本,BasicTable高度自适应功能失效,设置BasicTable组件maxHeight失效; 原因已找到,请看详情
-      bodyEl = tableEl.querySelector('.ant-table-tbody');
-      //update-end-author:taoyan date:2023-2-11 for: issues/355 前端-jeecgboot-vue3 3.4.4版本,BasicTable高度自适应功能失效,设置BasicTable组件maxHeight失效; 原因已找到,请看详情
-      if (!bodyEl) return;
+    const tableBody = tableEl.querySelector('.ant-table-body') as HTMLElement;
+    const tbodyEl = tableEl.querySelector('.ant-table-tbody') as HTMLElement;
+    if (!tbodyEl) return;
+
+    if (tableBody) {
+      const hasScrollBarY = tableBody.scrollHeight > tableBody.clientHeight + 1;
+      const hasScrollBarX = tableBody.scrollWidth > tableBody.clientWidth + 5;
+
+      if (hasScrollBarY) {
+        tableEl.classList.contains('hide-scrollbar-y') && tableEl.classList.remove('hide-scrollbar-y');
+      } else {
+        !tableEl.classList.contains('hide-scrollbar-y') && tableEl.classList.add('hide-scrollbar-y');
+      }
+
+      if (hasScrollBarX) {
+        tableEl.classList.contains('hide-scrollbar-x') && tableEl.classList.remove('hide-scrollbar-x');
+      } else {
+        !tableEl.classList.contains('hide-scrollbar-x') && tableEl.classList.add('hide-scrollbar-x');
+      }
     }
 
-    const hasScrollBarY = bodyEl.scrollHeight > bodyEl.clientHeight;
-    const hasScrollBarX = bodyEl.scrollWidth > bodyEl.clientWidth;
-
-    if (hasScrollBarY) {
-      tableEl.classList.contains('hide-scrollbar-y') && tableEl.classList.remove('hide-scrollbar-y');
-    } else {
-      !tableEl.classList.contains('hide-scrollbar-y') && tableEl.classList.add('hide-scrollbar-y');
-    }
-
-    if (hasScrollBarX) {
-      tableEl.classList.contains('hide-scrollbar-x') && tableEl.classList.remove('hide-scrollbar-x');
-    } else {
-      !tableEl.classList.contains('hide-scrollbar-x') && tableEl.classList.add('hide-scrollbar-x');
-    }
-
-    bodyEl!.style.height = 'unset';
+    if (tableBody) tableBody.style.height = 'unset';
 
     if (!unref(getCanResize) || ( !tableData || tableData.length === 0)) return;
 

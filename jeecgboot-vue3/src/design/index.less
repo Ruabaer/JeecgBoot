@@ -75,11 +75,6 @@ body {
 
 /* 🌟 表格列拖拽虚影与竖直蓝色引导线样式 (Table Column Resize Ghost Line) */
 .ant-table-wrapper {
-  .ant-table-body,
-  .ant-table-content {
-    overflow-x: auto !important;
-  }
-
   .ant-table-header {
     overflow: hidden !important;
     margin-right: 0 !important;
@@ -102,8 +97,6 @@ body {
   .ant-table-body table,
   .ant-table-content table {
     table-layout: fixed !important;
-    width: 100% !important;
-    min-width: 100% !important;
     margin-right: 0 !important;
     padding-right: 0 !important;
     border-collapse: collapse !important;
@@ -114,6 +107,70 @@ body {
   .ant-table-container {
     max-width: 100% !important;
     box-sizing: border-box !important;
+  }
+
+  /* 🌟 防拖动打穿：覆盖 AntD Vue 的 ping-right / ping-left / scroll-horizontal 导致的拖动补丁溢出 */
+  .hide-scrollbar-x,
+  .ant-table-wrapper.hide-scrollbar-x {
+    &,
+    .ant-spin-nested-loading,
+    .ant-spin-container,
+    .ant-table,
+    .ant-table-container,
+    .ant-table-content,
+    .ant-table-body,
+    .ant-table-ping-right,
+    .ant-table-ping-left,
+    .ant-table-scroll-horizontal {
+      &,
+      .ant-table-body,
+      .ant-table-content,
+      .ant-table-container {
+        overflow-x: hidden !important;
+      }
+    }
+  }
+
+  /* 🌟 拖拽过程硬锁：鼠标拖动列宽时全局屏蔽横向滚动条，杜绝 VDOM 高频重绘闪烁 */
+  body.is-table-dragging & {
+    &,
+    .ant-table,
+    .ant-table-container,
+    .ant-table-content,
+    .ant-table-body,
+    .ant-table-ping-right,
+    .ant-table-ping-left,
+    .ant-table-scroll-horizontal {
+      &,
+      .ant-table-body,
+      .ant-table-content,
+      .ant-table-container {
+        overflow-x: hidden !important;
+      }
+    }
+  }
+
+  /* 🌟 模式切换硬锁：从行扩展激活到取消（表格缩回）全过程硬锁，杜绝 VDOM 微任务 Patch 重绘闪烁 */
+  .is-toggling-mode,
+  .ant-table-wrapper.is-toggling-mode,
+  body.is-toggling-mode & {
+    &,
+    .ant-spin-nested-loading,
+    .ant-spin-container,
+    .ant-table,
+    .ant-table-container,
+    .ant-table-content,
+    .ant-table-body,
+    .ant-table-ping-right,
+    .ant-table-ping-left,
+    .ant-table-scroll-horizontal {
+      &,
+      .ant-table-body,
+      .ant-table-content,
+      .ant-table-container {
+        overflow-x: hidden !important;
+      }
+    }
   }
 
   .ant-table-thead > tr > th:not(.ant-table-cell-scrollbar),

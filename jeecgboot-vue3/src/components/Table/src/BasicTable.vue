@@ -348,10 +348,36 @@
 
       const isFullWidthRef = ref<boolean>(true);
 
+      function applyToggleTransitionLock() {
+        lastAppliedColWidths = [];
+        document.body.classList.add('is-toggling-mode');
+        const tableWrapper = (wrapRef.value?.querySelector('.ant-table-wrapper') as HTMLElement) || wrapRef.value;
+        wrapRef.value?.classList.add('is-toggling-mode');
+        tableWrapper?.classList.add('is-toggling-mode');
+
+        ensureAllColWidthsExcept();
+        nextTick(() => {
+          ensureAllColWidthsExcept();
+          requestAnimationFrame(() => {
+            ensureAllColWidthsExcept();
+            setTimeout(() => {
+              document.body.classList.remove('is-toggling-mode');
+              wrapRef.value?.classList.remove('is-toggling-mode');
+              tableWrapper?.classList.remove('is-toggling-mode');
+              ensureAllColWidthsExcept();
+            }, 150);
+          });
+        });
+      }
+
       function toggleFullWidthMode() {
         isFullWidthRef.value = !isFullWidthRef.value;
-        ensureAllColWidthsExcept();
+        applyToggleTransitionLock();
       }
+
+      watch(isFullWidthRef, () => {
+        applyToggleTransitionLock();
+      });
 
       const tableAction: TableActionType = {
         reload,
@@ -488,22 +514,30 @@
         return viewIndex;
       }
 
-      // 动态读取表体真实纵向滚动条宽度（没有滚动条时严格返回 0）
+      // 动态读取表体真实纵向滚动条宽度（精确扣除 Y 轴滚动条）
       function getScrollbarWidth(): number {
         if (!wrapRef.value) return 0;
         const bodyEl = wrapRef.value.querySelector('.ant-table-body') as HTMLElement;
-        const tbodyEl = wrapRef.value.querySelector('.ant-table-tbody') as HTMLElement;
-        if (!bodyEl || !tbodyEl) return 0;
+        if (!bodyEl) return 0;
 
-        // 物理真理判定：对比 tbody 数据行真实物理高度 (tbody.offsetHeight) 与容器可见高度 (bodyEl.clientHeight)
-        const hasScrollbar = bodyEl.clientHeight > 0 && tbodyEl.offsetHeight > bodyEl.clientHeight;
+        // 1. 优先读取 AntD 真实渲染的表头右侧滚动条占位 TH 宽度
+        const scrollbarTh = wrapRef.value.querySelector('.ant-table-thead > tr > th.ant-table-cell-scrollbar') as HTMLElement;
+        if (scrollbarTh && scrollbarTh.style.display !== 'none') {
+          const thW = Math.round(scrollbarTh.getBoundingClientRect().width || parseFloat(scrollbarTh.style.width) || 0);
+          if (thW > 0) return thW;
+        }
+
+        // 2. 权威物理判定：对比表体 scrollHeight 与 clientHeight
+        const style = window.getComputedStyle(bodyEl);
+        const hasScrollbar = bodyEl.clientHeight > 0 && (bodyEl.scrollHeight > bodyEl.clientHeight + 1 || style.overflowY === 'scroll');
         if (!hasScrollbar) return 0;
 
         const sbWidth = bodyEl.offsetWidth - bodyEl.clientWidth;
-        return sbWidth > 0 ? sbWidth : 0;
+        return sbWidth > 0 ? sbWidth : 17;
       }
 
       let isUpdatingCols = false;
+      let lastAppliedColWidths: number[] = [];
 
       // 强行给表头 <colgroup>、表体 <colgroup> 及 TH 注入完全相等的 colWidths 数组，保证表头与表体网格线 100% 绝对对齐
       function ensureAllColWidthsExcept(targetColIndex: number = -1, targetW: number = 0) {
@@ -513,6 +547,7 @@
           const thList = Array.from(wrapRef.value.querySelectorAll('.ant-table-thead > tr > th:not(.ant-table-cell-scrollbar)')) as HTMLElement[];
           const headerCols = Array.from(wrapRef.value.querySelectorAll('.ant-table-header col')) as HTMLTableColElement[];
           const bodyCols = Array.from(wrapRef.value.querySelectorAll('.ant-table-body col')) as HTMLTableColElement[];
+          const containerEl = (wrapRef.value.querySelector('.ant-table-body') as HTMLElement) || wrapRef.value;
           if (!thList.length || (!headerCols.length && !bodyCols.length)) return;
 
           const viewCols = unref(getViewColumns);
@@ -553,6 +588,8 @@
 
                 if (!isNaN(targetWVal) && targetWVal > 0) {
                   colWidths[i] = Math.max(50, Math.round(targetWVal));
+                } else if (lastAppliedColWidths[i] && lastAppliedColWidths[i] > 0) {
+                  colWidths[i] = lastAppliedColWidths[i];
                 } else if (targetColIndex === -1 && thList[i]) {
                   const domW = Math.round(thList[i].getBoundingClientRect().width);
                   colWidths[i] = Math.max(50, domW);
@@ -584,10 +621,11 @@
           // 扣除 16px 的多列网格边框 (ant-table-bordered) 与右侧布局容差，确保右侧操作列 100% 内嵌在视口以内
           const availableW = Math.max(0, containerW - scrollbarW - 16);
 
-          if (isFullWidthRef.value && targetColIndex === -1 && containerW > 0 && rawTotalColsW < availableW && colWidths.length > 0) {
+          if (isFullWidthRef.value && containerW > 0 && rawTotalColsW < availableW && colWidths.length > 0) {
             const extraW = availableW - rawTotalColsW;
             let targetExpandIdx = colWidths.length - 1;
             for (let k = thList.length - 1; k >= 0; k--) {
+              if (k === targetColIndex && thList.length > 1) continue;
               const thEl = thList[k];
               const isFixedRight = thEl?.classList.contains('ant-table-cell-fix-right');
               const thText = thEl?.textContent?.trim() || '';
@@ -601,6 +639,7 @@
           }
 
           const finalColsW = colWidths.reduce((sum, w) => sum + w, 0);
+          lastAppliedColWidths = [...colWidths];
 
           // 3. 分别强行对表头 <colgroup> 与表体 <colgroup> 的每一个 col 节点注入完全相同的 width / minWidth / maxWidth 样式与 HTML width 属性（跳过隐藏列）
           let visibleHeaderIdx = 0;
@@ -618,7 +657,7 @@
               colEl.style.setProperty('max-width', wStr, 'important');
               colEl.setAttribute('width', `${colWidths[visibleHeaderIdx]}`);
               visibleHeaderIdx++;
-            } else if (visibleHeaderIdx === colWidths.length && scrollbarW > 0) {
+            } else if (visibleHeaderIdx === colWidths.length && scrollbarW > 0 && finalColsW > containerW) {
               const sbStr = `${scrollbarW}px`;
               colEl.style.setProperty('width', sbStr, 'important');
               colEl.style.setProperty('min-width', sbStr, 'important');
@@ -630,6 +669,7 @@
               colEl.style.setProperty('min-width', '0px', 'important');
               colEl.style.setProperty('max-width', '0px', 'important');
               colEl.setAttribute('width', '0');
+              visibleHeaderIdx++;
             }
           });
 
@@ -689,19 +729,19 @@
           // 5. 同步更新表头右侧滚动条占位 TH (th.ant-table-cell-scrollbar)
           const scrollbarTH = wrapRef.value.querySelector('.ant-table-thead > tr > th.ant-table-cell-scrollbar') as HTMLElement;
           if (scrollbarTH) {
-            if (scrollbarW > 0) {
+            if (scrollbarW > 0 && finalColsW > containerW) {
               const sbStr = `${scrollbarW}px`;
-              scrollbarTH.style.width = sbStr;
-              scrollbarTH.style.minWidth = sbStr;
-              scrollbarTH.style.maxWidth = sbStr;
+              scrollbarTH.style.setProperty('width', sbStr, 'important');
+              scrollbarTH.style.setProperty('min-width', sbStr, 'important');
+              scrollbarTH.style.setProperty('max-width', sbStr, 'important');
               scrollbarTH.style.display = '';
             } else {
-              scrollbarTH.style.width = '0px';
-              scrollbarTH.style.minWidth = '0px';
-              scrollbarTH.style.maxWidth = '0px';
-              scrollbarTH.style.padding = '0';
-              scrollbarTH.style.margin = '0';
-              scrollbarTH.style.border = 'none';
+              scrollbarTH.style.setProperty('width', '0px', 'important');
+              scrollbarTH.style.setProperty('min-width', '0px', 'important');
+              scrollbarTH.style.setProperty('max-width', '0px', 'important');
+              scrollbarTH.style.setProperty('padding', '0', 'important');
+              scrollbarTH.style.setProperty('margin', '0', 'important');
+              scrollbarTH.style.setProperty('border', 'none', 'important');
               scrollbarTH.style.display = 'none';
             }
           }
@@ -709,8 +749,20 @@
           // 6. 强行同步 headerTable 与 bodyTable 的 <table> 节点整体像素宽度，并追加 !important 彻底覆写 AntD Vue 默认的 width: max-content 内联样式
           const headerTableEl = wrapRef.value.querySelector('.ant-table-header table') as HTMLElement;
           const bodyTableEl = wrapRef.value.querySelector('.ant-table-body table') as HTMLElement;
+          const antTableEl = wrapRef.value.querySelector('.ant-table') as HTMLElement;
+
+          if (antTableEl) {
+            if (isFullWidthRef.value && finalColsW <= containerW) {
+              antTableEl.style.width = '100%';
+              antTableEl.style.maxWidth = '100%';
+            } else {
+              antTableEl.style.width = `${finalColsW}px`;
+              antTableEl.style.maxWidth = '100%';
+            }
+          }
+
           if (headerTableEl) {
-            const hWidthStr = `${finalColsW + scrollbarW}px`;
+            const hWidthStr = `${finalColsW}px`;
             headerTableEl.style.setProperty('width', hWidthStr, 'important');
             headerTableEl.style.setProperty('min-width', hWidthStr, 'important');
             headerTableEl.style.setProperty('max-width', hWidthStr, 'important');
@@ -722,12 +774,24 @@
             bodyTableEl.style.setProperty('max-width', bWidthStr, 'important');
           }
 
-          // 7. 动态防闪烁：总列宽小于等于容器宽时，强行屏蔽横向滚动条；只有真正超出容器时才开启横向滚动条
+          // 7. 动态防闪烁：当表格总宽 <= 容器宽时，强锁所有层级 hidden；只有真正超出容器 15px 时才开启滚动条
           if (containerEl && containerW > 0) {
-            if (finalColsW <= containerW + 1) {
+            const tableWrapper = (wrapRef.value.closest('.ant-table-wrapper') as HTMLElement) || wrapRef.value;
+            const tableContent = wrapRef.value.querySelector('.ant-table-content') as HTMLElement;
+            const tableContainer = wrapRef.value.querySelector('.ant-table-container') as HTMLElement;
+
+            if (finalColsW <= containerW) {
               containerEl.style.setProperty('overflow-x', 'hidden', 'important');
-            } else {
+              if (tableContent) tableContent.style.setProperty('overflow-x', 'hidden', 'important');
+              if (tableContainer) tableContainer.style.setProperty('overflow-x', 'hidden', 'important');
+              wrapRef.value?.classList.add('hide-scrollbar-x');
+              tableWrapper?.classList.add('hide-scrollbar-x');
+            } else if (finalColsW > containerW + 15) {
               containerEl.style.setProperty('overflow-x', 'auto', 'important');
+              if (tableContent) tableContent.style.setProperty('overflow-x', 'auto', 'important');
+              if (tableContainer) tableContainer.style.setProperty('overflow-x', 'auto', 'important');
+              wrapRef.value?.classList.remove('hide-scrollbar-x');
+              tableWrapper?.classList.remove('hide-scrollbar-x');
             }
           }
 
@@ -844,6 +908,8 @@
 
       // DOM 变动与尺寸监听器：处理 AntD 动态容器尺寸与初始化挂载
       let resizeObserver: ResizeObserver | null = null;
+      let onHeaderMouseDownFn: ((e: MouseEvent) => void) | null = null;
+      let onMouseUpFn: (() => void) | null = null;
 
       onMounted(() => {
         nextTick(() => {
@@ -856,6 +922,30 @@
               scheduleEnsureWidths();
             });
             resizeObserver.observe(wrapRef.value);
+
+            // 绑定全局列拖拽状态，彻底阻断拖动过程中 VDOM 高频重绘引发的横向滚动条闪烁
+            onHeaderMouseDownFn = (e: MouseEvent) => {
+              const target = e.target as HTMLElement;
+              if (
+                target &&
+                (target.classList.contains('react-resizable-handle') ||
+                  target.classList.contains('ant-table-resize-handle') ||
+                  target.closest('th') ||
+                  target.closest('.react-resizable'))
+              ) {
+                document.body.classList.add('is-table-dragging');
+              }
+            };
+
+            onMouseUpFn = () => {
+              if (document.body.classList.contains('is-table-dragging')) {
+                document.body.classList.remove('is-table-dragging');
+                scheduleEnsureWidths();
+              }
+            };
+
+            wrapRef.value.addEventListener('mousedown', onHeaderMouseDownFn, true);
+            window.addEventListener('mouseup', onMouseUpFn, true);
           }
         });
       });
@@ -864,6 +954,12 @@
         if (resizeObserver) {
           resizeObserver.disconnect();
           resizeObserver = null;
+        }
+        if (wrapRef.value && onHeaderMouseDownFn) {
+          wrapRef.value.removeEventListener('mousedown', onHeaderMouseDownFn, true);
+        }
+        if (onMouseUpFn) {
+          window.removeEventListener('mouseup', onMouseUpFn, true);
         }
       });
       // update-end--author:antigravity---date:20260802---for：【表格列拖拽优化】基于 AntD 原生 resize 事件 + RAF DOM 同步，实现 1:1 跟手列宽拖拽

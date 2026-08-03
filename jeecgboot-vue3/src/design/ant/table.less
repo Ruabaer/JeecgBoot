@@ -42,32 +42,10 @@
     .ant-spin-nested-loading {
       .ant-spin-container {
         .ant-table {
-          .ant-table-content {
-            .ant-table-scroll {
-              .ant-table-hide-scrollbar {
-                //overflow-x: auto !important;
-              }
-
-              .ant-table-content {
-                overflow: auto !important;
-              }
-            }
-
-            .ant-table-fixed-right {
-              .ant-table-body-outer {
-                .ant-table-body-inner {
-                  overflow-x: auto !important;
-                }
-              }
-            }
-
-            .ant-table-fixed-left {
-              .ant-table-body-outer {
-                .ant-table-body-inner {
-                  overflow-x: auto !important;
-                }
-              }
-            }
+          .ant-table-content,
+          .ant-table-body,
+          .ant-table-container {
+            overflow-x: hidden !important;
           }
         }
       }
