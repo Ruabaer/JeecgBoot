@@ -65,6 +65,7 @@
   import { listNoCareTenant, deleteUser, batchDeleteUser, getImportUrl, getExportUrl, frozenBatch } from './user.api';
   import { usePermission } from '/@/hooks/web/usePermission';
   import ImportExcelProgress from './components/ImportExcelProgress.vue';
+  import { initDictOptions } from '/@/utils/dict';
 
   const { createMessage, createConfirm } = useMessage();
   const { isDisabledAuth } = usePermission();
@@ -100,6 +101,18 @@
       beforeFetch: (params) => {
         return Object.assign({ column: 'createTime', order: 'desc' }, params);
       },
+      filterFn: (data: Recordable) => {
+        const res: Recordable = {};
+        Object.keys(data).forEach((key) => {
+          const val = data[key];
+          if (Array.isArray(val) && val.length > 0) {
+            res[key] = val.join(',');
+          } else if (val != null && val !== '') {
+            res[key] = val;
+          }
+        });
+        return res;
+      },
     },
     exportConfig: {
       name: '用户列表',
@@ -111,7 +124,21 @@
   });
 
   //注册table数据
-  const [registerTable, { reload, updateTableDataRecord }, { rowSelection, selectedRows, selectedRowKeys }] = tableContext;
+  const [registerTable, { reload, updateTableDataRecord, setColumns }, { rowSelection, selectedRows, selectedRowKeys }] = tableContext;
+
+  // 动态绑定【性别】表头过滤选项（绑定字典 sex）
+  initDictOptions('sex').then((dictList: any[]) => {
+    if (Array.isArray(dictList) && dictList.length > 0) {
+      const sexColumn = columns.find((col) => col.dataIndex === 'sex');
+      if (sexColumn) {
+        sexColumn.filters = dictList.map((item) => ({
+          text: item.text || item.label || item.title,
+          value: String(item.value),
+        }));
+        setColumns([...columns]);
+      }
+    }
+  });
 
   /**
    * 新增事件

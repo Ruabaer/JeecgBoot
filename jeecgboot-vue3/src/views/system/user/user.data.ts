@@ -1,8 +1,11 @@
+import { h } from 'vue';
+import { Tag } from 'ant-design-vue';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 import { getAllRolesListNoByTenant, getAllTenantList } from './user.api';
 import { rules } from '/@/utils/helper/validator';
 import { render } from '/@/utils/common/renderUtils';
+import { getDictItemsByCode } from '/@/utils/dict';
 export const columns: BasicColumn[] = [
   {
     title: '用户账号',
@@ -28,6 +31,10 @@ export const columns: BasicColumn[] = [
     dataIndex: 'sex',
     width: 90,
     sorter: true,
+    filters: getDictItemsByCode('sex')?.map((item: any) => ({
+      text: item.text || item.label || item.title,
+      value: String(item.value),
+    })),
     customRender: ({ text }) => {
       return render.renderDict(text, 'sex');
     },
@@ -68,6 +75,12 @@ export const columns: BasicColumn[] = [
     dataIndex: 'status_dictText',
     width: 100,
     resizable: true,
+    customRender: ({ text, record }) => {
+      const dictItems = getDictItemsByCode('user_status') || [];
+      const matchItem = dictItems.find((item: any) => item.value == record.status || item.text === text);
+      const color = matchItem?.itemColor || matchItem?.color || (record.status == 2 || text === '冻结' ? 'red' : 'green');
+      return h(Tag, { color }, () => text);
+    },
   },
 ];
 
@@ -110,7 +123,7 @@ export const searchFormSchema: FormSchema[] = [
     label: '名字',
     field: 'realname',
     component: 'JInput',
-   //colProps: { span: 6 },
+    //colProps: { span: 6 },
   },
   {
     label: '性别',
@@ -138,7 +151,7 @@ export const searchFormSchema: FormSchema[] = [
       placeholder: '请选择状态',
       stringToNumber: true,
     },
-   //colProps: { span: 6 },
+    //colProps: { span: 6 },
   },
 ];
 
@@ -163,7 +176,7 @@ export const formSchema: FormSchema[] = [
     label: '登录密码',
     field: 'password',
     component: 'StrengthMeter',
-    componentProps:{
+    componentProps: {
       autocomplete: 'new-password',
     },
     rules: [
@@ -196,15 +209,15 @@ export const formSchema: FormSchema[] = [
     component: 'Input',
     dynamicRules: ({ model, schema }) => rules.duplicateCheckRule('sys_user', 'work_no', model, schema, false),
   },
-/*  {
-    label: '职务',
-    field: 'post',
-    required: false,
-    component: 'JSelectPosition',
-    componentProps: {
-      labelKey: 'name',
-    },
-  },*/
+  /*  {
+      label: '职务',
+      field: 'post',
+      required: false,
+      component: 'JSelectPosition',
+      componentProps: {
+        labelKey: 'name',
+      },
+    },*/
   {
     label: '职务',
     field: 'positionType',
@@ -247,15 +260,15 @@ export const formSchema: FormSchema[] = [
             //修改主岗位和兼职岗位的参数
             {
               field: 'mainDepPostId',
-              componentProps: { params: { departIds: values?values.value.join(","): "" } },
+              componentProps: { params: { departIds: values ? values.value.join(",") : "" } },
             },
             {
               field: 'otherDepPostId',
-              componentProps: { params: { departIds: values?values.value.join(","): "" } },
+              componentProps: { params: { departIds: values ? values.value.join(",") : "" } },
             }
           ]);
           //update-begin---author:wangshuai---date:2024-05-11---for:【issues/1222】用户编辑界面“所属部门”与“负责部门”联动出错整---
-          if(!values){
+          if (!values) {
             formModel.departIds = [];
             formModel.mainDepPostId = "";
             formModel.otherDepPostId = "";
@@ -276,8 +289,8 @@ export const formSchema: FormSchema[] = [
       rowKey: 'id',
       multiple: false
     },
-    ifShow:  ({ values }) => {
-      if(!values.selecteddeparts){
+    ifShow: ({ values }) => {
+      if (!values.selecteddeparts) {
         return false;
       }
       return !(values.selecteddeparts instanceof Array && values.selecteddeparts.length == 0);
@@ -290,8 +303,8 @@ export const formSchema: FormSchema[] = [
     componentProps: {
       rowKey: 'id',
     },
-    ifShow:  ({ values }) => {
-      if(!values.selecteddeparts){
+    ifShow: ({ values }) => {
+      if (!values.selecteddeparts) {
         return false;
       }
       return !(values.selecteddeparts instanceof Array && values.selecteddeparts.length == 0);
@@ -302,7 +315,7 @@ export const formSchema: FormSchema[] = [
     field: 'relTenantIds',
     component: 'JSearchSelect',
     componentProps: {
-      dict:"sys_tenant,name,id",
+      dict: "sys_tenant,name,id",
       async: true,
       multiple: true
     },
