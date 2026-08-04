@@ -622,21 +622,65 @@
           // 扣除 16px 的多列网格边框 (ant-table-bordered) 与右侧布局容差，确保右侧操作列 100% 内嵌在视口以内
           const availableW = Math.max(0, containerW - scrollbarW - 16);
 
-          if (isFullWidthRef.value && containerW > 0 && rawTotalColsW < availableW && colWidths.length > 0) {
-            const extraW = availableW - rawTotalColsW;
-            let targetExpandIdx = colWidths.length - 1;
-            for (let k = thList.length - 1; k >= 0; k--) {
-              if (k === targetColIndex && thList.length > 1) continue;
-              const thEl = thList[k];
-              const isFixedRight = thEl?.classList.contains('ant-table-cell-fix-right');
-              const thText = thEl?.textContent?.trim() || '';
-              const isActionCol = thText === '操作' || thText === 'Action' || thEl?.classList.contains('ant-table-row-cell-last');
-              if (!isFixedRight && !isActionCol) {
-                targetExpandIdx = k;
-                break;
+          if (isFullWidthRef.value && containerW > 0 && colWidths.length > 0) {
+            if (rawTotalColsW < availableW) {
+              const extraW = availableW - rawTotalColsW;
+              let targetExpandIdx = colWidths.length - 1;
+              for (let k = thList.length - 1; k >= 0; k--) {
+                if (k === targetColIndex && thList.length > 1) continue;
+                const thEl = thList[k];
+                const isFixedRight = thEl?.classList.contains('ant-table-cell-fix-right');
+                const thText = thEl?.textContent?.trim() || '';
+                const isActionCol = thText === '操作' || thText === 'Action' || thEl?.classList.contains('ant-table-row-cell-last');
+                if (!isFixedRight && !isActionCol) {
+                  targetExpandIdx = k;
+                  break;
+                }
+              }
+              colWidths[targetExpandIdx] += extraW;
+            } else if (rawTotalColsW > availableW) {
+              // 当列宽超出屏宽且开启【行扩展：100%屏宽】时，按比例缩放可变列，使表格收缩适配 100% 容器宽度
+              let fixedW = 0;
+              let flexW = 0;
+              const isFlexCol: boolean[] = [];
+
+              for (let k = 0; k < thList.length; k++) {
+                const thEl = thList[k];
+                const isFixedLeft = thEl?.classList.contains('ant-table-cell-fix-left');
+                const isFixedRight = thEl?.classList.contains('ant-table-cell-fix-right');
+                const thText = thEl?.textContent?.trim() || '';
+                const isActionCol = thText === '操作' || thText === 'Action' || thEl?.classList.contains('ant-table-row-cell-last');
+                const isSelectionCol = thEl?.classList.contains('ant-table-selection-column') || thEl?.querySelector('.ant-checkbox-wrapper') != null || (!useViewColsDirectly && k === 0);
+
+                if (isFixedLeft || isFixedRight || isActionCol || isSelectionCol) {
+                  isFlexCol[k] = false;
+                  fixedW += colWidths[k];
+                } else {
+                  isFlexCol[k] = true;
+                  flexW += colWidths[k];
+                }
+              }
+
+              const targetFlexW = availableW - fixedW;
+              if (flexW > 0 && targetFlexW > 0) {
+                const scale = targetFlexW / flexW;
+                let currentTotal = fixedW;
+                let lastFlexIdx = -1;
+
+                for (let k = 0; k < colWidths.length; k++) {
+                  if (isFlexCol[k]) {
+                    const scaledW = Math.max(40, Math.floor(colWidths[k] * scale));
+                    colWidths[k] = scaledW;
+                    currentTotal += scaledW;
+                    lastFlexIdx = k;
+                  }
+                }
+
+                if (lastFlexIdx !== -1 && currentTotal < availableW) {
+                  colWidths[lastFlexIdx] += (availableW - currentTotal);
+                }
               }
             }
-            colWidths[targetExpandIdx] += extraW;
           }
 
           const finalColsW = colWidths.reduce((sum, w) => sum + w, 0);
