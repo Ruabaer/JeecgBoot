@@ -45,6 +45,7 @@
       sm: { span: 18 },
     },
   });
+  const rowId = ref('');
   //表单赋值
   const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
     //重置表单
@@ -52,6 +53,7 @@
     setModalProps({ confirmLoading: false });
     isUpdate.value = !!data?.isUpdate;
     if (unref(isUpdate)) {
+      rowId.value = data.record?.id;
       //表单赋值
       await setFieldsValue({
         ...data.record,
@@ -67,6 +69,9 @@
     try {
       const values = await validate();
       values.dictId = props.dictId;
+      if (unref(isUpdate)) {
+        values.id = rowId.value || values.id;
+      }
       setModalProps({ confirmLoading: true });
       //提交表单
       await saveOrUpdateDictItem(values, isUpdate.value);
