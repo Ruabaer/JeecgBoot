@@ -19,6 +19,7 @@
     schemas: roleIndexFormSchema,
     showActionButtonGroup: false,
   });
+  const rowId = ref('');
   //表单赋值
   const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
     //重置表单
@@ -28,6 +29,7 @@
     let res = await queryIndexByCode({ roleCode: data.roleCode });
     isUpdate.value = !!res.result?.id;
     if (unref(isUpdate)) {
+      rowId.value = res.result?.id;
       //表单赋值
       await setFieldsValue({
         ...res.result,
@@ -39,6 +41,9 @@
   async function handleSubmit(v) {
     try {
       let values = await validate();
+      if (unref(isUpdate)) {
+        values.id = rowId.value || values.id;
+      }
       setModalProps({ confirmLoading: true });
       //提交表单
       await saveOrUpdateRoleIndex(values, isUpdate.value);

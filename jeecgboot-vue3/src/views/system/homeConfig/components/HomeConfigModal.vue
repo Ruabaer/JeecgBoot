@@ -20,6 +20,7 @@
     schemas: formSchema,
     showActionButtonGroup: false,
   });
+  const rowId = ref('');
   //表单赋值
   const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
     //重置表单
@@ -27,6 +28,7 @@
     setModalProps({ confirmLoading: false });
     isUpdate.value = !!data?.isUpdate;
     if (unref(isUpdate)) {
+      rowId.value = data.values?.id || data.record?.id;
       const record = {...data.values}
       //表单赋值
       if (record.relationType == 'USER') {
@@ -46,6 +48,9 @@
   async function handleSubmit() {
     try {
       let values = await validate();
+      if (unref(isUpdate)) {
+        values.id = rowId.value || values.id;
+      }
       setModalProps({ confirmLoading: true });
       //提交表单
       if(values.relationType == 'USER'){
