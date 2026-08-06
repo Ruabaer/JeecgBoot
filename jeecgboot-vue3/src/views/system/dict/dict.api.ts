@@ -21,7 +21,13 @@ enum Api {
   dictItemCheck = '/sys/dictItem/dictItemCheck',
   refreshCache = '/sys/dict/refleshCache',
   queryAllDictItems = '/sys/dict/queryAllDictItems',
+  getUseDetails = '/sys/dict/getUseDetails',
 }
+/**
+ * 获取字典使用明细列表
+ */
+export const getDictUseDetails = (params) => defHttp.get({ url: Api.getUseDetails, params });
+
 /**
  * 导出api
  * @param params

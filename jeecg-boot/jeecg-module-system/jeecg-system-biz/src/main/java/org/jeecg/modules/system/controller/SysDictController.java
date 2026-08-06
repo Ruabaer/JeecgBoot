@@ -92,20 +92,65 @@ public class SysDictController {
 			sysDict.setTenantId(oConvertUtils.getInt(TenantContext.getTenant(),0));
 		}
 		//------------------------------------------------------------------------------------------------
-		QueryWrapper<SysDict> queryWrapper = QueryGenerator.initQueryWrapper(sysDict, req.getParameterMap());
+		String column = req.getParameter("column");
+		String order = req.getParameter("order");
+		Map<String, String[]> parameterMap = new HashMap<>(req.getParameterMap());
+		if ("useCount".equals(column) || "use_count".equals(column)) {
+			parameterMap.remove("column");
+			parameterMap.remove("order");
+		}
+		QueryWrapper<SysDict> queryWrapper = QueryGenerator.initQueryWrapper(sysDict, parameterMap);
 		// 查询关键字，模糊筛选code和name
 		if (oConvertUtils.isNotEmpty(keywords)) {
 			queryWrapper.and(i -> i.like("dict_code", keywords).or().like("dict_name", keywords));
 		}
 
-		Page<SysDict> page = new Page<>(pageNo, pageSize);
-		IPage<SysDict> pageList = sysDictService.page(page, queryWrapper);
+		Page<SysDict> pageList = new Page<>(pageNo, pageSize);
+		if ("useCount".equals(column) || "use_count".equals(column)) {
+			// 关联数属于计算属性，执行全量内存分页与全局跨页排序
+			List<SysDict> allDicts = sysDictService.list(queryWrapper);
+			if (allDicts != null) {
+				for (SysDict dict : allDicts) {
+					dict.setUseCount(sysDictService.getDictUseCount(dict.getDictCode()));
+				}
+				if ("asc".equalsIgnoreCase(order) || "ascend".equalsIgnoreCase(order)) {
+					allDicts.sort(Comparator.comparingInt(d -> d.getUseCount() == null ? 0 : d.getUseCount()));
+				} else {
+					allDicts.sort((d1, d2) -> Integer.compare(d2.getUseCount() == null ? 0 : d2.getUseCount(), d1.getUseCount() == null ? 0 : d1.getUseCount()));
+				}
+				int total = allDicts.size();
+				int fromIndex = Math.min((pageNo - 1) * pageSize, total);
+				int toIndex = Math.min(fromIndex + pageSize, total);
+				pageList.setTotal(total);
+				pageList.setRecords(allDicts.subList(fromIndex, toIndex));
+			}
+		} else {
+			// 普通物理字段（如 dictCode, dictName）走 SQL 级分页
+			pageList = sysDictService.page(pageList, queryWrapper);
+			if (pageList != null && pageList.getRecords() != null) {
+				for (SysDict dict : pageList.getRecords()) {
+					dict.setUseCount(sysDictService.getDictUseCount(dict.getDictCode()));
+				}
+			}
+		}
 		log.debug("查询当前页："+pageList.getCurrent());
 		log.debug("查询当前页数量："+pageList.getSize());
 		log.debug("查询结果数量："+pageList.getRecords().size());
 		log.debug("数据总数："+pageList.getTotal());
 		result.setSuccess(true);
 		result.setResult(pageList);
+		return result;
+	}
+
+	/**
+	 * 获取指定字典被功能模块引用的使用明细列表
+	 */
+	@RequestMapping(value = "/getUseDetails", method = RequestMethod.GET)
+	public Result<List<org.jeecg.modules.system.vo.DictUseDetail>> getUseDetails(@RequestParam(name = "dictCode") String dictCode) {
+		Result<List<org.jeecg.modules.system.vo.DictUseDetail>> result = new Result<>();
+		List<org.jeecg.modules.system.vo.DictUseDetail> list = sysDictService.getDictUseDetails(dictCode);
+		result.setSuccess(true);
+		result.setResult(list);
 		return result;
 	}
 

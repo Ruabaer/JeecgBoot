@@ -242,4 +242,32 @@
 		</foreach>
 	</delete>
 
+	<!-- 查询Online动态表单关联字典使用明细 -->
+	<select id="getOnlineFormDictUseList" resultType="org.jeecg.modules.system.vo.DictUseDetail">
+		SELECT
+			'Online表单' AS type,
+			h.table_name AS tableName,
+			h.table_txt AS tableTxt,
+			f.db_field_name AS fieldName,
+			f.db_field_txt AS fieldTxt,
+			CONCAT('Online低代码表单 (类型: ', CASE h.table_type WHEN 1 THEN '单表' WHEN 2 THEN '主表' WHEN 3 THEN '附表' ELSE '树表' END, ')') AS moduleRemark
+		FROM onl_cgform_field f
+		INNER JOIN onl_cgform_head h ON h.id = f.cgform_head_id
+		WHERE f.dict_field = #{dictCode} OR f.query_dict_field = #{dictCode}
+	</select>
+
+	<!-- 查询Online报表关联字典使用明细 -->
+	<select id="getOnlineReportDictUseList" resultType="org.jeecg.modules.system.vo.DictUseDetail">
+		SELECT
+			'Online报表' AS type,
+			h.code AS tableName,
+			h.name AS tableTxt,
+			i.field_name AS fieldName,
+			i.field_txt AS fieldTxt,
+			'Online动态数据分析与图表报表' AS moduleRemark
+		FROM onl_cgreport_item i
+		INNER JOIN onl_cgreport_head h ON h.id = i.cgrhead_id
+		WHERE i.dict_code = #{dictCode}
+	</select>
+
 </mapper>

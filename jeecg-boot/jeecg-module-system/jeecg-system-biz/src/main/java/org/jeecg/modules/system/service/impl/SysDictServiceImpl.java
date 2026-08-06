@@ -911,4 +911,118 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		//新增子项
 		this.addDictItem(id,dictItemList);
 	}
+
+	private Map<String, List<org.jeecg.modules.system.vo.DictUseDetail>> javaEntityDictMap = null;
+
+	private synchronized Map<String, List<org.jeecg.modules.system.vo.DictUseDetail>> getJavaEntityDictMap() {
+		if (javaEntityDictMap != null) {
+			return javaEntityDictMap;
+		}
+		Map<String, List<org.jeecg.modules.system.vo.DictUseDetail>> map = new HashMap<>();
+		try {
+			org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider scanner = new org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider(false);
+			scanner.addIncludeFilter(new org.springframework.core.type.filter.AssignableTypeFilter(Object.class));
+			Set<org.springframework.beans.factory.config.BeanDefinition> components = scanner.findCandidateComponents("org.jeecg.modules");
+			for (org.springframework.beans.factory.config.BeanDefinition component : components) {
+				try {
+					Class<?> clazz = Class.forName(component.getBeanClassName());
+					String tableName = clazz.getSimpleName();
+					String tableTxt = clazz.getSimpleName();
+					io.swagger.annotations.ApiModel apiModel = clazz.getAnnotation(io.swagger.annotations.ApiModel.class);
+					if (apiModel != null && oConvertUtils.isNotEmpty(apiModel.value())) {
+						tableTxt = apiModel.value();
+					} else {
+						com.baomidou.mybatisplus.annotation.TableName tableNameAnn = clazz.getAnnotation(com.baomidou.mybatisplus.annotation.TableName.class);
+						if (tableNameAnn != null && oConvertUtils.isNotEmpty(tableNameAnn.value())) {
+							tableName = tableNameAnn.value();
+						}
+					}
+					java.lang.reflect.Field[] fields = clazz.getDeclaredFields();
+					for (java.lang.reflect.Field field : fields) {
+						org.jeecg.common.aspect.annotation.Dict dict = field.getAnnotation(org.jeecg.common.aspect.annotation.Dict.class);
+						if (dict != null && oConvertUtils.isNotEmpty(dict.dicCode())) {
+							org.jeecg.modules.system.vo.DictUseDetail detail = new org.jeecg.modules.system.vo.DictUseDetail();
+							detail.setType("系统实体");
+							detail.setTableName(tableName);
+							detail.setTableTxt(tableTxt);
+							detail.setFieldName(field.getName());
+							detail.setFieldTxt(field.getName());
+							io.swagger.annotations.ApiModelProperty prop = field.getAnnotation(io.swagger.annotations.ApiModelProperty.class);
+							if (prop != null && oConvertUtils.isNotEmpty(prop.value())) {
+								detail.setFieldTxt(prop.value());
+							}
+							String className = component.getBeanClassName();
+							String moduleRemark = "业务拓展实体模块";
+							io.swagger.annotations.Api apiAnn = clazz.getAnnotation(io.swagger.annotations.Api.class);
+							if (apiAnn != null && apiAnn.tags() != null && apiAnn.tags().length > 0 && oConvertUtils.isNotEmpty(apiAnn.tags()[0])) {
+								moduleRemark = apiAnn.tags()[0];
+							} else if (className.contains(".system.")) {
+								moduleRemark = "系统管理基础服务模块";
+							} else if (className.contains(".message.")) {
+								moduleRemark = "消息中心与通知调度模块";
+							} else if (className.contains(".quartz.")) {
+								moduleRemark = "定时任务与后台调度模块";
+							} else if (className.contains(".airag.")) {
+								moduleRemark = "AI Agent 智能体与知识库模块";
+							} else if (className.contains(".monitor.")) {
+								moduleRemark = "系统性能与日志监控模块";
+							} else if (className.contains(".demo.")) {
+								moduleRemark = "示例演示与测试模块";
+							} else if (className.contains(".modules.")) {
+								try {
+									String subPkg = className.substring(className.indexOf(".modules.") + 9);
+									String key = subPkg.split("\\.")[0];
+									if (oConvertUtils.isNotEmpty(key)) {
+										moduleRemark = key.toUpperCase() + " 业务扩展模块";
+									}
+								} catch (Exception ignored) {
+								}
+							}
+							detail.setModuleRemark(moduleRemark);
+							map.computeIfAbsent(dict.dicCode(), k -> new ArrayList<>()).add(detail);
+						}
+					}
+				} catch (Throwable ignored) {
+				}
+			}
+		} catch (Exception e) {
+			log.error("扫描@Dict注解引发的依赖查询异常", e);
+		}
+		javaEntityDictMap = map;
+		return javaEntityDictMap;
+	}
+
+	@Override
+	public List<org.jeecg.modules.system.vo.DictUseDetail> getDictUseDetails(String dictCode) {
+		List<org.jeecg.modules.system.vo.DictUseDetail> result = new ArrayList<>();
+		if (oConvertUtils.isEmpty(dictCode)) {
+			return result;
+		}
+		List<org.jeecg.modules.system.vo.DictUseDetail> entityList = getJavaEntityDictMap().get(dictCode);
+		if (entityList != null) {
+			result.addAll(entityList);
+		}
+		try {
+			List<org.jeecg.modules.system.vo.DictUseDetail> onlineFormList = baseMapper.getOnlineFormDictUseList(dictCode);
+			if (onlineFormList != null) {
+				result.addAll(onlineFormList);
+			}
+		} catch (Exception e) {
+			log.debug("未使用/找不到Online表单关联数据: {}", e.getMessage());
+		}
+		try {
+			List<org.jeecg.modules.system.vo.DictUseDetail> onlineReportList = baseMapper.getOnlineReportDictUseList(dictCode);
+			if (onlineReportList != null) {
+				result.addAll(onlineReportList);
+			}
+		} catch (Exception e) {
+			log.debug("未使用/找不到Online报表关联数据: {}", e.getMessage());
+		}
+		return result;
+	}
+
+	@Override
+	public int getDictUseCount(String dictCode) {
+		return getDictUseDetails(dictCode).size();
+	}
 }

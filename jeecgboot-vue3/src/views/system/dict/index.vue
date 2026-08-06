@@ -24,6 +24,13 @@
         </a-button>
       </a-dropdown>
     </template>
+    <!--已关联列-->
+    <template #useCount="{ record }">
+      <Tag v-if="record.useCount > 0" color="blue" class="use-count-tag" @click="handleOpenUseDetail(record)">
+        {{ record.useCount }} 个模块
+      </Tag>
+      <Tag v-else color="default">未关联</Tag>
+    </template>
     <!--操作栏-->
     <template #action="{ record }">
       <TableAction :actions="getTableAction(record)" />
@@ -35,17 +42,21 @@
   <DictItemList @register="registerDrawer" />
   <!--回收站弹窗-->
   <DictRecycleBinModal @register="registerModal1" @success="reload" />
+  <!--使用明细弹窗-->
+  <DictUseDetailModal @register="registerDetailModal" />
 </template>
 
 <script lang="ts" name="system-dict" setup>
   //ts语法
   import { ref, computed, unref } from 'vue';
+  import { Tag } from 'ant-design-vue';
   import { BasicTable, TableAction } from '/src/components/Table';
   import { useDrawer } from '/src/components/Drawer';
   import { useModal } from '/src/components/Modal';
   import DictItemList from './components/DictItemList.vue';
   import DictModal from './components/DictModal.vue';
   import DictRecycleBinModal from './components/DictRecycleBinModal.vue';
+  import DictUseDetailModal from './components/DictUseDetailModal.vue';
   import { useMessage } from '/src/hooks/web/useMessage';
   import { removeAuthCache, setAuthCache } from '/src/utils/auth';
   import { columns, searchFormSchema } from './dict.data';
@@ -56,8 +67,14 @@
   const { createMessage } = useMessage();
   //字典model
   const [registerModal, { openModal }] = useModal();
+  //字典使用明细modal
+  const [registerDetailModal, { openModal: openDetailModal }] = useModal();
   //字典配置drawer
   const [registerDrawer, { openDrawer }] = useDrawer();
+
+  function handleOpenUseDetail(record: Recordable) {
+    openDetailModal(true, record);
+  }
   import { useListPage } from '/@/hooks/system/useListPage';
 
   //回收站model
@@ -194,4 +211,12 @@
   }
 </script>
 
-<style scoped></style>
+<style scoped lang="less">
+  .use-count-tag {
+    cursor: pointer;
+    transition: all 0.3s;
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+</style>

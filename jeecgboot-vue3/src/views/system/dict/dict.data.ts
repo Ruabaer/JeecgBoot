@@ -16,6 +16,14 @@ export const columns: BasicColumn[] = [
     width: 240,
   },
   {
+    title: '已关联',
+    dataIndex: 'useCount',
+    width: 120,
+    align: 'center',
+    sorter: true,
+    slots: { customRender: 'useCount' },
+  },
+  {
     title: '描述',
     dataIndex: 'description',
     // width: 120

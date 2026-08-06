@@ -214,4 +214,14 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 	 * @return
 	 */
     int removeLogicDeleted(@Param("ids")List<String> ids);
+
+	/**
+	 * 查询Online动态表单关联字典使用明细
+	 */
+	List<org.jeecg.modules.system.vo.DictUseDetail> getOnlineFormDictUseList(@Param("dictCode") String dictCode);
+
+	/**
+	 * 查询Online报表关联字典使用明细
+	 */
+	List<org.jeecg.modules.system.vo.DictUseDetail> getOnlineReportDictUseList(@Param("dictCode") String dictCode);
 }

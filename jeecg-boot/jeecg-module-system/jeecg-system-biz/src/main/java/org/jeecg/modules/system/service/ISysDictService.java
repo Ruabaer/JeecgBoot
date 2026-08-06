@@ -300,4 +300,14 @@ public interface ISysDictService extends IService<SysDict> {
 	 * @param ids
 	 */
 	boolean removeLogicDeleted(List<String> ids);
+
+	/**
+	 * 获取指定字典被功能模块引用的使用明细列表
+	 */
+	List<org.jeecg.modules.system.vo.DictUseDetail> getDictUseDetails(String dictCode);
+
+	/**
+	 * 获取指定字典被功能模块引用的总数量
+	 */
+	int getDictUseCount(String dictCode);
 }

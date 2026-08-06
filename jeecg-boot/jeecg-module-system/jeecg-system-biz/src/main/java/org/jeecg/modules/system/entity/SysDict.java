@@ -87,4 +87,8 @@ public class SysDict implements Serializable {
     /** 关联的低代码应用ID */
     private java.lang.String lowAppId;
 
+    /** 已关联功能/模块数量 */
+    @com.baomidou.mybatisplus.annotation.TableField(exist = false)
+    private java.lang.Integer useCount;
+
 }
