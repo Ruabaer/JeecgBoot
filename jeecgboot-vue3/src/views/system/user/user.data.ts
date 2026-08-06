@@ -78,8 +78,14 @@ export const columns: BasicColumn[] = [
     customRender: ({ text, record }) => {
       const dictItems = getDictItemsByCode('user_status') || [];
       const matchItem = dictItems.find((item: any) => item.value == record.status || item.text === text);
-      const color = matchItem?.itemColor || matchItem?.color || (record.status == 2 || text === '冻结' ? 'red' : 'green');
-      return h(Tag, { color }, () => text);
+      let color = matchItem?.color || matchItem?.itemColor;
+      if (color) {
+        if (/^[0-9a-fA-F]{6}$/.test(color)) {
+          color = `#${color}`;
+        }
+        return h(Tag, { color }, () => text);
+      }
+      return text;
     },
   },
 ];

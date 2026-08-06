@@ -67,13 +67,13 @@ export function useTableScroll(
     const tableEl: Element = table.$el;
     if (!tableEl) return;
 
-    const tableBody = tableEl.querySelector('.ant-table-body') as HTMLElement;
+    bodyEl = tableEl.querySelector('.ant-table-body') as HTMLElement;
     const tbodyEl = tableEl.querySelector('.ant-table-tbody') as HTMLElement;
     if (!tbodyEl) return;
 
-    if (tableBody) {
-      const hasScrollBarY = tableBody.scrollHeight > tableBody.clientHeight + 1;
-      const hasScrollBarX = tableBody.scrollWidth > tableBody.clientWidth + 5;
+    if (bodyEl) {
+      const hasScrollBarY = bodyEl.scrollHeight > bodyEl.clientHeight + 1;
+      const hasScrollBarX = bodyEl.scrollWidth > bodyEl.clientWidth + 5;
 
       if (hasScrollBarY) {
         tableEl.classList.contains('hide-scrollbar-y') && tableEl.classList.remove('hide-scrollbar-y');
@@ -88,7 +88,7 @@ export function useTableScroll(
       }
     }
 
-    if (tableBody) tableBody.style.height = 'unset';
+    if (bodyEl) bodyEl.style.height = 'unset';
 
     if (!unref(getCanResize) || ( !tableData || tableData.length === 0)) return;
 
@@ -143,7 +143,7 @@ export function useTableScroll(
     height = (height > maxHeight! ? (maxHeight as number) : height) ?? height;
     setHeight(height);
 
-    bodyEl!.style.height = `${height}px`;
+    if (bodyEl) bodyEl.style.height = `${height}px`;
     // update-begin--author:liaozhiyang---date:20240609---for【issues/8374】分页始终显示在底部
     nextTick(() => {
       if (maxHeight === undefined) {
