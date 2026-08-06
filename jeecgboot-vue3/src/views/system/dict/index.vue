@@ -26,10 +26,13 @@
     </template>
     <!--已关联列-->
     <template #useCount="{ record }">
-      <Tag v-if="record.useCount > 0" color="blue" class="use-count-tag" @click="handleOpenUseDetail(record)">
-        {{ record.useCount }} 个模块
-      </Tag>
-      <Tag v-else color="default">未关联</Tag>
+      <div class="use-count-tag-wrapper">
+        <Tag v-if="record.isPreset === 1" color="purple">框架预置</Tag>
+        <Tag v-if="record.useCount && record.useCount > 0" color="blue" class="use-count-tag" @click="handleOpenUseDetail(record)">
+          {{ record.useCount }} 个模块
+        </Tag>
+        <Tag v-else color="default">未关联</Tag>
+      </div>
     </template>
     <!--操作栏-->
     <template #action="{ record }">
@@ -212,6 +215,17 @@
 </script>
 
 <style scoped lang="less">
+  .use-count-tag-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    :deep(.ant-tag) {
+      margin-right: 0;
+    }
+  }
+
   .use-count-tag {
     cursor: pointer;
     transition: all 0.3s;

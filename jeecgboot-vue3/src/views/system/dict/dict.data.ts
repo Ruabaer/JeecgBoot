@@ -18,7 +18,7 @@ export const columns: BasicColumn[] = [
   {
     title: '已关联',
     dataIndex: 'useCount',
-    width: 120,
+    width: 195,
     align: 'center',
     sorter: true,
     slots: { customRender: 'useCount' },
