@@ -91,4 +91,8 @@ public class SysDict implements Serializable {
     @com.baomidou.mybatisplus.annotation.TableField(exist = false)
     private java.lang.Integer useCount;
 
+    /** 是否系统/框架预置字典 (1:是, 0:否) */
+    @com.baomidou.mybatisplus.annotation.TableField(exist = false)
+    private java.lang.Integer isPreset;
+
 }

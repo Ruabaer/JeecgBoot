@@ -96,6 +96,7 @@ public class AiragKnowledgeDoc implements Serializable {
      * 类型
      */
     @Excel(name = "类型", width = 15, dicCode = "know_doc_type")
+    @org.jeecg.common.aspect.annotation.Dict(dicCode = "know_doc_type")
     @Schema(description = "类型")
     private String type;
 

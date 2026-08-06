@@ -112,6 +112,7 @@ public class SysDictController {
 			if (allDicts != null) {
 				for (SysDict dict : allDicts) {
 					dict.setUseCount(sysDictService.getDictUseCount(dict.getDictCode()));
+					dict.setIsPreset(sysDictService.isPresetDict(dict.getDictCode(), dict.getType()) ? 1 : 0);
 				}
 				if ("asc".equalsIgnoreCase(order) || "ascend".equalsIgnoreCase(order)) {
 					allDicts.sort(Comparator.comparingInt(d -> d.getUseCount() == null ? 0 : d.getUseCount()));
@@ -130,6 +131,7 @@ public class SysDictController {
 			if (pageList != null && pageList.getRecords() != null) {
 				for (SysDict dict : pageList.getRecords()) {
 					dict.setUseCount(sysDictService.getDictUseCount(dict.getDictCode()));
+					dict.setIsPreset(sysDictService.isPresetDict(dict.getDictCode(), dict.getType()) ? 1 : 0);
 				}
 			}
 		}

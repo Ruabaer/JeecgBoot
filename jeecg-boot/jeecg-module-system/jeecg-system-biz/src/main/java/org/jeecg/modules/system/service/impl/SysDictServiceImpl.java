@@ -939,8 +939,17 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 					}
 					java.lang.reflect.Field[] fields = clazz.getDeclaredFields();
 					for (java.lang.reflect.Field field : fields) {
+						String dictCodeVal = null;
 						org.jeecg.common.aspect.annotation.Dict dict = field.getAnnotation(org.jeecg.common.aspect.annotation.Dict.class);
 						if (dict != null && oConvertUtils.isNotEmpty(dict.dicCode())) {
+							dictCodeVal = dict.dicCode();
+						} else {
+							org.jeecgframework.poi.excel.annotation.Excel excel = field.getAnnotation(org.jeecgframework.poi.excel.annotation.Excel.class);
+							if (excel != null && oConvertUtils.isNotEmpty(excel.dicCode())) {
+								dictCodeVal = excel.dicCode();
+							}
+						}
+						if (oConvertUtils.isNotEmpty(dictCodeVal)) {
 							org.jeecg.modules.system.vo.DictUseDetail detail = new org.jeecg.modules.system.vo.DictUseDetail();
 							detail.setType("系统实体");
 							detail.setTableName(tableName);
@@ -979,7 +988,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 								}
 							}
 							detail.setModuleRemark(moduleRemark);
-							map.computeIfAbsent(dict.dicCode(), k -> new ArrayList<>()).add(detail);
+							map.computeIfAbsent(dictCodeVal, k -> new ArrayList<>()).add(detail);
 						}
 					}
 				} catch (Throwable ignored) {
@@ -1024,5 +1033,23 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	@Override
 	public int getDictUseCount(String dictCode) {
 		return getDictUseDetails(dictCode).size();
+	}
+
+	private static final Set<String> PRESET_DICT_CODES = new HashSet<>(Arrays.asList(
+		"cgform_table_type", "bpm_process_type", "online_graph_display_template", 
+		"online_graph_data_type", "online_graph_type", "rule_conditions", 
+		"del_flag", "valid_status", "ceshi_online", "global_perms_type", 
+		"perms_type", "status", "dict_item_status", "dict_type"
+	));
+
+	@Override
+	public boolean isPresetDict(String dictCode, Integer type) {
+		if (Integer.valueOf(1).equals(type)) {
+			return true;
+		}
+		if (oConvertUtils.isEmpty(dictCode)) {
+			return false;
+		}
+		return PRESET_DICT_CODES.contains(dictCode) || dictCode.startsWith("cgform_") || dictCode.startsWith("online_") || dictCode.startsWith("bpm_");
 	}
 }

@@ -310,4 +310,9 @@ public interface ISysDictService extends IService<SysDict> {
 	 * 获取指定字典被功能模块引用的总数量
 	 */
 	int getDictUseCount(String dictCode);
+
+	/**
+	 * 判断是否属于系统/框架预置字典
+	 */
+	boolean isPresetDict(String dictCode, Integer type);
 }
