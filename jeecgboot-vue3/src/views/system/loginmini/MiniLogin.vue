@@ -37,19 +37,19 @@
                       <div class="aui-inputClear">
                         <i class="icon icon-code"></i>
                         <a-form-item>
-                          <a-input class="fix-auto-fill" :placeholder="t('sys.login.userName')" v-model:value="formData.username" />
+                          <a-input class="fix-auto-fill" autocomplete="username" :placeholder="t('sys.login.userName')" v-model:value="formData.username" />
                         </a-form-item>
                       </div>
                       <div class="aui-inputClear">
                         <i class="icon icon-password"></i>
                         <a-form-item>
-                          <a-input class="fix-auto-fill" type="password" :placeholder="t('sys.login.password')" v-model:value="formData.password" />
+                          <a-input class="fix-auto-fill" type="password" autocomplete="current-password" :placeholder="t('sys.login.password')" v-model:value="formData.password" />
                         </a-form-item>
                       </div>
                       <div class="aui-inputClear">
                         <i class="icon icon-code"></i>
                         <a-form-item>
-                          <a-input class="fix-auto-fill" type="text" :placeholder="t('sys.login.inputCode')" v-model:value="formData.inputCode" />
+                          <a-input class="fix-auto-fill" type="text" autocomplete="one-time-code" :placeholder="t('sys.login.inputCode')" v-model:value="formData.inputCode" />
                         </a-form-item>
                         <div class="aui-code">
                           <img v-if="randCodeData.requestCodeSuccess" :src="randCodeData.randCodeImage" @click="handleChangeCheckCode" />
@@ -75,7 +75,7 @@
                         <a-input class="fix-auto-fill" :placeholder="t('sys.login.mobile')" v-model:value="phoneFormData.mobile" />
                       </div>
                       <div class="aui-inputClear">
-                        <a-input class="fix-auto-fill" :maxlength="6" :placeholder="t('sys.login.smsCode')" v-model:value="phoneFormData.smscode" />
+                        <a-input class="fix-auto-fill" :maxlength="6" autocomplete="one-time-code" :placeholder="t('sys.login.smsCode')" v-model:value="phoneFormData.smscode" />
                         <div v-if="showInterval" class="aui-code" @click="getLoginCode">
                           <a>{{ t('component.countdown.normalText') }}</a>
                         </div>
@@ -270,7 +270,7 @@
     }
     try {
       loginLoading.value = true;
-      const { userInfo } = await userStore.login(
+      const res = await userStore.login(
         toRaw({
           password: formData.password,
           username: formData.username,
@@ -279,7 +279,9 @@
           mode: 'none', //不要默认的错误提示
         })
       );
+      const userInfo = res?.userInfo;
       if (userInfo) {
+        window['initHeavyModules']?.();
         notification.success({
           message: t('sys.login.loginSuccessTitle'),
           description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.realname}`,
@@ -318,6 +320,7 @@
         mode: 'none', //不要默认的错误提示
       });
       if (userInfo) {
+        window['initHeavyModules']?.();
         notification.success({
           message: t('sys.login.loginSuccessTitle'),
           description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.realname}`,

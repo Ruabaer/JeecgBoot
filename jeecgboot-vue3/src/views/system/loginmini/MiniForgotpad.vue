@@ -35,12 +35,12 @@
                 <div class="aui-account aui-account-line aui-forgot">
                   <a-form-item>
                     <div class="aui-input-line">
-                      <a-input type="text" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
+                      <a-input type="text" autocomplete="tel" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
                     </div>
                   </a-form-item>
                   <div class="aui-input-line">
                     <a-form-item>
-                      <a-input type="text" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
+                      <a-input type="text" autocomplete="one-time-code" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
                     </a-form-item>
                     <div v-if="showInterval" class="aui-code-line" @click="getLoginCode">{{t('component.countdown.normalText')}}</div>
                     <div v-else class="aui-code-line">{{t('component.countdown.sendText',[unref(timeRuning)])}}</div>
@@ -53,12 +53,12 @@
                 <div class="aui-account aui-account-line aui-forgot">
                   <a-form-item>
                     <div class="aui-input-line">
-                      <a-input type="password" :placeholder="t('sys.login.passwordPlaceholder')" v-model:value="pwdFormData.password" />
+                      <a-input type="password" autocomplete="new-password" :placeholder="t('sys.login.passwordPlaceholder')" v-model:value="pwdFormData.password" />
                     </div>
                   </a-form-item>
                   <a-form-item>
                     <div class="aui-input-line">
-                      <a-input type="password" :placeholder="t('sys.login.confirmPassword')" v-model:value="pwdFormData.confirmPassword" />
+                      <a-input type="password" autocomplete="new-password" :placeholder="t('sys.login.confirmPassword')" v-model:value="pwdFormData.confirmPassword" />
                     </div>
                   </a-form-item>
                 </div>

@@ -16,15 +16,10 @@ import { setupGlobDirectives } from '/@/directives';
 import { setupI18n } from '/@/locales/setupI18n';
 import { setupElectron } from "@/electron";
 import { registerGlobComp } from '/@/components/registerGlobComp';
-import { registerThirdComp } from '/@/settings/registerThirdComp';
-import { registerSuper } from '/@/views/super/registerSuper';
 import { useSso } from '/@/hooks/web/useSso';
 import { checkIsQiankunMicro } from "/@/qiankun/micro";
 import { autoUseQiankunMicro } from "/@/qiankun/micro/qiankunMicro";
 import { useAppStoreWithOut } from "@/store/modules/app";
-
-// 注册online模块lib
-import { registerPackages } from '/@/utils/monorepo/registerPackages';
 
 // 程序入口
 async function main() {
@@ -63,45 +58,94 @@ async function bootstrap(props?: MainAppProps) {
   // 初始化内部系统配置
   initAppConfigStore();
 
-  // 注册外部模块路由(注册online模块lib)
-  registerPackages(app);
+  const isAuthPage = window.location.pathname.includes('/login') || window.location.hash.includes('/login');
 
-  // 注册全局组件
-  registerGlobComp(app);
+  // 动态导入后台重型模块 (Online / Super / ThirdComp)
+  const initHeavyModules = async () => {
+    if (window['__HEAVY_MODULES_LOADED__']) return;
+    window['__HEAVY_MODULES_LOADED__'] = true;
+    try {
+      const [{ registerPackages }, { registerSuper }, { registerThirdComp }] = await Promise.all([
+        import('/@/utils/monorepo/registerPackages'),
+        import('/@/views/super/registerSuper'),
+        import('/@/settings/registerThirdComp'),
+      ]);
+      registerPackages(app);
+      await registerSuper(app);
+      await registerThirdComp(app);
+      console.log('--- 后台重型模块按需加载完成 ---');
+    } catch (e) {
+      console.warn('后台重型模块按需加载异常:', e);
+    }
+  };
+  window['initHeavyModules'] = initHeavyModules;
 
-  //CAS单点登录
-  await useSso().ssoLogin();
+  if (!isAuthPage) {
+    // 非登录页：同步加载重型模块并完成挂载
+    await initHeavyModules();
 
-  // 注册super应用路由
-  await registerSuper(app);
-  
-  // 配置路由
-  setupRouter(app);
+    // 注册全局组件
+    registerGlobComp(app);
 
-  // 路由保护
-  setupRouterGuard(router);
+    //CAS单点登录
+    await useSso().ssoLogin();
 
-  // 注册全局指令
-  setupGlobDirectives(app);
+    // 配置路由
+    setupRouter(app);
 
-  // 配置全局错误处理
-  setupErrorHandle(app);
+    // 路由保护
+    setupRouterGuard(router);
 
-  // 注册第三方组件
-  await registerThirdComp(app);
+    // 注册全局指令
+    setupGlobDirectives(app);
 
-  // 配置electron
-  setupElectron(app)
+    // 配置全局错误处理
+    setupErrorHandle(app);
 
-  // 当路由准备好时再执行挂载( https://next.router.vuejs.org/api/#isready)
-  await router.isReady();
+    // 配置electron
+    setupElectron(app);
 
-  // 挂载应用
-  app.mount(getMountContainer(props), true);
+    // 当路由准备好时再执行挂载( https://next.router.vuejs.org/api/#isready)
+    await router.isReady();
 
-  console.log(" vue3 app 加载完成！")
+    // 挂载应用
+    app.mount(getMountContainer(props), true);
 
-  return app
+    console.log('%c Vue3 App %c 仪表盘与后台功能已就绪 ', 'color: #ffffff; background: #1890ff; padding: 2px 4px; border-radius: 3px 0 0 3px; font-weight: bold;', 'color: #1890ff; background: #e6f7ff; padding: 2px 4px; border-radius: 0 3px 3px 0; border: 1px solid #91d5ff;');
+
+    return app;
+  } else {
+    // 登录页极速启动模式：彻底免线强引重型模块，极速直连挂载登录页面
+    registerGlobComp(app);
+
+    //CAS单点登录
+    await useSso().ssoLogin();
+
+    // 配置路由
+    setupRouter(app);
+
+    // 路由保护
+    setupRouterGuard(router);
+
+    // 注册全局指令
+    setupGlobDirectives(app);
+
+    // 配置全局错误处理
+    setupErrorHandle(app);
+
+    // 配置electron
+    setupElectron(app);
+
+    // 当路由准备好时再执行挂载( https://next.router.vuejs.org/api/#isready)
+    await router.isReady();
+
+    // 挂载应用
+    app.mount(getMountContainer(props), true);
+
+    console.log('%c Vue3 App %c 登录页极速版就绪 ', 'color: #ffffff; background: #52c41a; padding: 2px 4px; border-radius: 3px 0 0 3px; font-weight: bold;', 'color: #52c41a; background: #f6ffed; padding: 2px 4px; border-radius: 0 3px 3px 0; border: 1px solid #b7eb8f;');
+
+    return app;
+  }
 }
 
 // 获取应用挂载容器

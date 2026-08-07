@@ -2,17 +2,17 @@
   <LoginFormTitle v-show="getShow" class="enter-x" />
   <Form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef" v-show="getShow" @keypress.enter="handleLogin">
     <FormItem name="account" class="enter-x">
-      <Input size="large" v-model:value="formData.account" :placeholder="t('sys.login.userName')" class="fix-auto-fill" />
+      <Input size="large" autocomplete="username" v-model:value="formData.account" :placeholder="t('sys.login.userName')" class="fix-auto-fill" />
     </FormItem>
     <FormItem name="password" class="enter-x">
-      <InputPassword size="large" visibilityToggle v-model:value="formData.password" :placeholder="t('sys.login.password')" />
+      <InputPassword size="large" visibilityToggle autocomplete="current-password" v-model:value="formData.password" :placeholder="t('sys.login.password')" />
     </FormItem>
 
     <!--验证码-->
     <ARow class="enter-x">
       <ACol :span="12">
         <FormItem name="inputCode" class="enter-x">
-          <Input size="large" v-model:value="formData.inputCode" :placeholder="t('sys.login.inputCode')" style="min-width: 100px" />
+          <Input size="large" autocomplete="one-time-code" v-model:value="formData.inputCode" :placeholder="t('sys.login.inputCode')" style="min-width: 100px" />
         </FormItem>
       </ACol>
       <ACol :span="8">
@@ -109,7 +109,7 @@
     scriptUrl: '//at.alicdn.com/t/font_2316098_umqusozousr.js',
   });
   const { t } = useI18n();
-  const { notification, createErrorModal } = useMessage();
+  const { notification } = useMessage();
   const { prefixCls } = useDesign('login');
   const userStore = useUserStore();
 
@@ -126,7 +126,11 @@
     password: '123456',
     inputCode: '',
   });
-  const randCodeData = reactive({
+  const randCodeData = reactive<{
+    randCodeImage: string;
+    requestCodeSuccess: boolean;
+    checkKey: string | null;
+  }>({
     randCodeImage: '',
     requestCodeSuccess: false,
     checkKey: null,
@@ -143,7 +147,7 @@
     if (!data) return;
     try {
       loading.value = true;
-      const { userInfo } = await userStore.login(
+      const res = await userStore.login(
         toRaw({
           password: data.password,
           username: data.account,
@@ -152,17 +156,19 @@
           mode: 'none', //不要默认的错误提示
         })
       );
+      const userInfo = res?.userInfo;
       if (userInfo) {
+        window['initHeavyModules']?.();
         notification.success({
           message: t('sys.login.loginSuccessTitle'),
           description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.realname}`,
           duration: 3,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
         message: t('sys.api.errorTip'),
-        description: error.message || t('sys.api.networkExceptionMsg'),
+        description: error?.message || t('sys.api.networkExceptionMsg'),
         duration: 3,
       });
       loading.value = false;

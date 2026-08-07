@@ -1,8 +1,7 @@
 import type { App } from 'vue';
 import { Icon } from './Icon';
 import AIcon from '/@/components/jeecg/AIcon.vue';
-//Tinymce富文本
- import Editor from '/@/components/Tinymce/src/Editor.vue'
+import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
 
 import { Button, JUploadButton } from './Button';
 
@@ -67,16 +66,15 @@ export function registerGlobComp(app: App) {
     app.component(comp.name || comp.displayName, comp);
   });
   
-  //仪表盘依赖Tinymce，需要提前加载（没办法按需加载了）
-  app.component(Editor.name, Editor);
-  // update-begin--author:liaozhiyang---date:20240308---for：【QQYUN-8241】Tinymce异步加载
-  // app.component(
-  //   'Tinymce',
-  //   createAsyncComponent(() => import('./Tinymce/src/Editor.vue'), {
-  //     loading: true,
-  //   })
-  // );
-  // update-end--author:liaozhiyang---date:20240308---for：【QQYUN-8241】Tinymce异步加载
+  // Tinymce 富文本异步组件加载
+  app.component(
+    'Tinymce',
+    createAsyncComponent(() => import('./Tinymce/src/Editor.vue'), { loading: true })
+  );
+  app.component(
+    'Editor',
+    createAsyncComponent(() => import('./Tinymce/src/Editor.vue'), { loading: true })
+  );
   app.use(Select)
     .use(Alert)
     .use(Button)
@@ -126,5 +124,5 @@ export function registerGlobComp(app: App) {
     .use(Cascader)
     .use(Rate)
     .use(Progress);
-    console.log("---初始化---， 全局注册Antd、仪表盘、流程设计器、online、流程等组件--------------")
+    console.log('%c 全局组件 %c AntDesignVue 基础控件注册完成 ', 'color: #ffffff; background: #fa8c16; padding: 2px 4px; border-radius: 3px 0 0 3px; font-weight: bold;', 'color: #fa8c16; background: #fff7e6; padding: 2px 4px; border-radius: 0 3px 3px 0; border: 1px solid #ffd591;');
 }

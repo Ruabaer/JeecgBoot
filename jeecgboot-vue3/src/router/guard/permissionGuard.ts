@@ -194,6 +194,7 @@ export function createPermissionGuard(router: Router) {
       userStore.setAllDictItemsByLocal();
     }
     // update-end--author:liaozhiyang---date:20240321---for：【QQYUN-8572】表格行选择卡顿问题（customRender中字典引起的）
+    window['initHeavyModules']?.();
     if (permissionStore.getIsDynamicAddedRoute) {
       next();
       return;

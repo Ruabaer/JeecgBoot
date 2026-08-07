@@ -18,19 +18,19 @@
                   <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:user-outlined"/>
-                      <a-input class="fix-auto-fill" type="text" :placeholder="t('sys.login.userName')" v-model:value="formData.username" />
+                      <a-input class="fix-auto-fill" type="text" autocomplete="username" :placeholder="t('sys.login.userName')" v-model:value="formData.username" />
                     </div>
                   </a-form-item>
                   <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:mobile-outlined"/>
-                      <a-input class="fix-auto-fill" type="text" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
+                      <a-input class="fix-auto-fill" type="text" autocomplete="tel" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
                     </div>
                   </a-form-item>
                   <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:mail-outlined"/>
-                      <a-input class="fix-auto-fill" type="text" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
+                      <a-input class="fix-auto-fill" type="text" autocomplete="one-time-code" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
                       <div v-if="showInterval" class="aui-code-line" @click="getLoginCode">{{t('component.countdown.normalText')}}</div>
                       <div v-else class="aui-code-line">{{t('component.countdown.sendText',[unref(timeRuning)])}}</div>
                     </div>
@@ -38,7 +38,7 @@
                   <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:lock-outlined"/>
-                      <a-input class="fix-auto-fill" :type="pwdIndex==='close'?'password':'text'" :placeholder="t('sys.login.password')" v-model:value="formData.password" />
+                      <a-input class="fix-auto-fill" :type="pwdIndex==='close'?'password':'text'" autocomplete="new-password" :placeholder="t('sys.login.password')" v-model:value="formData.password" />
                       <div class="aui-eye">
                         <img :src="eyeKImg" alt="开启" v-if="pwdIndex==='open'"  @click="pwdClick('close')" />
                         <img :src="eyeGImg" alt="关闭"  v-else-if="pwdIndex==='close'"  @click="pwdClick('open')" />
@@ -48,7 +48,7 @@
                   <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:lock-outlined"/>
-                      <a-input class="fix-auto-fill" :type="confirmPwdIndex==='close'?'password':'text'" :placeholder="t('sys.login.confirmPassword')" v-model:value="formData.confirmPassword" />
+                      <a-input class="fix-auto-fill" :type="confirmPwdIndex==='close'?'password':'text'" autocomplete="new-password" :placeholder="t('sys.login.confirmPassword')" v-model:value="formData.confirmPassword" />
                       <div class="aui-eye">
                         <img :src="eyeKImg" alt="开启" v-if="confirmPwdIndex==='open'" @click="confirmPwdClick('close')" />
                         <img :src="eyeGImg" alt="关闭" v-else-if="confirmPwdIndex==='close'" @click="confirmPwdClick('open')" />
