@@ -46,10 +46,12 @@
 		<commonmark.version>0.17.0</commonmark.version>
 		<knife4j-spring-boot-starter.version>4.4.0</knife4j-spring-boot-starter.version>
 		<!-- 数据库驱动 -->
-		<postgresql.version>42.2.25</postgresql.version>
+		<!-- postgresql (升级至42.7.3以修复CVE-2024-1597 SQL注入漏洞) -->
+		<postgresql.version>42.7.3</postgresql.version>
 		<ojdbc6.version>11.2.0.3</ojdbc6.version>
 		<sqljdbc4.version>12.6.1.jre8</sqljdbc4.version>
-		<mysql-connector-java.version>8.0.27</mysql-connector-java.version>
+		<!-- mysql-connector (升级至8.0.33以修复CVE-2023-21971反序列化缺陷) -->
+		<mysql-connector-java.version>8.0.33</mysql-connector-java.version>
 		<hutool.version>5.8.25</hutool.version>
 		<!-- 国产数据库驱动 -->
 		<kingbase8.version>9.0.0</kingbase8.version>
@@ -70,7 +72,7 @@
 		<dynamic-datasource-spring-boot-starter.version>4.1.3</dynamic-datasource-spring-boot-starter.version>
 		<druid.version>1.2.24</druid.version>
 
-		<commons-io.version>2.11.0</commons-io.version>
+		<commons-io.version>2.16.1</commons-io.version>
 		<commons-fileupload.version>1.5</commons-fileupload.version>
 		<commons.version>2.6</commons.version>
 		<aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
@@ -80,14 +82,17 @@
 		<shiro-redis.version>3.2.3</shiro-redis.version>
 		<java-jwt.version>4.5.0</java-jwt.version>
 		<codegenerate.version>1.5.1</codegenerate.version>
-		<minio.version>8.0.3</minio.version>
+		<minio.version>8.5.14</minio.version>
 		<justauth-spring-boot-starter.version>1.4.0</justauth-spring-boot-starter.version>
-		<dom4j.version>1.6.1</dom4j.version>
+		<!-- dom4j (升级至2.1.4以修复CVE-2020-10683和CVE-2023-45960漏洞) -->
+		<dom4j.version>2.1.4</dom4j.version>
 		<qiniu-java-sdk.version>7.4.0</qiniu-java-sdk.version>
 		<baidu-java-sdk.version>4.16.19</baidu-java-sdk.version>
-		<!-- Log4j2爆雷漏洞 -->
-		<log4j2.version>2.17.0</log4j2.version>
+		<!-- Log4j2爆雷漏洞 (升级至2.23.1安全版本) -->
+		<log4j2.version>2.23.1</log4j2.version>
 		<logback.version>1.2.13</logback.version>
+		<!-- protobuf (支持Calcite/Avatica/JimuReport) -->
+		<protobuf.version>3.25.3</protobuf.version>
 	</properties>
 
 	<modules>
@@ -344,10 +349,11 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+			<!-- okhttp3 (升级至4.12.0以修复CVE-2023-3635 Denial of Service漏洞) -->
 			<dependency>
 				<groupId>com.squareup.okhttp3</groupId>
 				<artifactId>okhttp</artifactId>
-				<version>4.4.1</version>
+				<version>4.12.0</version>
 			</dependency>
 			<!-- hutool工具类-->
 			<dependency>
@@ -375,6 +381,12 @@
 						<groupId>com.squareup.okhttp3</groupId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<!-- protobuf (提供给 Calcite / Avatica / JimuReport 使用) -->
+			<dependency>
+				<groupId>com.google.protobuf</groupId>
+				<artifactId>protobuf-java</artifactId>
+				<version>${protobuf.version}</version>
 			</dependency>
 			<!-- 企业微信和钉钉 api -->
 			<dependency>
