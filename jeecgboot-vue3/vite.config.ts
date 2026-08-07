@@ -140,6 +140,21 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       esbuildOptions: {
         target: 'es2020',
       },
+      include: [
+        'codemirror',
+        'codemirror/mode/javascript/javascript',
+        'codemirror/mode/css/css',
+        'codemirror/mode/xml/xml',
+        'codemirror/mode/sql/sql',
+        'tinymce/tinymce',
+        '@tinymce/tinymce-vue',
+        'sortablejs',
+        'cron-parser',
+        'echarts/core',
+        'echarts/charts',
+        'echarts/components',
+        'echarts/renderers',
+      ],
       exclude: [
         //升级vite4后，需要排除online依赖
         '@jeecg/online',

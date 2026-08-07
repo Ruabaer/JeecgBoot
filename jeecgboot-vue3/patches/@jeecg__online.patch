@@ -395,3 +395,30 @@ index 7c899f746d20569e83521c79e51a9847374950ae..572e5d753c5a5cbe0dfc7a79ecffcce7
    setTimeout(() => {
      q.value = !1;
    }, 4e3);
+diff --git a/BuiltInButtonList.vue_vue_type_script_setup_true_lang-07d0b7d0.mjs b/BuiltInButtonList.vue_vue_type_script_setup_true_lang-07d0b7d0.mjs
+index 1000000..2000000 100644
+--- a/BuiltInButtonList.vue_vue_type_script_setup_true_lang-07d0b7d0.mjs
++++ b/BuiltInButtonList.vue_vue_type_script_setup_true_lang-07d0b7d0.mjs
+@@ -199,7 +199,8 @@ const _e = { style: { "margin-top": "20px" } }, he = /* @__PURE__ */ K({
+   props: {
+     record: {
+       type: Object,
+-      required: !0
++      required: !1,
++      default: () => ({})
+     }
+   },
+   emits: ["register"],
+diff --git a/CustomButtonList-26490688.mjs b/CustomButtonList-26490688.mjs
+index 1000000..2000000 100644
+--- a/CustomButtonList-26490688.mjs
++++ b/CustomButtonList-26490688.mjs
+@@ -264,7 +264,7 @@ function Fe(o, e, t, C, g, M) {
+     }, 8, ["onRegister", "onCancel"]),
+     s(m, {
+       onRegister: o.registerBIButtonModal,
+-      record: o.record
++      record: o.record || {}
+     }, null, 8, ["onRegister", "record"])
+   ], 64);
+ }
