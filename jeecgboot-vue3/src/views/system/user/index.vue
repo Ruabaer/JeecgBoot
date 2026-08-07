@@ -32,6 +32,22 @@
           </a-button>
         </a-dropdown>
       </template>
+      <!--角色列-->
+      <template #roleText="{ text }">
+        <div class="role-tag-wrapper" v-if="text">
+          <Tag v-for="(roleName, index) in text.split(',')" :key="roleName" :color="tagColors[index % tagColors.length]">
+            {{ roleName.trim() }}
+          </Tag>
+        </div>
+        <span v-else>-</span>
+      </template>
+      <!--状态列-->
+      <template #status_dictText="{ text, record }">
+        <Tag v-if="getStatusColor(record.status, text)" :color="getStatusColor(record.status, text)">
+          {{ text }}
+        </Tag>
+        <span v-else>{{ text }}</span>
+      </template>
       <!--操作栏-->
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
@@ -51,6 +67,7 @@
 <script lang="ts" name="system-user" setup>
   //ts语法
   import { ref, computed, unref } from 'vue';
+  import { Tag } from 'ant-design-vue';
   import { BasicTable, TableAction, ActionItem } from '/@/components/Table';
   import UserDrawer from './UserDrawer.vue';
   import UserRecycleBinModal from './UserRecycleBinModal.vue';
@@ -65,8 +82,19 @@
   import { listNoCareTenant, deleteUser, batchDeleteUser, getImportUrl, getExportUrl, frozenBatch } from './user.api';
   import { usePermission } from '/@/hooks/web/usePermission';
   import ImportExcelProgress from './components/ImportExcelProgress.vue';
-  import { initDictOptions } from '/@/utils/dict';
+  import { initDictOptions, getDictItemsByCode } from '/@/utils/dict';
 
+  const tagColors = ['blue', 'cyan', 'purple', 'green', 'orange', 'magenta', 'geekblue'];
+
+  function getStatusColor(statusValue: any, text: string) {
+    const dictItems = getDictItemsByCode('user_status') || [];
+    const matchItem = dictItems.find((item: any) => item.value == statusValue || item.text === text);
+    let color = matchItem?.color || matchItem?.itemColor;
+    if (color && /^[0-9a-fA-F]{6}$/.test(color)) {
+      color = `#${color}`;
+    }
+    return color;
+  }
   const { createMessage, createConfirm } = useMessage();
   const { isDisabledAuth } = usePermission();
   //注册drawer
@@ -302,4 +330,16 @@
 
 </script>
 
-<style scoped></style>
+<style scoped lang="less">
+  .role-tag-wrapper {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+
+    .ant-tag {
+      margin-right: 0 !important;
+      margin-bottom: 0 !important;
+    }
+  }
+</style>

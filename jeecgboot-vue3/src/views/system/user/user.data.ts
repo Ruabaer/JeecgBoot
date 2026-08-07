@@ -1,5 +1,3 @@
-import { h } from 'vue';
-import { Tag } from 'ant-design-vue';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 import { getAllRolesListNoByTenant, getAllTenantList } from './user.api';
@@ -59,6 +57,13 @@ export const columns: BasicColumn[] = [
     resizable: true,
   },
   {
+    title: '角色',
+    width: 200,
+    dataIndex: 'roleText',
+    resizable: true,
+    slots: { customRender: 'roleText' },
+  },
+  {
     title: '负责部门',
     width: 195,
     dataIndex: 'departIds_dictText',
@@ -75,18 +80,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'status_dictText',
     width: 100,
     resizable: true,
-    customRender: ({ text, record }) => {
-      const dictItems = getDictItemsByCode('user_status') || [];
-      const matchItem = dictItems.find((item: any) => item.value == record.status || item.text === text);
-      let color = matchItem?.color || matchItem?.itemColor;
-      if (color) {
-        if (/^[0-9a-fA-F]{6}$/.test(color)) {
-          color = `#${color}`;
-        }
-        return h(Tag, { color }, () => text);
-      }
-      return text;
-    },
+    slots: { customRender: 'status_dictText' },
   },
 ];
 

@@ -202,6 +202,12 @@ public class SysUser implements Serializable {
     private String postText;
 
     /**
+     * 角色名称(多个逗号分隔)
+     */
+    @TableField(exist = false)
+    private String roleText;
+
+    /**
      * 流程状态
      */
     private String bpmStatus;

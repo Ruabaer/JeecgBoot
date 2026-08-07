@@ -186,14 +186,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		Page<SysUser> page = new Page<SysUser>(pageNo, pageSize);
 		IPage<SysUser> pageList = this.page(page, queryWrapper);
 
-		//批量查询用户的所属部门
+		//批量查询用户的所属部门与角色
 		//step.1 先拿到全部的 useids
-		//step.2 通过 useids，一次性查询用户的所属部门名字
+		//step.2 通过 useids，一次性查询用户的所属部门名字与角色名称
 		List<String> userIds = pageList.getRecords().stream().map(SysUser::getId).collect(Collectors.toList());
 		if (userIds != null && userIds.size() > 0) {
 			Map<String, String> useDepNames = this.getDepNamesByUserIds(userIds);
+			List<org.jeecg.modules.system.vo.SysUserPositionVo> userRoles = sysRoleMapper.getUserRoleByUserId(pageList.getRecords());
+			Map<String, String> userRoleMap = new HashMap<>();
+			if (cn.hutool.core.collection.CollectionUtil.isNotEmpty(userRoles)) {
+				userRoleMap = userRoles.stream()
+						.filter(r -> oConvertUtils.isNotEmpty(r.getUserId()) && oConvertUtils.isNotEmpty(r.getName()))
+						.collect(Collectors.groupingBy(
+								org.jeecg.modules.system.vo.SysUserPositionVo::getUserId,
+								Collectors.mapping(org.jeecg.modules.system.vo.SysUserPositionVo::getName, Collectors.joining(SymbolConstant.COMMA))
+						));
+			}
+			Map<String, String> finalUserRoleMap = userRoleMap;
 			pageList.getRecords().forEach(item -> {
 				item.setOrgCodeTxt(useDepNames.get(item.getId()));
+				item.setRoleText(finalUserRoleMap.get(item.getId()));
 				//查询用户的租户ids
 				List<Integer> list = userTenantMapper.getTenantIdsByUserId(item.getId());
 				if (oConvertUtils.isNotEmpty(list)) {
