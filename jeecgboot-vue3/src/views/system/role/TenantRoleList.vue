@@ -1,5 +1,5 @@
 <template>
-  <BasicTable @register="registerTable">
+  <BasicTable @register="registerTable" :rowSelection="rowSelection">
     <template #tableTitle>
       <a-button type="primary" preIcon="ant-design:plus-outlined" @click="handleCreate"> 新增</a-button>
       <a-dropdown v-if="selectedRowKeys.length > 0">
@@ -56,13 +56,16 @@
       title: '租户角色列表',
       api: listByTenant,
       columns: columns,
+      size: 'small',
+      canResize: true,
+      scroll: { x: 'max-content' },
       formConfig: {
         schemas: searchFormSchema,
       },
       actionColumn: {
-        width: 120,
+        width: 150,
       },
-      rowSelection: null,
+      rowSelection: { type: 'checkbox' },
       //自定义默认排序
       defSort: {
         column: 'id',

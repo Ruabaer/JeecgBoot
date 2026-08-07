@@ -37,48 +37,25 @@ import { StrengthMeter } from '/@/components/StrengthMeter';
 import { IconPicker } from '/@/components/Icon';
 import { CountdownInput } from '/@/components/CountDown';
 //自定义组件
-// import JAreaLinkage from './jeecg/components/JAreaLinkage.vue';
-import JSelectUser from './jeecg/components/JSelectUser.vue';
-import JSelectPosition from './jeecg/components/JSelectPosition.vue';
-import JSelectRole from './jeecg/components/JSelectRole.vue';
-import JImageUpload from './jeecg/components/JImageUpload.vue';
 import JDictSelectTag from './jeecg/components/JDictSelectTag.vue';
-import JSelectDept from './jeecg/components/JSelectDept.vue';
-import JSelectDepartPost from './jeecg/components/JSelectDepartPost.vue';
 import JAreaSelect from './jeecg/components/JAreaSelect.vue';
-import JEditor from './jeecg/components/JEditor.vue';
-// import JMarkdownEditor from './jeecg/components/JMarkdownEditor.vue';
 import JSelectInput from './jeecg/components/JSelectInput.vue';
-// import JCodeEditor from './jeecg/components/JCodeEditor.vue';
 import JCategorySelect from './jeecg/components/JCategorySelect.vue';
 import JSelectMultiple from './jeecg/components/JSelectMultiple.vue';
-import JPopup from './jeecg/components/JPopup.vue';
-// update-begin--author:liaozhiyang---date:20240130---for：【QQYUN-7961】popupDict字典
-import JPopupDict from './jeecg/components/JPopupDict.vue';
-// update-end--author:liaozhiyang---date:20240130---for：【QQYUN-7961】popupDict字典
 import JSwitch from './jeecg/components/JSwitch.vue';
 import JTreeDict from './jeecg/components/JTreeDict.vue';
 import JInputPop from './jeecg/components/JInputPop.vue';
-// import { JEasyCron } from './jeecg/components/JEasyCron';
 import JCheckbox from './jeecg/components/JCheckbox.vue';
 import JInput from './jeecg/components/JInput.vue';
 import JTreeSelect from './jeecg/components/JTreeSelect.vue';
 import JEllipsis from './jeecg/components/JEllipsis.vue';
-import JSelectUserByDept from './jeecg/components/JSelectUserByDept.vue';
-import JSelectUserByDepartment from './jeecg/components/JSelectUserByDepartment.vue';
-import JLinkTableCard from './jeecg/components/JLinkTableCard/JLinkTableCard.vue';
-
-import JUpload from './jeecg/components/JUpload/JUpload.vue';
 import JSearchSelect from './jeecg/components/JSearchSelect.vue';
 import JAddInput from './jeecg/components/JAddInput.vue';
 import { Time } from '/@/components/Time';
 import JRangeNumber from './jeecg/components/JRangeNumber.vue';
-import UserSelect from './jeecg/components/userSelect/index.vue';
-import JRangeDate from './jeecg/components/JRangeDate.vue'
-import JRangeTime from './jeecg/components/JRangeTime.vue'
-import JInputSelect from './jeecg/components/JInputSelect.vue'
-import RoleSelectInput from './jeecg/components/roleSelect/RoleSelectInput.vue';
-import JSelectUserByDeptPost from './jeecg/components/JSelectUserByDeptPost.vue';
+import JRangeDate from './jeecg/components/JRangeDate.vue';
+import JRangeTime from './jeecg/components/JRangeTime.vue';
+import JInputSelect from './jeecg/components/JInputSelect.vue';
 import {DatePickerInFilter, CascaderPcaInFilter} from "@/components/InFilter";
 
 const componentMap = new Map<ComponentType, Component>();
@@ -125,19 +102,36 @@ componentMap.set(
   'JAreaLinkage',
   createAsyncComponent(() => import('./jeecg/components/JAreaLinkage.vue'))
 );
-componentMap.set('JSelectPosition', JSelectPosition);
-componentMap.set('JSelectUser', JSelectUser);
-componentMap.set('JSelectRole', JSelectRole);
-componentMap.set('JImageUpload', JImageUpload);
+componentMap.set(
+  'JSelectPosition',
+  createAsyncComponent(() => import('./jeecg/components/JSelectPosition.vue'))
+);
+componentMap.set(
+  'JSelectUser',
+  createAsyncComponent(() => import('./jeecg/components/JSelectUser.vue'))
+);
+componentMap.set(
+  'JSelectRole',
+  createAsyncComponent(() => import('./jeecg/components/JSelectRole.vue'))
+);
+componentMap.set(
+  'JImageUpload',
+  createAsyncComponent(() => import('./jeecg/components/JImageUpload.vue'))
+);
 componentMap.set('JDictSelectTag', JDictSelectTag);
-componentMap.set('JSelectDept', JSelectDept);
+componentMap.set(
+  'JSelectDept',
+  createAsyncComponent(() => import('./jeecg/components/JSelectDept.vue'))
+);
 componentMap.set('JAreaSelect', JAreaSelect);
-componentMap.set('JLinkTableCard', JLinkTableCard);
-// componentMap.set(
-//   'JEditor',
-//   createAsyncComponent(() => import('./jeecg/components/JEditor.vue'))
-// );
-componentMap.set('JEditor', JEditor);
+componentMap.set(
+  'JLinkTableCard',
+  createAsyncComponent(() => import('./jeecg/components/JLinkTableCard/JLinkTableCard.vue'))
+);
+componentMap.set(
+  'JEditor',
+  createAsyncComponent(() => import('./jeecg/components/JEditor.vue'))
+);
 componentMap.set(
   'JMarkdownEditor',
   createAsyncComponent(() => import('./jeecg/components/JMarkdownEditor.vue'))
@@ -149,10 +143,14 @@ componentMap.set(
 );
 componentMap.set('JCategorySelect', JCategorySelect);
 componentMap.set('JSelectMultiple', JSelectMultiple);
-componentMap.set('JPopup', JPopup);
-// update-begin--author:liaozhiyang---date:20240130---for：【QQYUN-7961】popupDict字典
-componentMap.set('JPopupDict', JPopupDict);
-// update-end--author:liaozhiyang---date:20240130---for：【QQYUN-7961】popupDict字典
+componentMap.set(
+  'JPopup',
+  createAsyncComponent(() => import('./jeecg/components/JPopup.vue'))
+);
+componentMap.set(
+  'JPopupDict',
+  createAsyncComponent(() => import('./jeecg/components/JPopupDict.vue'))
+);
 componentMap.set('JSwitch', JSwitch);
 componentMap.set('JTreeDict', JTreeDict);
 componentMap.set('JInputPop', JInputPop);
@@ -164,20 +162,41 @@ componentMap.set('JCheckbox', JCheckbox);
 componentMap.set('JInput', JInput);
 componentMap.set('JTreeSelect', JTreeSelect);
 componentMap.set('JEllipsis', JEllipsis);
-componentMap.set('JSelectUserByDept', JSelectUserByDept);
-componentMap.set('JSelectUserByDepartment', JSelectUserByDepartment);
-componentMap.set('JUpload', JUpload);
+componentMap.set(
+  'JSelectUserByDept',
+  createAsyncComponent(() => import('./jeecg/components/JSelectUserByDept.vue'))
+);
+componentMap.set(
+  'JSelectUserByDepartment',
+  createAsyncComponent(() => import('./jeecg/components/JSelectUserByDepartment.vue'))
+);
+componentMap.set(
+  'JUpload',
+  createAsyncComponent(() => import('./jeecg/components/JUpload/JUpload.vue'))
+);
 componentMap.set('JSearchSelect', JSearchSelect);
 componentMap.set('JAddInput', JAddInput);
 componentMap.set('JRangeNumber', JRangeNumber);
 componentMap.set('CascaderPcaInFilter', CascaderPcaInFilter);
-componentMap.set('UserSelect', UserSelect);
+componentMap.set(
+  'UserSelect',
+  createAsyncComponent(() => import('./jeecg/components/userSelect/index.vue'))
+);
 componentMap.set('RangeDate', JRangeDate);
 componentMap.set('RangeTime', JRangeTime);
-componentMap.set('RoleSelect', RoleSelectInput);
+componentMap.set(
+  'RoleSelect',
+  createAsyncComponent(() => import('./jeecg/components/roleSelect/RoleSelectInput.vue'))
+);
 componentMap.set('JInputSelect', JInputSelect);
-componentMap.set('JSelectDepartPost', JSelectDepartPost);
-componentMap.set('JSelectUserByDeptPost', JSelectUserByDeptPost);
+componentMap.set(
+  'JSelectDepartPost',
+  createAsyncComponent(() => import('./jeecg/components/JSelectDepartPost.vue'))
+);
+componentMap.set(
+  'JSelectUserByDeptPost',
+  createAsyncComponent(() => import('./jeecg/components/JSelectUserByDeptPost.vue'))
+);
 
 
 

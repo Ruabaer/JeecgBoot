@@ -1,5 +1,5 @@
 <template>
-  <BasicTable @register="registerTable">
+  <BasicTable @register="registerTable" :rowSelection="rowSelection">
     <template #tableTitle>
       <a-button type="primary" preIcon="ant-design:plus-outlined" @click="handleCreate"> 新增</a-button>
       <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
@@ -61,17 +61,20 @@
       title: '系统角色列表',
       api: list,
       columns: columns,
+      size: 'small',
+      canResize: true,
+      scroll: { x: 'max-content' },
       formConfig: {
         // update-begin--author:liaozhiyang---date:20230803---for：【QQYUN-5873】查询区域lablel默认居左
-        labelWidth:65,
+        labelWidth: 65,
         rowProps: { gutter: 24 },
         // update-end--author:liaozhiyang---date:20230803---for：【QQYUN-5873】查询区域lablel默认居左
         schemas: searchFormSchema,
       },
       actionColumn: {
-        width: 120,
+        width: 150,
       },
-      rowSelection: null,
+      rowSelection: { type: 'checkbox' },
       //自定义默认排序
       defSort: {
         column: 'id',

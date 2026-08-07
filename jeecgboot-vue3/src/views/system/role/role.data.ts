@@ -4,17 +4,20 @@ export const columns = [
   {
     title: '角色名称',
     dataIndex: 'roleName',
-    width: 100,
+    width: 180,
+    resizable: true,
   },
   {
     title: '角色编码',
     dataIndex: 'roleCode',
-    width: 100,
+    width: 180,
+    resizable: true,
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
-    width: 100,
+    width: 180,
+    resizable: true,
   },
 ];
 /**
@@ -24,15 +27,20 @@ export const userColumns = [
   {
     title: '用户账号',
     dataIndex: 'username',
+    width: 160,
+    resizable: true,
   },
   {
     title: '用户姓名',
     dataIndex: 'realname',
+    width: 160,
+    resizable: true,
   },
   {
     title: '状态',
     dataIndex: 'status_dictText',
-    width: 80,
+    width: 100,
+    resizable: true,
   },
 ];
 export const searchFormSchema: FormSchema[] = [
