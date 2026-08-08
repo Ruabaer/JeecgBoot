@@ -15,6 +15,8 @@
   const emit = defineEmits(['success', 'register']);
   const title = ref<string>('');
   const isUpdate = ref<boolean>(false);
+  // 缓存编辑记录的id，因为validate()不会返回show:false的隐藏字段
+  const recordId = ref<string>('');
   // 注册 form
   //update-begin---author:wangshuai ---date:20221123  for：[VUEN-2807]消息模板加一个查看功能------------
   const [registerForm, { resetFields, setFieldsValue, validate, updateSchema, setProps }] = useForm({
@@ -36,6 +38,8 @@
     setModalProps({confirmLoading: false,showCancelBtn:!!data?.showFooter,showOkBtn:!!data?.showFooter});
     isUpdate.value = unref(data.isUpdate);
     title.value = unref(data.title);
+    // 缓存记录id
+    recordId.value = data.record?.id || '';
     await resetFields();
     await setFieldsValue({ ...data.record });
     // 隐藏底部时禁用整个表单
@@ -46,6 +50,10 @@
   async function onSubmit() {
     try {
       const values = await validate();
+      // validate()不返回show:false的字段，手动补回id
+      if (unref(isUpdate) && recordId.value) {
+        values.id = recordId.value;
+      }
       setModalProps({ confirmLoading: true });
       // 提交表单
       await saveOrUpdate(values, isUpdate);
@@ -58,3 +66,4 @@
     }
   }
 </script>
+

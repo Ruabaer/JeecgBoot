@@ -1,6 +1,7 @@
 import { BasicColumn, FormSchema } from '/@/components/Table';
 import { rules } from '/@/utils/helper/validator';
 import { filterDictTextByCache } from '/@/utils/dict/JDictSelectUtil';
+import { render } from '/@/utils/common/renderUtils';
 
 export const columns: BasicColumn[] = [
   {
@@ -25,7 +26,13 @@ export const columns: BasicColumn[] = [
     title: '模板类型',
     dataIndex: 'templateType',
     width: 100,
-    customRender: ({ text }) => filterDictTextByCache('msgType', text),
+    customRender: ({ text }) => filterDictTextByCache('msgType', text) || text,
+  },
+  {
+    title: '模板分类',
+    dataIndex: 'templateCategory',
+    width: 100,
+    customRender: ({ text }) => render.renderDict(text, 'msg_category') || text,
   },
   {
     title: '是否应用',
@@ -38,6 +45,11 @@ export const columns: BasicColumn[] = [
         return '否';
       }
     },
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'updateTime',
+    width: 160,
   },
 ];
 
@@ -58,6 +70,14 @@ export const searchFormSchema: FormSchema[] = [
     component: 'JDictSelectTag',
     componentProps: {
       dictCode: 'msgType',
+    },
+  },
+  {
+    label: '模板分类',
+    field: 'templateCategory',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: 'msg_category',
     },
   },
 ];
@@ -102,7 +122,7 @@ export const formSchemas: FormSchema[] = [
     field: 'templateCategory',
     component: 'JDictSelectTag',
     componentProps: {
-      dictCode: 'msgCategory',
+      dictCode: 'msg_category',
       placeholder: '请选择模板分类',
     }
   },
