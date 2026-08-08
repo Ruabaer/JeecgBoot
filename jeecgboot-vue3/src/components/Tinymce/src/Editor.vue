@@ -154,7 +154,6 @@
           // 添加以下粘贴相关配置
           paste_data_images: true, // 允许粘贴图片
           paste_as_text: false, // 不以纯文本粘贴
-          paste_retain_style_properties: 'all', // 保留所有样式属性
           paste_webkit_styles: 'all', // 保留webkit样式
           paste_merge_formats: true, // 合并格式
           paste_block_drop: true, // 允许拖放粘贴
