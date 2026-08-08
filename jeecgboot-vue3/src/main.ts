@@ -23,15 +23,21 @@ import { useAppStoreWithOut } from "@/store/modules/app";
 
 // 程序入口
 async function main() {
-  if (checkIsQiankunMicro()) {
-    // 【JEECG作为乾坤子应用】以乾坤子应用模式启动
-    // await autoUseQiankunMicro(bootstrap)
-    await autoUseQiankunMicro(bootstrap)
-  } else {
-    // 获取参数
-    const props = getMainAppProps();
-    // 普通启动
-    await bootstrap(props)
+  try {
+    if (checkIsQiankunMicro()) {
+      // 【JEECG作为乾坤子应用】以乾坤子应用模式启动
+      await autoUseQiankunMicro(bootstrap);
+    } else {
+      // 获取参数
+      const props = getMainAppProps();
+      // 普通启动
+      await bootstrap(props);
+    }
+  } catch (err: any) {
+    console.error('--- 应用启动/服务器连接异常 ---', err);
+    if (window['__showStartupError__']) {
+      window['__showStartupError__'](err);
+    }
   }
 }
 

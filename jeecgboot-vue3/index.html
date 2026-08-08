@@ -37,6 +37,118 @@
           color: rgba(255, 255, 255, 0.85);
         }
 
+        html[data-theme='dark'] .app-startup-error {
+          background-color: #1f293d;
+          border-color: #303d54;
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        html[data-theme='dark'] .app-startup-error .app-startup-error-title {
+          color: rgba(255, 255, 255, 0.88);
+        }
+
+        html[data-theme='dark'] .app-startup-error .app-startup-error-sub {
+          color: rgba(255, 255, 255, 0.65);
+        }
+
+        html[data-theme='dark'] .app-startup-error .app-startup-error-detail {
+          background-color: #141b27;
+          color: #ff7875;
+          border-color: #2a364d;
+        }
+
+        .app-startup-error {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 32px 24px;
+          background-color: #ffffff;
+          border: 1px solid #f0f0f0;
+          border-radius: 12px;
+          box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.08), 0 9px 28px 0 rgba(0, 0, 0, 0.05);
+          max-width: 520px;
+          width: 90%;
+          margin: 0 auto;
+          text-align: center;
+          box-sizing: border-box;
+          animation: startupFadeIn 0.3s ease-in-out;
+        }
+
+        .app-startup-error-icon {
+          width: 64px;
+          height: 64px;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #fff2f0;
+          border-radius: 50%;
+          color: #ff4d4f;
+        }
+
+        .app-startup-error-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: rgba(0, 0, 0, 0.88);
+          margin-bottom: 12px;
+        }
+
+        .app-startup-error-sub {
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.65);
+          line-height: 1.6;
+          margin-bottom: 16px;
+        }
+
+        .app-startup-error-detail {
+          width: 100%;
+          max-height: 120px;
+          overflow-y: auto;
+          font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+          font-size: 12px;
+          background-color: #fafafa;
+          border: 1px solid #f0f0f0;
+          border-radius: 6px;
+          padding: 10px 12px;
+          color: #cf1322;
+          text-align: left;
+          word-break: break-all;
+          white-space: pre-wrap;
+          margin-bottom: 20px;
+          box-sizing: border-box;
+        }
+
+        .app-startup-error-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          height: 38px;
+          padding: 0 24px;
+          font-size: 14px;
+          font-weight: 500;
+          color: #ffffff;
+          background-color: #1890ff;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+        }
+
+        .app-startup-error-btn:hover {
+          background-color: #40a9ff;
+        }
+
+        .app-startup-error-btn:active {
+          background-color: #096dd9;
+        }
+
+        @keyframes startupFadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
         .app-loading {
           display: flex;
           width: 100%;
@@ -165,6 +277,62 @@
         </div>
       </div>
     </div>
+    <script>
+      (function () {
+        function escapeHtml(str) {
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+
+        window.__showStartupError__ = function (err) {
+          var appEl = document.getElementById('app');
+          if (!appEl) return;
+          var loadingEl = appEl.querySelector('.app-loading');
+          if (loadingEl || !appEl.hasChildNodes() || appEl.querySelector('.app-startup-error')) {
+            var rawMsg = (err && (err.message || err.stack || String(err))) || '未知网络/服务器连接异常';
+            var safeMsg = escapeHtml(rawMsg);
+            appEl.innerHTML = `
+              <div class="app-loading">
+                <div class="app-startup-error">
+                  <div class="app-startup-error-icon">
+                    <svg viewBox="64 64 896 896" focusable="false" data-icon="close-circle" width="36" height="36" fill="currentColor" aria-hidden="true">
+                      <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm165.4 618.2l-66 66L512 578 400.6 689.4l-66-66L446 512 334.6 400.6l66-66L512 446l111.4-111.4 66 66L578 512l111.4 111.4z"></path>
+                    </svg>
+                  </div>
+                  <div class="app-startup-error-title">无法连接服务器 / 加载异常</div>
+                  <div class="app-startup-error-sub">系统检测到网络连接异常或服务器无法访问，请检查后端服务运行状态及网络连接。</div>
+                  <div class="app-startup-error-detail">${safeMsg}</div>
+                  <button class="app-startup-error-btn" onclick="window.location.reload()">重新加载页面</button>
+                </div>
+              </div>
+            `;
+          }
+        };
+
+        window.addEventListener(
+          'error',
+          function (e) {
+            if (document.querySelector('#app .app-loading')) {
+              var target = e.target || e.srcElement;
+              var src = target && (target.src || target.href || target.currentSrc);
+              var msg = e.message || (src ? '资源加载失败: ' + src : '网络连接拒绝 (ERR_CONNECTION_REFUSED)');
+              window.__showStartupError__(msg);
+            }
+          },
+          true
+        );
+
+        window.addEventListener('unhandledrejection', function (e) {
+          if (document.querySelector('#app .app-loading')) {
+            window.__showStartupError__(e.reason);
+          }
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
