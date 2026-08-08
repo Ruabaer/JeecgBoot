@@ -6,17 +6,20 @@ export const columns: BasicColumn[] = [
   {
     title: '模板标题',
     dataIndex: 'templateName',
-    width: 80,
+    width: 140,
+    ellipsis: true,
   },
   {
     title: '模板编码',
     dataIndex: 'templateCode',
-    width: 100,
+    width: 140,
+    ellipsis: true,
   },
   {
     title: '通知模板',
     dataIndex: 'templateContent',
-    width: 150,
+    width: 260,
+    ellipsis: true,
   },
   {
     title: '模板类型',

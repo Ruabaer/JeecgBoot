@@ -51,8 +51,16 @@
       title: '消息中心模板列表数据',
       api: list,
       columns: columns,
+      canResize: true,
+      scroll: { x: 'max-content' },
       formConfig: {
         schemas: searchFormSchema,
+      },
+      actionColumn: {
+        width: 180,
+        title: '操作',
+        dataIndex: 'action',
+        slots: { customRender: 'action' },
       },
     },
     exportConfig: {
