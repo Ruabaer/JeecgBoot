@@ -3,9 +3,7 @@ package org.jeecg.common.system.util;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.system.annotation.EnumDict;
 import org.jeecg.common.system.vo.DictModel;
-import org.jeecg.common.util.SpringContextUtils;
 import org.jeecg.common.util.oConvertUtils;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -35,7 +33,7 @@ public class ResourceUtil {
             "org.jeecg.common.constant.enums",
             "org.jeecg.modules.message.enums"
     };
-    
+
     /**
      * 枚举字典数据
      */
@@ -44,7 +42,7 @@ public class ResourceUtil {
      * 所有枚举java类
      */
 
-    private final static String CLASS_ENUM_PATTERN="/**/*Enum.class";
+    private final static String CLASS_ENUM_PATTERN = "/**/*Enum.class";
 
     /**
      * 初始化状态标识
@@ -91,7 +89,8 @@ public class ResourceUtil {
 
         // 扫描多个包路径
         for (String basePackage : BASE_SCAN_PACKAGES) {
-            String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils.convertClassNameToResourcePath(basePackage) + CLASS_ENUM_PATTERN;
+            String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+                    + ClassUtils.convertClassNameToResourcePath(basePackage) + CLASS_ENUM_PATTERN;
 
             try {
                 Resource[] resources = resourcePatternResolver.getResources(pattern);
@@ -163,7 +162,8 @@ public class ResourceUtil {
     }
 
     /**
-     * 用于后端字典翻译 SysDictServiceImpl#queryManyDictByKeys(java.util.List, java.util.List)
+     * 用于后端字典翻译 SysDictServiceImpl#queryManyDictByKeys(java.util.List,
+     * java.util.List)
      *
      * @param dictCodeList 字典编码列表
      * @param keys         键值列表
@@ -193,5 +193,5 @@ public class ResourceUtil {
         }
         return map;
     }
-    
+
 }

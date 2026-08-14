@@ -17,11 +17,11 @@ import java.util.List;
  * 
  */
 public class JeecgDataAutorUtils {
-	
+
 	public static final String MENU_DATA_AUTHOR_RULES = "MENU_DATA_AUTHOR_RULES";
-	
+
 	public static final String MENU_DATA_AUTHOR_RULE_SQL = "MENU_DATA_AUTHOR_RULE_SQL";
-	
+
 	public static final String SYS_USER_INFO = "SYS_USER_INFO";
 
 	/**
@@ -30,18 +30,18 @@ public class JeecgDataAutorUtils {
 	 * @param request
 	 * @param dataRules
 	 */
-	public static synchronized void installDataSearchConditon(HttpServletRequest request, List<SysPermissionDataRuleModel> dataRules) {
-		@SuppressWarnings("unchecked")
-        // 1.先从request获取MENU_DATA_AUTHOR_RULES，如果存则获取到LIST
-		List<SysPermissionDataRuleModel> list = (List<SysPermissionDataRuleModel>)loadDataSearchConditon();
-		if (list==null) {
+	public static synchronized void installDataSearchConditon(HttpServletRequest request,
+			List<SysPermissionDataRuleModel> dataRules) {
+		// 1.先从request获取MENU_DATA_AUTHOR_RULES，如果存则获取到LIST
+		List<SysPermissionDataRuleModel> list = (List<SysPermissionDataRuleModel>) loadDataSearchConditon();
+		if (list == null) {
 			// 2.如果不存在，则new一个list
 			list = new ArrayList<SysPermissionDataRuleModel>();
 		}
 		for (SysPermissionDataRuleModel tsDataRule : dataRules) {
 			list.add(tsDataRule);
 		}
-        // 3.往list里面增量存指
+		// 3.往list里面增量存指
 		request.setAttribute(MENU_DATA_AUTHOR_RULES, list);
 	}
 
@@ -52,8 +52,9 @@ public class JeecgDataAutorUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static synchronized List<SysPermissionDataRuleModel> loadDataSearchConditon() {
-		return (List<SysPermissionDataRuleModel>) SpringContextUtils.getHttpServletRequest().getAttribute(MENU_DATA_AUTHOR_RULES);
-				
+		return (List<SysPermissionDataRuleModel>) SpringContextUtils.getHttpServletRequest()
+				.getAttribute(MENU_DATA_AUTHOR_RULES);
+
 	}
 
 	/**
@@ -74,12 +75,13 @@ public class JeecgDataAutorUtils {
 	public static synchronized void installDataSearchConditon(HttpServletRequest request, String sql) {
 		String ruleSql = (String) loadDataSearchConditonSqlString();
 		if (!StringUtils.hasText(ruleSql)) {
-			request.setAttribute(MENU_DATA_AUTHOR_RULE_SQL,sql);
+			request.setAttribute(MENU_DATA_AUTHOR_RULE_SQL, sql);
 		}
 	}
 
 	/**
 	 * 将用户信息存到request
+	 * 
 	 * @param request
 	 * @param userinfo
 	 */
@@ -89,6 +91,7 @@ public class JeecgDataAutorUtils {
 
 	/**
 	 * 将用户信息存到request
+	 * 
 	 * @param userinfo
 	 */
 	public static synchronized void installUserInfo(SysUserCacheInfo userinfo) {
@@ -97,10 +100,11 @@ public class JeecgDataAutorUtils {
 
 	/**
 	 * 从request获取用户信息
+	 * 
 	 * @return
 	 */
 	public static synchronized SysUserCacheInfo loadUserInfo() {
 		return (SysUserCacheInfo) SpringContextUtils.getHttpServletRequest().getAttribute(SYS_USER_INFO);
-				
+
 	}
 }
